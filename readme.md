@@ -48,7 +48,7 @@
         - information you gave away (your range)
     3. EV of each card played at each step
 - Implement for Uruguayan truco
-- nicer file spearation (hands, truco, etc, helpers)
+- nicer file spearation (hands, truco, etc) - make sure we reuse generic functions (truco)
 
 ### References
 https://quanam.com/todo-lo-que-siempre-quisiste-saber-del-truco-uruguayo/
