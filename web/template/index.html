@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truco Web</title>
+    <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        #counter {
+            font-size: 2rem;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Hello World</h1>
+        <p>Welcome to the Truco Web App</p>
+
+        <div id="counter">0</div>
+
+        <button hx-post="/add" hx-target="#counter"
+            hx-vals='js:{counter: document.getElementById("counter").innerText}'>
+            Add 1
+        </button>
+    </div>
+</body>
+
+</html>
