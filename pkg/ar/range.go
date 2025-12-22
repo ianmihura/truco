@@ -1,6 +1,24 @@
-package main
+package ar
 
-import "slices"
+import (
+	"slices"
+	"truco/pkg/math"
+)
+
+// Return all cards in `cards` that dont belong to list eCards
+func CardsExcluding(cards, eCards []Card) []Card {
+	cards_ := make([]Card, 0, len(cards))
+	excluded := make(map[Card]bool)
+	for _, c := range eCards {
+		excluded[c] = true
+	}
+	for _, c := range cards {
+		if !excluded[c] {
+			cards_ = append(cards_, c)
+		}
+	}
+	return cards_
+}
 
 // Returns true only if all `cards` belong in `iCards`
 func isEveryCardIncluded(cards, iCards []Card) bool {
@@ -19,10 +37,10 @@ func isEveryCardIncluded(cards, iCards []Card) bool {
 // - if len(mCards) == 3, then len(hands) == 1
 // - if len(mCards) == 0, then len(hands) == pick(aCards, 3)
 func cardRangeNoEnvido(aCards, mCards []Card) []Hand {
-	hands := make([]Hand, 0, int(pick(len(aCards), 3)))
+	hands := make([]Hand, 0, int(math.Pick(len(aCards), 3)))
 
 	var hand Hand
-	combo := Combinations(aCards, 3)
+	combo := math.Combinations(aCards, 3)
 	for cs := range combo {
 		if isEveryCardIncluded(mCards, cs) {
 			hand = Hand{}

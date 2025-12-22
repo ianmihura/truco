@@ -1,7 +1,8 @@
-package main
+package ar
 
 import (
 	"slices"
+	"truco/pkg/math"
 )
 
 // Simulates two hands being played in Truco, in the orther they were given
@@ -62,11 +63,11 @@ func (mHand Hand) TrucoBeatsSorted(oHand Hand) bool {
 
 // returns count of beats-losses of mHand against oHand
 func (mHand Hand) TrucoBeatsAll(oHand Hand) (score int) {
-	mPerms := Permutations(mHand, 3)
-	oPerms := Permutations(oHand, 3)
+	mPerms := math.Permutations(mHand, 3)
+	oPerms := math.Permutations(oHand, 3)
 	for mH := range mPerms {
 		for oH := range oPerms {
-			score += TrucoBeats(mH, oH)
+			score += TrucoBeats(Hand(mH), Hand(oH))
 		}
 	}
 	return score
@@ -78,14 +79,14 @@ func (mHand Hand) TrucoBeatsAll(oHand Hand) (score int) {
 // counts times it wins, minus losses. averages the result dividing by 36:
 // range of score = (-36 to 36)
 func (mHand Hand) TrucoStrength() float32 {
-	mPerms := Permutations(mHand, 3)
+	mPerms := math.Permutations(mHand, 3)
 	aCards := CardsExcluding(ALL_CARDS, mHand)
-	oPerms := Permutations(aCards, 3)
+	oPerms := math.Permutations(aCards, 3)
 	var score int
 	for mH := range mPerms {
 		for oH := range oPerms {
-			score += TrucoBeats(mH, oH)
+			score += TrucoBeats(Hand(mH), Hand(oH))
 		}
 	}
-	return float32(score) / pick(37, 3)
+	return float32(score) / math.Pick(37, 3)
 }

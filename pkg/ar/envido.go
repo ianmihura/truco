@@ -1,4 +1,6 @@
-package main
+package ar
+
+import "truco/pkg/math"
 
 // returns a list of all suits of the same n, eg.
 // n=1, returns []Card{1e, 1b, 1o, 1c}
@@ -31,9 +33,9 @@ func envidoPairs(score uint8) (comb []Hand) {
 		}
 	} else if score == 20 {
 		// two figures
-		for cards := range Combinations(FIGURES, 2) {
+		for cards := range math.Combinations(FIGURES, 2) {
 			if cards[0].s == cards[1].s {
-				comb = append(comb, cards)
+				comb = append(comb, Hand(cards))
 			}
 		}
 	} else {
@@ -47,10 +49,10 @@ func envidoPairs(score uint8) (comb []Hand) {
 				cardsToComb = append(getSuitCards(cardVal[v][0]), getSuitCards(cardVal[v][1])...)
 			}
 
-			for cards := range Combinations(cardsToComb, 2) {
+			for cards := range math.Combinations(cardsToComb, 2) {
 				if cards[0].s == cards[1].s { // same suit
 					if !cards[0].IsF() || !cards[1].IsF() { // exclude double figures
-						comb = append(comb, cards)
+						comb = append(comb, Hand(cards))
 					}
 				}
 			}
@@ -101,7 +103,7 @@ func EnvidoHands(score uint8) (hands []Hand) {
 			}
 
 			// Get combinations of 2 from candidates
-			for combo := range Combinations(candidates, 2) {
+			for combo := range math.Combinations(candidates, 2) {
 				// We need to ensure the 2 candidates are ALSO different suits from each other
 				if combo[0].s != combo[1].s {
 					h := make(Hand, 3)
@@ -118,12 +120,12 @@ func EnvidoHands(score uint8) (hands []Hand) {
 
 // Raw probability of having a certain envido score
 func PEnvido(score uint8) float32 {
-	return 0.0
+	return 0.0 // TODO
 }
 
 // Probability a given envido is the highest of the table, given mCards and other kCards
 func PHighestEnvido(score uint8, mCards, kCards []Card) float32 {
-	return 0.0
+	return 0.0 // TODO
 }
 
 /*

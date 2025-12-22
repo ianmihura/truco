@@ -1,4 +1,4 @@
-package main
+package ar
 
 // Possible cards needed for an envido,
 // indexed by the envido amount,

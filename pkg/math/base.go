@@ -1,4 +1,4 @@
-package main
+package math
 
 import (
 	"iter"
@@ -120,4 +120,20 @@ func Permutations[T any](items []T, r int) iter.Seq[[]T] {
 			}
 		}
 	}
+}
+
+// Hany factorial that multiplies x*...*x-l.
+// Same as doing x!/l!. Note that Fact(x, 1) == x!
+// Handy for a faster Pick function
+func Fact(x, l int) int {
+	if x <= l {
+		return l
+	} else {
+		return x * Fact(x-1, l)
+	}
+}
+
+// From n pick k
+func Pick(n, k int) float32 {
+	return float32(Fact(n, n-k+1)) / float32(Fact(k, 1))
 }

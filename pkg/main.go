@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"truco/pkg/ar"
+	"truco/pkg/math"
 )
 
 func main() {
@@ -27,15 +29,11 @@ func main() {
 	// mHand = Hand{{6, 'e'}, {7, 'b'}, {6, 'o'}}
 	// fmt.Println(mHand.TrucoStrength())
 
-	hands := Combinations(ALL_CARDS, 3)
-	var mHand Hand
+	hands := math.Combinations(ar.ALL_CARDS, 3)
+	var mHand ar.Hand
 	for h := range hands {
-		mHand = Hand(h)
+		mHand = ar.Hand(h)
 		mHand.Print()
 		fmt.Print(" scores: ", mHand.TrucoStrength(), "\n")
 	}
-}
-
-func read() {
-
 }
