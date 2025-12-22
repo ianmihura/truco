@@ -21,8 +21,8 @@ func TestSortCards(t *testing.T) {
 	sorted := []uint8{7, 5, 3, 1, 1, 12, 10, 11}
 
 	for i := range len(strs) {
-		if strs[i].n != sorted[i] {
-			t.Errorf("Error sorting Hand, at index %d got %d, expected %d", i, strs[i].n, sorted[i])
+		if strs[i].N != sorted[i] {
+			t.Errorf("Error sorting Hand, at index %d got %d, expected %d", i, strs[i].N, sorted[i])
 		}
 	}
 }
@@ -217,10 +217,10 @@ func equalHands(h1, h2 Hand) bool {
 	s1 := make([]string, len(h1))
 	s2 := make([]string, len(h2))
 	for i := range h1 {
-		s1[i] = string(h1[i].s) + string(rune(h1[i].n)) // Rough key
+		s1[i] = string(h1[i].S) + string(rune(h1[i].N)) // Rough key
 	}
 	for i := range h2 {
-		s2[i] = string(h2[i].s) + string(rune(h2[i].n))
+		s2[i] = string(h2[i].S) + string(rune(h2[i].N))
 	}
 	// Better: sort cards and compare
 	// But Hand struct doesn't strictly define sort.

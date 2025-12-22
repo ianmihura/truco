@@ -2,7 +2,7 @@ package ar
 
 // Possible cards needed for an envido,
 // indexed by the envido amount,
-// mapped to a list of possible card number (Card.n)
+// mapped to a list of possible card number (Card.N)
 //
 //	1-7
 //	f -> 10,11,12

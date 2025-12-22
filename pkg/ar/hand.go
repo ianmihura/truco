@@ -11,11 +11,11 @@ type Hand []Card
 // cmp func to sort Cards in a Hand, highest envido value first:
 // 7-1,10,11,12
 func sortForEnvido(a, b Card) int {
-	an := a.n
+	an := a.N
 	if an >= 10 {
 		an = 0
 	}
-	bn := b.n
+	bn := b.N
 	if bn >= 10 {
 		bn = 0
 	}
@@ -34,9 +34,9 @@ func sortForTruco(a, b Card) int {
 func (h Hand) EnvidoCards() *Hand {
 	slices.SortFunc(h, sortForEnvido)
 
-	s0 := h[0].s
-	s1 := h[1].s
-	s2 := h[2].s
+	s0 := h[0].S
+	s1 := h[1].S
+	s2 := h[2].S
 
 	if s0 == s1 && s1 == s2 {
 		// flor, highest envido for now
@@ -61,14 +61,6 @@ func (h Hand) Envido() uint8 {
 	} else {
 		return (*cards)[0].Envido() + (*cards)[1].Envido() + 20
 	}
-}
-
-// Full value of hand
-func (h Hand) Truco() (s uint8) {
-	for _, c := range h {
-		s += c.Truco()
-	}
-	return s
 }
 
 func (h Hand) Print() {

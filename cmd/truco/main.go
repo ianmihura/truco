@@ -1,51 +1,26 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
-	"sync"
-)
-
-// Global state for the counter (simple demo)
-var (
-	counter int
-	mu      sync.Mutex
+	"truco/internal/server"
 )
 
 func main() {
 	// Parse templates
+	// Note: Adjust the path if running from a different directory or use absolute paths in production
 	tmpl, err := template.ParseGlob("web/template/*.html")
 	if err != nil {
 		log.Fatalf("Error parsing templates: %v", err)
 	}
 
-	// Handlers
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if err := tmpl.ExecuteTemplate(w, "index.html", nil); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	})
-
-	http.HandleFunc("/add", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-			return
-		}
-
-		mu.Lock()
-		counter++
-		currentVal := counter
-		mu.Unlock()
-
-		// Return just the new number as HTML (HTMX swaps this into the target)
-		fmt.Fprintf(w, "%d", currentVal)
-	})
+	// Initialize Server
+	srv := server.NewServer(tmpl)
 
 	// Start server
 	log.Println("Server starting on :8080...")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	if err := http.ListenAndServe(":8080", srv); err != nil {
 		log.Fatal(err)
 	}
 }

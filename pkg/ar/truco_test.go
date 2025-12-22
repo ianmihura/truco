@@ -1,6 +1,8 @@
 package ar
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestTrucoBeats(t *testing.T) {
 	// Cases from the request

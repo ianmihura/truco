@@ -34,7 +34,7 @@ func envidoPairs(score uint8) (comb []Hand) {
 	} else if score == 20 {
 		// two figures
 		for cards := range math.Combinations(FIGURES, 2) {
-			if cards[0].s == cards[1].s {
+			if cards[0].S == cards[1].S {
 				comb = append(comb, Hand(cards))
 			}
 		}
@@ -50,7 +50,7 @@ func envidoPairs(score uint8) (comb []Hand) {
 			}
 
 			for cards := range math.Combinations(cardsToComb, 2) {
-				if cards[0].s == cards[1].s { // same suit
+				if cards[0].S == cards[1].S { // same suit
 					if !cards[0].IsF() || !cards[1].IsF() { // exclude double figures
 						comb = append(comb, Hand(cards))
 					}
@@ -71,9 +71,9 @@ func EnvidoHands(score uint8) (hands []Hand) {
 			// we need 1 more card of DIFFERENT suit.
 			// rank does not matter for the 3rd card as it doesn't affect envido score
 			// (envido score is determined by the 2 same-suit cards).
-			suit := p[0].s
+			suit := p[0].S
 			for _, c := range ALL_CARDS {
-				if c.s != suit {
+				if c.S != suit {
 					// Create new hand with the pair + this card
 					h := make(Hand, 3)
 					h[0] = p[0]
@@ -97,7 +97,7 @@ func EnvidoHands(score uint8) (hands []Hand) {
 			// Filter candidates: different suit than c1, and value <= c1.Envido()
 			var candidates []Card
 			for _, c := range ALL_CARDS {
-				if c.s != c1.s && c.Envido() <= c1.Envido() {
+				if c.S != c1.S && c.Envido() <= c1.Envido() {
 					candidates = append(candidates, c)
 				}
 			}
@@ -105,7 +105,7 @@ func EnvidoHands(score uint8) (hands []Hand) {
 			// Get combinations of 2 from candidates
 			for combo := range math.Combinations(candidates, 2) {
 				// We need to ensure the 2 candidates are ALSO different suits from each other
-				if combo[0].s != combo[1].s {
+				if combo[0].S != combo[1].S {
 					h := make(Hand, 3)
 					h[0] = c1
 					h[1] = combo[0]
