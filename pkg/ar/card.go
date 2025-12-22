@@ -10,6 +10,20 @@ type Card struct {
 	S uint8 // Suit: e,b,o,c (espada, basto, oro, copa)
 }
 
+// Returns a new Card from a string: Card{c[0], c[1]}.
+//
+//	"1e" -> Card{1, 'e'}
+//	"10e" -> Card{10, 'e'}
+func NewCard(c string) Card {
+	if len(c) == 2 {
+		return Card{c[0] - '0', c[1]}
+	} else if len(c) == 3 {
+		return Card{10 + (c[1] - '0'), c[2]}
+	} else {
+		return Card{}
+	}
+}
+
 // Value of card for envido (-20)
 func (c Card) Envido() uint8 {
 	if c.N <= 7 {
@@ -26,6 +40,27 @@ func (c Card) Truco() uint8 {
 // Is a figure (10, 11, 12)
 func (c Card) IsF() bool {
 	return c.N >= 10
+}
+
+// string representation of card
+func (c Card) ToString() string {
+	return fmt.Sprintf("%d%c", c.N, c.S)
+}
+
+// Returns the rank of the card. Eg.
+//   - 1e -> 1e
+//   - 2c -> 2
+//   - 7c -> 7f
+func (c Card) ToRank() string {
+	if c.Truco() > 10 {
+		// 1e, 1b, 7e, 7b
+		return fmt.Sprintf("%d%c", c.N, c.S)
+	} else if c.N == 1 || c.N == 7 {
+		// 1f, 7f
+		return fmt.Sprintf("%df", c.N)
+	} else {
+		return string(c.N)
+	}
 }
 
 func (c Card) Print() {

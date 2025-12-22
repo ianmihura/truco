@@ -21,14 +21,14 @@
     </script>
 </head>
 
-<body class="bg-slate-900 text-slate-100 font-sans flex flex-col items-center min-h-screen p-8">
+<body class="bg-slate-900 text-slate-100 font-sans flex flex-col items-center min-h-screen p-2">
 
     <h1
-        class="mb-8 font-bold text-center text-4xl bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+        class="mb-4 font-bold text-center text-2xl bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
         Truco Argentino
     </h1>
 
-    <div class="grid grid-cols-[repeat(14,minmax(0,1fr))] gap-px bg-slate-900 border border-slate-900 rounded-lg overflow-hidden shadow-2xl max-w-7xl w-full"
+    <div class="grid grid-cols-[repeat(14,minmax(0,1fr))] gap-px bg-slate-900 border border-slate-900 rounded-lg overflow-hidden shadow-2xl max-w-5xl w-full"
         id="matrix">
         <!-- JS will populate this -->
     </div>
@@ -36,9 +36,10 @@
     <script>
         const ranks = ["1e", "1b", "7e", "7o", "3", "2", "1f", "12", "11", "10", "7f", "6", "5", "4"];
         const matrix = document.getElementById('matrix');
+        const stats = {{ .}}; // injected from Go
 
         // Common cell classes
-        const baseCellClass = 'p-2 flex items-center justify-center text-sm font-medium cursor-pointer transition-all duration-200 select-none aspect-square relative';
+        const baseCellClass = 'p-1 flex items-center justify-center font-medium cursor-pointer transition-all duration-200 select-none aspect-square relative leading-tight';
         const hoverEffects = 'hover:bg-blue-300 hover:scale-105 hover:z-10 hover:shadow-lg hover:text-slate-900';
         const activeEffects = 'active:scale-95';
 
@@ -53,19 +54,33 @@
                     // Diagonal
                     cell.className = `${baseCellClass} bg-slate-700 text-slate-400 cursor-default`;
                     cell.textContent = rowRank;
-                } else if (j > i) {
-                    // Upper Triangle - With Envido
-                    cell.className = `${cellClasses} bg-blue-500 text-white ${hoverEffects}`;
-                    cell.textContent = `${rowRank} ${colRank}`;
-                    cell.title = `Hand: ${rowRank} + ${colRank} (With Envido)`;
-                    cell.onclick = () => console.log(`Clicked: ${rowRank} + ${colRank} [Envido]`);
                 } else {
-                    // Lower Triangle - No Envido
-                    // This includes the diagonal elements that weren't caught by the first if-statement
-                    cell.className = `${cellClasses} bg-blue-600 text-white/80 ${hoverEffects}`;
-                    cell.textContent = `${colRank} ${rowRank}`;
-                    cell.title = `Hand: ${colRank} + ${rowRank} (No Envido)`;
-                    cell.onclick = () => console.log(`Clicked: ${colRank} + ${rowRank} [No Envido]`);
+                    // Determine key for lookup (ensure proper order or check both)
+                    // The Go backend sorted them by strength descending. 
+                    // To be safe, we check "A B" and "B A" or ensure we replicate the sort.
+                    // But simpler: check "Row Col" and "Col Row"
+                    let key = `${rowRank} ${colRank}`;
+                    let val = stats[key];
+                    if (val === undefined) {
+                        key = `${colRank} ${rowRank}`;
+                        val = stats[key];
+                    }
+
+                    const score = val !== undefined ? val.toFixed(1) : "";
+
+                    if (j > i) {
+                        // Upper Triangle - With Envido
+                        cell.className = `${cellClasses} bg-blue-500 text-white ${hoverEffects}`;
+                        cell.innerHTML = `${rowRank} ${colRank}<br><span class="text-[0.6rem] opacity-80">${score}</span>`;
+                        cell.title = `Hand: ${rowRank} + ${colRank} (With Envido) - Score: ${score}`;
+                        cell.onclick = () => console.log(`Clicked: ${rowRank} + ${colRank} [Envido]`);
+                    } else {
+                        // Lower Triangle - No Envido
+                        cell.className = `${cellClasses} bg-blue-600 text-white/80 ${hoverEffects}`;
+                        cell.innerHTML = `${colRank} ${rowRank}<br><span class="text-[0.6rem] opacity-80">${score}</span>`;
+                        cell.title = `Hand: ${colRank} + ${rowRank} (No Envido) - Score: ${score}`;
+                        cell.onclick = () => console.log(`Clicked: ${colRank} + ${rowRank} [No Envido]`);
+                    }
                 }
 
                 matrix.appendChild(cell);
