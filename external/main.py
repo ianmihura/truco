@@ -1,5 +1,4 @@
 import csv
-import matplotlib.pyplot as plt
 from data import *
 
 
@@ -18,6 +17,11 @@ def main():
             data.append(row)
     data.sort(key=lambda d: d['truco_score'])
     print(data)
+
+    with open('./../truco_strength_sorted.csv', mode='w') as f:
+        writer = csv.DictWriter(f, fieldnames=['hand', 'truco_score'])
+        writer.writeheader()
+        writer.writerows(data)
 
     # hands = [" ".join(d['hand']) for d in data]
     # scores = [d['truco_score'] for d in data]
