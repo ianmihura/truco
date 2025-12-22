@@ -21,15 +21,15 @@
     - Individual cards
 
 ### TODO UI:
-- choose your hand similar to poker GTO (see .odt)
+- hot reload
 - choose mCards and kCards out of a 4x10 matrix
     then also choose an envido
 - Separate between arg & uru
-- Make it easier for user to choose their hand
+- choose your hand similar to poker GTO (see .odt)
     - table of best 2 cards (ar)14x14 or (uy)14x19
     - sub-choose third (worst) card
-    - sub-sub-choose envido
-    - 2-3 click choose muestra
+    - sub-choose envido (optional)
+- 2-3 click choose muestra
 - How many players?
 
 ### TODO backend 

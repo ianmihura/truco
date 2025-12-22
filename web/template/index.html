@@ -4,46 +4,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Truco Web</title>
+    <title>Truco Hand Strategies</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@2.0.0"></script>
-    <style>
-        body {
-            font-family: sans-serif;
-            padding: 2rem;
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bg: '#0f172a',
+                        grid: '#1e293b',
+                    }
+                }
+            }
         }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-
-        #counter {
-            font-size: 2rem;
-            margin: 20px 0;
-            font-weight: bold;
-        }
-    </style>
+    </script>
 </head>
 
-<body>
-    <div class="container">
-        <h1>Hello World</h1>
-        <p>Welcome to the Truco Web App</p>
+<body class="bg-slate-900 text-slate-100 font-sans flex flex-col items-center min-h-screen p-8">
 
-        <div id="counter">0</div>
+    <h1
+        class="mb-8 font-bold text-center text-4xl bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+        Truco Argentino
+    </h1>
 
-        <button hx-post="/add" hx-target="#counter"
-            hx-vals='js:{counter: document.getElementById("counter").innerText}'>
-            Add 1
-        </button>
+    <div class="grid grid-cols-[repeat(14,minmax(0,1fr))] gap-px bg-slate-900 border border-slate-900 rounded-lg overflow-hidden shadow-2xl max-w-7xl w-full"
+        id="matrix">
+        <!-- JS will populate this -->
     </div>
+
+    <script>
+        const ranks = ["1e", "1b", "7e", "7o", "3", "2", "1f", "12", "11", "10", "7f", "6", "5", "4"];
+        const matrix = document.getElementById('matrix');
+
+        // Common cell classes
+        const baseCellClass = 'p-2 flex items-center justify-center text-sm font-medium cursor-pointer transition-all duration-200 select-none aspect-square relative';
+        const hoverEffects = 'hover:bg-blue-300 hover:scale-105 hover:z-10 hover:shadow-lg hover:text-slate-900';
+        const activeEffects = 'active:scale-95';
+
+        // Create Grid Rows
+        ranks.forEach((rowRank, i) => {
+            // Cells
+            ranks.forEach((colRank, j) => {
+                const cell = document.createElement('div');
+                const cellClasses = `${baseCellClass} ${activeEffects}`;
+
+                if (i === j && ["1e", "1b", "7e", "7o"].includes(rowRank)) {
+                    // Diagonal
+                    cell.className = `${baseCellClass} bg-slate-700 text-slate-400 cursor-default`;
+                    cell.textContent = rowRank;
+                } else if (j > i) {
+                    // Upper Triangle - With Envido
+                    cell.className = `${cellClasses} bg-blue-500 text-white ${hoverEffects}`;
+                    cell.textContent = `${rowRank} ${colRank}`;
+                    cell.title = `Hand: ${rowRank} + ${colRank} (With Envido)`;
+                    cell.onclick = () => console.log(`Clicked: ${rowRank} + ${colRank} [Envido]`);
+                } else {
+                    // Lower Triangle - No Envido
+                    // This includes the diagonal elements that weren't caught by the first if-statement
+                    cell.className = `${cellClasses} bg-blue-600 text-white/80 ${hoverEffects}`;
+                    cell.textContent = `${colRank} ${rowRank}`;
+                    cell.title = `Hand: ${colRank} + ${rowRank} (No Envido)`;
+                    cell.onclick = () => console.log(`Clicked: ${colRank} + ${rowRank} [No Envido]`);
+                }
+
+                matrix.appendChild(cell);
+            });
+        });
+
+    </script>
 </body>
 
 </html>
