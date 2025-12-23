@@ -57,8 +57,11 @@
         - information you have on others (their range)
         - information you gave away (your range)
     3. EV of each card played at each step
-- Implement for Uruguayan truco
-- nicer file spearation (hands, truco, etc) - make sure we reuse generic functions (truco)
+- Implement for Uruguayan truco (make sure to reuse generic functions)
 
 ### References
 https://quanam.com/todo-lo-que-siempre-quisiste-saber-del-truco-uruguayo/
+
+### Next steps
+- Reduce the amount of js in the matrix file. This can be done by passing some of the logic to go, and allow generation of html in the backend (as htmx is meant to do). It will help that later we need to be able to change the hand_stats.csv file dynamically (remove some impossible hands, given known information). This means that the function 
+

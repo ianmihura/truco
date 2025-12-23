@@ -5,79 +5,152 @@
 </div>
 
 <script>
-    let stats = {};
+    let pairStats = {};
+    let currentSelectedKey = null;
 
     const COLOR_CONFIG = {
-        // Low score color (HSL format: [hue, saturation%, lightness%])
-        lowScore: [25, 85, 40],      // Red: hsl(0, 85%, 50%)
-        // High score color (HSL format: [hue, saturation%, lightness%])
-        highScore: [90, 85, 50],   // Blue: hsl(210, 85%, 55%)
-        // Text color threshold (scores above this use dark text, below use light text)
+        lowScore: [25, 85, 40],
+        highScore: [90, 85, 50],
         textThreshold: 0.6
     };
 
-    /**
-     * Interpolates between two HSL colors based on a value between 0 and 1
-     */
-    function getColorForScore(score) {
-        if (score === undefined) {
-            return 'hsl(220, 15%, 30%)'; // Default gray for missing data
+    // score: value to map color to
+    // range: max value score can have
+    //   If score is not evenly distributed try with higher or lower range,
+    //   or pass 1 if value is already normalized
+    function getColorForScore(score, range) {
+        if (score === undefined || isNaN(score)) {
+            return 'hsl(220, 15%, 30%)';
         }
-
         const [h1, s1, l1] = COLOR_CONFIG.lowScore;
         const [h2, s2, l2] = COLOR_CONFIG.highScore;
-
-        // Clamp score between 0 and 1
-        const t = Math.max(0, Math.min(1, score));
-
-        // Interpolate each HSL component
+        const t = score / range;
         const h = h1 + (h2 - h1) * t;
         const s = s1 + (s2 - s1) * t;
         const l = l1 + (l2 - l1) * t;
-
         return `hsl(${h}, ${s}%, ${l}%)`;
     }
 
-    /**
-     * Determines text color based on score
-     */
-    function getTextColorForScore(score) {
-        return 'rgb(15, 23, 42)'
-        if (score === null || score === undefined) {
-            return 'rgb(148, 163, 184)'; // slate-400
-        }
-        return score >= COLOR_CONFIG.textThreshold ? 'rgb(15, 23, 42)' : 'rgb(255, 255, 255)';
-    }
-
-    // Fetch and parse the CSV file
     async function loadStats() {
         try {
-            const response = await fetch('/static/pair_strength.csv');
+            const response = await fetch('/static/pair_stats.csv');
             const csvText = await response.text();
-
-            // Parse CSV into object
             const lines = csvText.trim().split('\n');
-            // Skip header row
+            const header = lines[0].split(',');
+
             for (let i = 1; i < lines.length; i++) {
-                const [pair, strength] = lines[i].split(',');
-                if (pair && strength) {
-                    stats[pair] = parseFloat(strength);
+                const values = lines[i].split(',');
+                const data = {};
+                header.forEach((col, index) => {
+                    data[col] = index === 0 ? values[index] : parseFloat(values[index]);
+                });
+                if (data.pair) {
+                    pairStats[data.pair] = data;
                 }
             }
-
-            // Initialize the matrix after stats are loaded
             initMatrix();
         } catch (error) {
             console.error('Failed to load pair strengths:', error);
         }
     }
 
+    function formatValue(val, precision = 2) {
+        if (val === undefined || isNaN(val)) return 'N/A';
+        return val.toFixed(precision);
+    }
+
+    function updateStatsPanel(key, isEnvido) {
+        const data = pairStats[key];
+        const placeholder = document.getElementById('stats-placeholder');
+        const content = document.getElementById('stats-content');
+
+        if (!data) {
+            placeholder.classList.remove('hidden');
+            content.classList.add('hidden');
+            return;
+        }
+
+        placeholder.classList.add('hidden');
+        content.classList.remove('hidden');
+
+        const [c1, c2] = key.split(' ');
+
+        content.innerHTML = `
+            <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-xl animate-in fade-in slide-in-from-right-4 duration-300">
+                <div class="bg-gradient-to-r from-blue-600/20 to-emerald-600/20 p-6 border-b border-slate-700">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-slate-400 text-xs font-bold uppercase tracking-wider">Selected Pair</span>
+                        <span class="bg-slate-700 text-slate-300 text-[10px] px-2 py-0.5 rounded-full font-mono">${isEnvido ? data.count_w_e : data.count} possible hands</span>
+                    </div>
+                    <h2 class="text-4xl font-black text-white flex items-center gap-3">
+                        ${c1}<span class="text-slate-500 font-light">&</span>${c2}
+                    </h2>
+                </div>
+                
+                <div class="p-6 space-y-6">
+                    <!-- Truco Stats -->
+                    <section>
+                        <h3 class="text-blue-400 text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                            Truco Stats
+                        </h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
+                                <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Mean</p>
+                                <p class="text-xl font-bold text-slate-200">${formatValue(data.truco_mean, 3)}</p>
+                            </div>
+                            <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
+                                <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Median</p>
+                                <p class="text-xl font-bold text-slate-200">${formatValue(data.truco_median, 3)}</p>
+                            </div>
+                            <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
+                                <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Max</p>
+                                <p class="text-xl font-bold text-emerald-400">${formatValue(data.truco_max, 3)}</p>
+                            </div>
+                            <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
+                                <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Min</p>
+                                <p class="text-xl font-bold text-red-400">${formatValue(data.truco_min, 3)}</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Divider -->
+                    <div class="border-t border-slate-700/50"></div>
+
+                    <section>
+                        <h3 class="text-emerald-400 text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            Envido Stats (WIP)
+                        </h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
+                                <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Average</p>
+                                <p class="text-xl font-bold text-slate-200">${formatValue(isEnvido ? data.envido_mean_w_e : data.envido_mean, 1)}</p>
+                            </div>
+                            <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
+                                <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Median</p>
+                                <p class="text-xl font-bold text-slate-200">${formatValue(isEnvido ? data.envido_median_w_e : data.envido_median, 0)}</p>
+                            </div>
+                            <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
+                                <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Max</p>
+                                <p class="text-xl font-bold text-emerald-400 font-mono">${data.envido_max || 0}</p>
+                            </div>
+                            <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
+                                <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Min</p>
+                                <p class="text-xl font-bold text-red-400 font-mono">${isEnvido ? data.envido_min_w_e : data.envido_min || 0}</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        `;
+    }
+
     function initMatrix() {
-        // Ѻ 🗡 Ų 𒓧
-        const ranks = ["1e", "1b", "7e", "7o", "3𝅃", "2𝅃", "1f", "12", "11", "10", "7f", "6𝅃", "5𝅃", "4𝅃"];
+        const ranks = ["1e", "1b", "7e", "7o", "3", "2", "1f", "12", "11", "10", "7f", "6", "5", "4"];
         const matrix = document.getElementById('matrix');
 
-        const baseCellClass = 'p-1 flex items-start justify-start font-medium cursor-pointer transition-all duration-200 select-none aspect-[4/3] relative leading-tight uppercase';
+        const baseCellClass = 'p-1 flex items-start justify-start font-medium cursor-pointer transition-all duration-200 select-none aspect-[4/3] relative leading-tight uppercase text-[10px]';
         const hoverEffects = 'hover:scale-105 hover:z-10 hover:shadow-lg';
         const activeEffects = 'active:scale-95';
 
@@ -91,37 +164,46 @@
                     cell.textContent = rowRank;
                 } else {
                     let key = `${rowRank} ${colRank}`;
-                    let val = stats[key];
-                    if (val === undefined) {
+                    let data = pairStats[key];
+                    if (!data) {
                         key = `${colRank} ${rowRank}`;
-                        val = stats[key];
+                        data = pairStats[key];
                     }
 
-                    const score = val ? val.toFixed(1) : "";
-                    const bgColor = getColorForScore(val);
-                    const textColor = getTextColorForScore(val);
+                    const isEnvido = j > i;
+
+                    let val;
+                    if (isEnvido) {
+                        val = data.truco_mean + (data.envido_mean_w_e / 33);
+                    } else {
+                        val = data.truco_mean + (data.envido_mean / 33);
+                    }
+
+                    const bgColor = getColorForScore(val, 2);
 
                     cell.className = `${cellClasses} ${hoverEffects}`;
                     cell.style.backgroundColor = bgColor;
-                    cell.style.color = textColor;
+                    cell.style.color = 'rgb(15, 23, 42)';
 
-                    if (j > i) {
-                        cell.innerHTML = `${rowRank} ${colRank}`;
-                        cell.title = `Hand: ${rowRank} + ${colRank} (With Envido) - Score: ${score}`;
-                        cell.onclick = () => console.log(`Clicked: ${rowRank} + ${colRank} [Envido]`);
+                    if (isEnvido) {
+                        cell.innerHTML = `${rowRank}<br>${colRank}`;
                     } else {
-                        cell.innerHTML = `${colRank} ${rowRank}`;
-                        cell.title = `Hand: ${colRank} + ${rowRank} (No Envido) - Score: ${score}`;
-                        cell.onclick = () => console.log(`Clicked: ${colRank} + ${rowRank} [No Envido]`);
+                        cell.innerHTML = `${colRank}<br>${rowRank}`;
                     }
-                }
 
+                    cell.onclick = () => {
+                        // Highlight selection (optional enhancement)
+                        document.querySelectorAll('#matrix > div').forEach(c => c.style.outline = 'none');
+                        cell.style.outline = '2px solid white';
+                        cell.style.outlineOffset = '-2px';
+                        updateStatsPanel(key, isEnvido);
+                    };
+                }
                 matrix.appendChild(cell);
             });
         });
     }
 
-    // Load stats and initialize matrix
     loadStats();
 </script>
 {{ end }}

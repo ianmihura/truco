@@ -6,20 +6,15 @@ import (
 )
 
 func main() {
-
-	// hands := math.Combinations(ar.ALL_CARDS, 3)
-	// var mHand ar.Hand
-	// for h := range hands {
-	// 	mHand = ar.Hand(h)
-	// 	mHand.Print()
-	// 	fmt.Print(" scores: ", mHand.TrucoStrength(), "\n")
+	// if err := ar.CreateHandStatsCSV("web/static/hand_stats.csv"); err != nil {
+	// 	fmt.Println("Error generating hand strength CSV:", err)
+	// } else {
+	// 	fmt.Println("Successfully generated hand strength CSV in web/static/hand_stats.csv")
 	// }
 
-	// TODO integrate stats into a concurrent pipeline to generate hand_strength.csv
-
-	if err := ar.PairStatsToCSV("web/static/hand_strength.csv", "web/static/pair_strength.csv"); err != nil {
+	if err := ar.CreatePairStatsCSV("web/static/hand_stats.csv", "web/static/pair_stats.csv"); err != nil {
 		fmt.Println("Error generating pair stats:", err)
 	} else {
-		fmt.Println("Successfully generated pair stats with envido info in web/static/pair_strength.csv")
+		fmt.Println("Successfully generated pair stats with envido info in web/static/pair_stats.csv")
 	}
 }

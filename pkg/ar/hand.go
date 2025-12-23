@@ -8,9 +8,9 @@ import (
 // Slice of Cards of any length
 type Hand []Card
 
-// cmp func to sort Cards in a Hand, highest envido value first:
+// SortForEnvido cmp func to sort Cards in a Hand, highest envido value first:
 // 7-1,10,11,12
-func sortForEnvido(a, b Card) int {
+func SortForEnvido(a, b Card) int {
 	an := a.N
 	if an >= 10 {
 		an = 0
@@ -23,16 +23,16 @@ func sortForEnvido(a, b Card) int {
 	return int(bn) - int(an)
 }
 
-// cmp func to sort Cards in a Hand, highest truco value first.
+// SortForTruco cmp func to sort Cards in a Hand, highest truco value first.
 // Uses TRUCO map in data.go
-func sortForTruco(a, b Card) int {
+func SortForTruco(a, b Card) int {
 	return int(b.Truco()) - int(a.Truco())
 }
 
 // Returns a sub-hand of the given hand
 // of the cards that count for envido (2 or 1 card)
 func (h Hand) EnvidoCards() *Hand {
-	slices.SortFunc(h, sortForEnvido)
+	slices.SortFunc(h, SortForEnvido)
 
 	s0 := h[0].S
 	s1 := h[1].S

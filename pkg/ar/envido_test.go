@@ -16,7 +16,7 @@ func TestSortCards(t *testing.T) {
 		Card{11, 0},
 		Card{1, 0},
 	}
-	slices.SortFunc(strs, sortForEnvido)
+	slices.SortFunc(strs, SortForEnvido)
 
 	sorted := []uint8{7, 5, 3, 1, 1, 12, 10, 11}
 

@@ -53,10 +53,10 @@ func TrucoBeats(mHand, oHand Hand) int {
 }
 
 // returns true if my sorted hand beats the other sorted hand, or if there's
-// a full tie (assumes i am 'mano': first player)
+// a full tie (assumes mHand wins ties: is first player)
 func (mHand Hand) TrucoBeatsSorted(oHand Hand) bool {
-	slices.SortFunc(mHand, sortForTruco)
-	slices.SortFunc(oHand, sortForTruco)
+	slices.SortFunc(mHand, SortForTruco)
+	slices.SortFunc(oHand, SortForTruco)
 
 	return TrucoBeats(mHand, oHand) >= 0
 }
