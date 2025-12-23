@@ -1,10 +1,6 @@
 package main
 
-import (
-	"fmt"
-	"truco/pkg/ar"
-	"truco/pkg/math"
-)
+import "truco/pkg/ar"
 
 func main() {
 	// h := Hand{Card{3, 'e'}, Card{4, 'e'}, Card{3, 'b'}}
@@ -29,11 +25,13 @@ func main() {
 	// mHand = Hand{{6, 'e'}, {7, 'b'}, {6, 'o'}}
 	// fmt.Println(mHand.TrucoStrength())
 
-	hands := math.Combinations(ar.ALL_CARDS, 3)
-	var mHand ar.Hand
-	for h := range hands {
-		mHand = ar.Hand(h)
-		mHand.Print()
-		fmt.Print(" scores: ", mHand.TrucoStrength(), "\n")
-	}
+	// hands := math.Combinations(ar.ALL_CARDS, 3)
+	// var mHand ar.Hand
+	// for h := range hands {
+	// 	mHand = ar.Hand(h)
+	// 	mHand.Print()
+	// 	fmt.Print(" scores: ", mHand.TrucoStrength(), "\n")
+	// }
+
+	ar.PairStrengthsToCSV("./truco_strength_avg.csv")
 }

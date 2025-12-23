@@ -1,0 +1,82 @@
+{{ define "matrix" }}
+<div class="grid grid-cols-[repeat(14,minmax(0,1fr))] gap-px bg-slate-900 border border-slate-900 rounded-lg overflow-hidden shadow-2xl max-w-5xl w-full"
+    id="matrix">
+    <!-- JS will populate this -->
+</div>
+
+<script>
+    let stats = {};
+
+    // Fetch and parse the CSV file
+    async function loadStats() {
+        try {
+            const response = await fetch('/static/pair_strength.csv');
+            const csvText = await response.text();
+
+            // Parse CSV into object
+            const lines = csvText.trim().split('\n');
+            // Skip header row
+            for (let i = 1; i < lines.length; i++) {
+                const [pair, strength] = lines[i].split(',');
+                if (pair && strength) {
+                    stats[pair] = parseFloat(strength);
+                }
+            }
+
+            // Initialize the matrix after stats are loaded
+            initMatrix();
+        } catch (error) {
+            console.error('Failed to load pair strengths:', error);
+        }
+    }
+
+    function initMatrix() {
+        const ranks = ["1e", "1b", "7e", "7o", "3", "2", "1f", "12", "11", "10", "7f", "6", "5", "4"];
+        const matrix = document.getElementById('matrix');
+
+        const baseCellClass = 'p-1 flex items-center justify-center font-medium cursor-pointer transition-all duration-200 select-none aspect-square relative leading-tight';
+        const hoverEffects = 'hover:bg-blue-300 hover:scale-105 hover:z-10 hover:shadow-lg hover:text-slate-900';
+        const activeEffects = 'active:scale-95';
+
+        console.log(stats)
+
+        ranks.forEach((rowRank, i) => {
+            ranks.forEach((colRank, j) => {
+                const cell = document.createElement('div');
+                const cellClasses = `${baseCellClass} ${activeEffects}`;
+
+                if (i === j && ["1e", "1b", "7e", "7o"].includes(rowRank)) {
+                    cell.className = `${baseCellClass} bg-slate-700 text-slate-400 cursor-default`;
+                    cell.textContent = rowRank;
+                } else {
+                    let key = `${rowRank} ${colRank}`;
+                    let val = stats[key];
+                    if (val === undefined) {
+                        key = `${colRank} ${rowRank}`;
+                        val = stats[key];
+                    }
+
+                    const score = val !== undefined ? val.toFixed(1) : "";
+
+                    if (j > i) {
+                        cell.className = `${cellClasses} bg-blue-500 text-white ${hoverEffects}`;
+                        cell.innerHTML = `${rowRank} ${colRank}<br><span class="text-[0.6rem] opacity-80">${score}</span>`;
+                        cell.title = `Hand: ${rowRank} + ${colRank} (With Envido) - Score: ${score}`;
+                        cell.onclick = () => console.log(`Clicked: ${rowRank} + ${colRank} [Envido]`);
+                    } else {
+                        cell.className = `${cellClasses} bg-blue-600 text-white/80 ${hoverEffects}`;
+                        cell.innerHTML = `${colRank} ${rowRank}<br><span class="text-[0.6rem] opacity-80">${score}</span>`;
+                        cell.title = `Hand: ${colRank} + ${rowRank} (No Envido) - Score: ${score}`;
+                        cell.onclick = () => console.log(`Clicked: ${colRank} + ${rowRank} [No Envido]`);
+                    }
+                }
+
+                matrix.appendChild(cell);
+            });
+        });
+    }
+
+    // Load stats and initialize matrix
+    loadStats();
+</script>
+{{ end }}

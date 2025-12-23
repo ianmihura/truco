@@ -26,6 +26,10 @@ func (s *Server) routes() {
 	homeHandler := pages.NewHomeHandler(s.Tmpl)
 	counterHandler := partials.NewCounterHandler()
 
+	// Serve static files
+	fs := http.FileServer(http.Dir("web/static"))
+	s.Handle("/static/", http.StripPrefix("/static/", fs))
+
 	// Register Routes
 	s.Handle("/", homeHandler)
 	s.Handle("/add", counterHandler)

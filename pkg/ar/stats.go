@@ -63,3 +63,36 @@ func PairStrengths(csvPath string) (map[string]float64, error) {
 	}
 	return averages, nil
 }
+
+func PairStrengthsToCSV(outputPath string) error {
+	f, err := os.Create(outputPath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	writer := csv.NewWriter(f)
+	defer writer.Flush()
+
+	// Write header
+	if err := writer.Write([]string{"pair", "average_strength"}); err != nil {
+		return err
+	}
+
+	pairStrengths, err := PairStrengths("truco_strength.csv")
+	if err != nil {
+		return err
+	}
+
+	for pair, strength := range pairStrengths {
+		row := []string{
+			pair,
+			fmt.Sprintf("%f", strength),
+		}
+		if err := writer.Write(row); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}

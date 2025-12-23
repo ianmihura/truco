@@ -59,7 +59,7 @@ func (c Card) ToRank() string {
 		// 1f, 7f
 		return fmt.Sprintf("%df", c.N)
 	} else {
-		return string(c.N)
+		return fmt.Sprintf("%d", c.N)
 	}
 }
 

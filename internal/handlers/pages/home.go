@@ -2,10 +2,8 @@ package pages
 
 import (
 	"encoding/json"
-	"fmt"
 	"html/template"
 	"net/http"
-	"truco/pkg/ar"
 )
 
 type HomeHandler struct {
@@ -16,13 +14,14 @@ type HomeHandler struct {
 func NewHomeHandler(tmpl *template.Template) *HomeHandler {
 	// Load stats (hardcoded path for now, typical in this setup)
 	// In a real app, inject this dependency or config.
-	data, err := ar.PairStrengths("truco_strength.csv")
-	if err != nil {
-		// Log error but continue with empty data to avoid crash
-		fmt.Printf("Error loading stats: %v\n", err)
-		data = make(map[string]float64)
-	}
-	return &HomeHandler{Tmpl: tmpl, Data: data}
+
+	// data, err := ar.PairStrengths("truco_strength.csv")
+	// if err != nil {
+	// 	// Log error but continue with empty data to avoid crash
+	// 	fmt.Printf("Error loading stats: %v\n", err)
+	// 	data = make(map[string]float64)
+	// }
+	return &HomeHandler{Tmpl: tmpl}
 }
 
 func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
