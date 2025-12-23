@@ -7,6 +7,48 @@
 <script>
     let stats = {};
 
+    const COLOR_CONFIG = {
+        // Low score color (HSL format: [hue, saturation%, lightness%])
+        lowScore: [25, 85, 40],      // Red: hsl(0, 85%, 50%)
+        // High score color (HSL format: [hue, saturation%, lightness%])
+        highScore: [90, 85, 50],   // Blue: hsl(210, 85%, 55%)
+        // Text color threshold (scores above this use dark text, below use light text)
+        textThreshold: 0.6
+    };
+
+    /**
+     * Interpolates between two HSL colors based on a value between 0 and 1
+     */
+    function getColorForScore(score) {
+        if (score === undefined) {
+            return 'hsl(220, 15%, 30%)'; // Default gray for missing data
+        }
+
+        const [h1, s1, l1] = COLOR_CONFIG.lowScore;
+        const [h2, s2, l2] = COLOR_CONFIG.highScore;
+
+        // Clamp score between 0 and 1
+        const t = Math.max(0, Math.min(1, score));
+
+        // Interpolate each HSL component
+        const h = h1 + (h2 - h1) * t;
+        const s = s1 + (s2 - s1) * t;
+        const l = l1 + (l2 - l1) * t;
+
+        return `hsl(${h}, ${s}%, ${l}%)`;
+    }
+
+    /**
+     * Determines text color based on score
+     */
+    function getTextColorForScore(score) {
+        return 'rgb(15, 23, 42)'
+        if (score === null || score === undefined) {
+            return 'rgb(148, 163, 184)'; // slate-400
+        }
+        return score >= COLOR_CONFIG.textThreshold ? 'rgb(15, 23, 42)' : 'rgb(255, 255, 255)';
+    }
+
     // Fetch and parse the CSV file
     async function loadStats() {
         try {
@@ -31,14 +73,13 @@
     }
 
     function initMatrix() {
-        const ranks = ["1e", "1b", "7e", "7o", "3", "2", "1f", "12", "11", "10", "7f", "6", "5", "4"];
+        // Ѻ 🗡 Ų 𒓧
+        const ranks = ["1e", "1b", "7e", "7o", "3𝅃", "2𝅃", "1f", "12", "11", "10", "7f", "6𝅃", "5𝅃", "4𝅃"];
         const matrix = document.getElementById('matrix');
 
-        const baseCellClass = 'p-1 flex items-center justify-center font-medium cursor-pointer transition-all duration-200 select-none aspect-square relative leading-tight';
-        const hoverEffects = 'hover:bg-blue-300 hover:scale-105 hover:z-10 hover:shadow-lg hover:text-slate-900';
+        const baseCellClass = 'p-1 flex items-start justify-start font-medium cursor-pointer transition-all duration-200 select-none aspect-[4/3] relative leading-tight uppercase';
+        const hoverEffects = 'hover:scale-105 hover:z-10 hover:shadow-lg';
         const activeEffects = 'active:scale-95';
-
-        console.log(stats)
 
         ranks.forEach((rowRank, i) => {
             ranks.forEach((colRank, j) => {
@@ -56,16 +97,20 @@
                         val = stats[key];
                     }
 
-                    const score = val !== undefined ? val.toFixed(1) : "";
+                    const score = val ? val.toFixed(1) : "";
+                    const bgColor = getColorForScore(val);
+                    const textColor = getTextColorForScore(val);
+
+                    cell.className = `${cellClasses} ${hoverEffects}`;
+                    cell.style.backgroundColor = bgColor;
+                    cell.style.color = textColor;
 
                     if (j > i) {
-                        cell.className = `${cellClasses} bg-blue-500 text-white ${hoverEffects}`;
-                        cell.innerHTML = `${rowRank} ${colRank}<br><span class="text-[0.6rem] opacity-80">${score}</span>`;
+                        cell.innerHTML = `${rowRank} ${colRank}`;
                         cell.title = `Hand: ${rowRank} + ${colRank} (With Envido) - Score: ${score}`;
                         cell.onclick = () => console.log(`Clicked: ${rowRank} + ${colRank} [Envido]`);
                     } else {
-                        cell.className = `${cellClasses} bg-blue-600 text-white/80 ${hoverEffects}`;
-                        cell.innerHTML = `${colRank} ${rowRank}<br><span class="text-[0.6rem] opacity-80">${score}</span>`;
+                        cell.innerHTML = `${colRank} ${rowRank}`;
                         cell.title = `Hand: ${colRank} + ${rowRank} (No Envido) - Score: ${score}`;
                         cell.onclick = () => console.log(`Clicked: ${colRank} + ${rowRank} [No Envido]`);
                     }

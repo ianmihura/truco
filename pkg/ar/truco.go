@@ -61,7 +61,7 @@ func (mHand Hand) TrucoBeatsSorted(oHand Hand) bool {
 	return TrucoBeats(mHand, oHand) >= 0
 }
 
-// returns count of beats-losses of mHand against oHand
+// returns count of beats-losses of all permutations of mHand against oHand
 func (mHand Hand) TrucoBeatsAll(oHand Hand) (score int) {
 	mPerms := math.Permutations(mHand, 3)
 	oPerms := math.Permutations(oHand, 3)
@@ -73,7 +73,7 @@ func (mHand Hand) TrucoBeatsAll(oHand Hand) (score int) {
 	return score
 }
 
-// strength of a hand in truco
+// strength of a hand in truco (brute force)
 //
 // plays the hand against all other hands, in all possible permutations.
 // counts times it wins, minus losses. averages the result dividing by 36:

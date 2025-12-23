@@ -21,29 +21,23 @@
     - Individual cards
 
 ### TODO UI:
-- hot reload
 - choose mCards and kCards out of a 4x10 matrix
     then also choose an envido
 - Separate between arg & uru
-- choose your hand similar to poker GTO (see .odt)
-    - table of best 2 cards (ar)14x14 or (uy)14x19
-    - sub-choose third (worst) card
-    - sub-choose envido (optional)
-- 2-3 click choose muestra
-- How many players?
-- ON CLICK
+- num players
+- on click
+    ### finish identifying your hand:
     - choose the third card
     - choose envido
-
+    ### stats:
     - % chance you can get this hand
-    - change other squares to show what's the chance of other hands
-
+    <!-- - update color of other hands, to show chance of other hands
+        given you blocked the one you're olding -->
     - strength (truco and envido)
     - % hands you can win (similar to strength)
 - main matrix: relevant info
     - que cartas puedo tener - my range
     - que chance hay que mis cartas sean las mejores de la mesa - strength
-
     - que cartas puede tener el otro
 
 

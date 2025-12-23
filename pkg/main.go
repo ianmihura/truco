@@ -1,29 +1,11 @@
 package main
 
-import "truco/pkg/ar"
+import (
+	"fmt"
+	"truco/pkg/ar"
+)
 
 func main() {
-	// h := Hand{Card{3, 'e'}, Card{4, 'e'}, Card{3, 'b'}}
-	// h.Println()
-
-	// r := CardRange(127, []Card{{10, 'c'}, {4, 'e'}}, []Card{{10, 'o'}, {5, 'e'}})
-	// for i := range r {
-	// 	r[i].Println()
-	// }
-
-	// h := []Card{{10, 'c'}, {4, 'e'}, {1, 'e'}, {7, 'o'}, {1, 'b'}, {2, 'o'}}
-	// slices.SortFunc(h, sortForTruco)
-	// fmt.Println(h)
-
-	// var mHand, oHand Hand
-	// mHand = Hand{{2, 'b'}, {3, 'o'}, {4, 'b'}}
-	// oHand = Hand{{7, 'b'}, {7, 'o'}, {4, 'o'}}
-	// fmt.Println(mHand.TrucoBeatsAll(oHand))
-
-	// mHand = Hand{{1, 'e'}, {6, 'o'}, {7, 'e'}}
-	// mHand = Hand{{1, 'e'}, {1, 'b'}, {7, 'e'}}
-	// mHand = Hand{{6, 'e'}, {7, 'b'}, {6, 'o'}}
-	// fmt.Println(mHand.TrucoStrength())
 
 	// hands := math.Combinations(ar.ALL_CARDS, 3)
 	// var mHand ar.Hand
@@ -33,5 +15,11 @@ func main() {
 	// 	fmt.Print(" scores: ", mHand.TrucoStrength(), "\n")
 	// }
 
-	ar.PairStrengthsToCSV("./truco_strength_avg.csv")
+	// TODO integrate stats into a concurrent pipeline to generate hand_strength.csv
+
+	if err := ar.PairStatsToCSV("web/static/hand_strength.csv", "web/static/pair_strength.csv"); err != nil {
+		fmt.Println("Error generating pair stats:", err)
+	} else {
+		fmt.Println("Successfully generated pair stats with envido info in web/static/pair_strength.csv")
+	}
 }
