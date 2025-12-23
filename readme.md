@@ -31,6 +31,22 @@
     - sub-choose envido (optional)
 - 2-3 click choose muestra
 - How many players?
+- ON CLICK
+    - choose the third card
+    - choose envido
+
+    - % chance you can get this hand
+    - change other squares to show what's the chance of other hands
+
+    - strength (truco and envido)
+    - % hands you can win (similar to strength)
+- main matrix: relevant info
+    - que cartas puedo tener - my range
+    - que chance hay que mis cartas sean las mejores de la mesa - strength
+
+    - que cartas puede tener el otro
+
+
 
 ### TODO backend 
 - chance that your hand is best in table, given known info
