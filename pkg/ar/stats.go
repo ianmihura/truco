@@ -141,19 +141,27 @@ func getCSVReader(csvPath string) ([][]string, error) {
 	return r, nil
 }
 
-// CreatePairStatsCSV reads hand strengths and computes detailed stats per pair,
+// Reads hand strengths (output of previous function) and computes stats per pair,
 // including max, min, mean, and median envido scores.
+//
+// This will get executed very often: every time there's a state change in the frontend.
+// The frontend uses it's output for stats and color coding the matrix
 func CreatePairStatsCSV(inputPath, outputPath string) error {
 	records, err := getCSVReader(inputPath)
 	if err != nil {
 		return err
 	}
 
+	type statsKey struct {
+		pair     string
+		isEnvido bool
+	}
+
 	type pairData struct {
 		scores  []float64
 		envidos []int
 	}
-	statsMap := make(map[string]*pairData)
+	statsMap := make(map[statsKey]*pairData)
 
 	for i, row := range records {
 		if i == 0 && (strings.HasPrefix(row[0], "hand") || strings.Contains(row[0], "score")) {
@@ -179,11 +187,14 @@ func CreatePairStatsCSV(inputPath, outputPath string) error {
 		// Full hand for envido
 		h := Hand{NewCard(cards[0]), NewCard(cards[1]), NewCard(cards[2])}
 		envido := int(h.Envido())
+		isEnvido := envido >= 20
 
 		// Key: first two cards (matches existing PairStrengths logic)
 		r0 := NewCard(cards[0]).ToRank()
 		r1 := NewCard(cards[1]).ToRank()
-		key := fmt.Sprintf("%s %s", r0, r1)
+		pairKey := fmt.Sprintf("%s %s", r0, r1)
+
+		key := statsKey{pair: pairKey, isEnvido: isEnvido}
 
 		if statsMap[key] == nil {
 			statsMap[key] = &pairData{}
@@ -204,49 +215,57 @@ func CreatePairStatsCSV(inputPath, outputPath string) error {
 	// Write header
 	header := []string{
 		"pair",
+		"is_envido",
 		"truco_max",
 		"truco_min",
 		"truco_mean",
 		"truco_median",
 		"envido_max",
 		"envido_min",
-		"envido_min_w_e",
 		"envido_mean",
-		"envido_mean_w_e",
 		"envido_median",
-		"envido_median_w_e",
+		"combined_mean",
 		"count",
-		"count_w_e",
 	}
 	if err := writer.Write(header); err != nil {
 		return err
 	}
 
 	// Sort keys for stable output
-	keys := make([]string, 0, len(statsMap))
-	for k := range statsMap {
-		keys = append(keys, k)
+	type sortedKey struct {
+		pair     string
+		isEnvido bool
 	}
-	sort.Strings(keys)
+	sortedKeys := make([]sortedKey, 0, len(statsMap))
+	for k := range statsMap {
+		sortedKeys = append(sortedKeys, sortedKey{k.pair, k.isEnvido})
+	}
+	sort.Slice(sortedKeys, func(i, j int) bool {
+		if sortedKeys[i].pair != sortedKeys[j].pair {
+			return sortedKeys[i].pair < sortedKeys[j].pair
+		}
+		return sortedKeys[i].isEnvido && !sortedKeys[j].isEnvido // envido (true) first
+	})
 
-	for _, k := range keys {
-		d := statsMap[k]
+	for _, k := range sortedKeys {
+		mapKey := statsKey{k.pair, k.isEnvido}
+		d := statsMap[mapKey]
 		if len(d.scores) == 0 {
 			continue
 		}
 
 		// Truco stats
 		sort.Float64s(d.scores)
+		count := len(d.scores)
 		minT := d.scores[0]
-		maxT := d.scores[len(d.scores)-1]
+		maxT := d.scores[count-1]
 		var sumS float64
 		for _, s := range d.scores {
 			sumS += s
 		}
-		meanT := sumS / float64(len(d.scores))
+		meanT := sumS / float64(count)
 
 		var medianT float64
-		count := len(d.scores)
 		if count%2 == 1 {
 			medianT = float64(d.scores[count/2])
 		} else {
@@ -256,21 +275,13 @@ func CreatePairStatsCSV(inputPath, outputPath string) error {
 		// Envido stats
 		sort.Ints(d.envidos)
 		minE := d.envidos[0]
-		maxE := d.envidos[len(d.envidos)-1]
-		minWE := maxE // will be lower than maxE but higher than minE
-		var sumE, sumWE, countWE int
+		maxE := d.envidos[count-1]
+		var sumE int
 		for _, e := range d.envidos {
 			sumE += e
-			if e >= 20 {
-				sumWE += e
-				countWE++
-				if e < minWE {
-					minWE = e
-				}
-			}
 		}
 		meanE := float64(sumE) / float64(count)
-		meanWE := float64(sumWE) / float64(countWE)
+
 		var medianE float64
 		if count%2 == 1 {
 			medianE = float64(d.envidos[count/2])
@@ -278,34 +289,21 @@ func CreatePairStatsCSV(inputPath, outputPath string) error {
 			medianE = float64(d.envidos[count/2-1]+d.envidos[count/2]) / 2.0
 		}
 
-		var medianWE float64
-		if countWE > 0 {
-			start := count - countWE
-			if countWE%2 == 1 {
-				medianWE = float64(d.envidos[start+countWE/2])
-			} else {
-				medianWE = float64(d.envidos[start+countWE/2-1]+d.envidos[start+countWE/2]) / 2.0
-			}
-		}
-
-		// TODO correct difference between envido and no envido pairs
-		// probably better to do it row-wise rather than column-wise
+		meanC := (meanT + meanE/33) / 2
 
 		writer.Write([]string{
-			k,
+			k.pair,
+			fmt.Sprintf("%v", k.isEnvido),
 			fmt.Sprintf("%.6f", maxT),
 			fmt.Sprintf("%.6f", minT),
 			fmt.Sprintf("%.6f", meanT),
 			fmt.Sprintf("%.6f", medianT),
 			fmt.Sprintf("%d", maxE),
 			fmt.Sprintf("%d", minE),
-			fmt.Sprintf("%d", minWE),
 			fmt.Sprintf("%.2f", meanE),
-			fmt.Sprintf("%.2f", meanWE),
 			fmt.Sprintf("%.1f", medianE),
-			fmt.Sprintf("%.1f", medianWE),
+			fmt.Sprintf("%.6f", meanC),
 			fmt.Sprintf("%d", count),
-			fmt.Sprintf("%d", countWE),
 		})
 	}
 
