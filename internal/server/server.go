@@ -25,6 +25,7 @@ func (s *Server) routes() {
 	// Initialize Handlers
 	homeHandler := pages.NewHomeHandler(s.Tmpl)
 	counterHandler := partials.NewCounterHandler()
+	trackerHandler := partials.NewTrackerHandler(s.Tmpl)
 
 	// Serve static files
 	fs := http.FileServer(http.Dir("web/static"))
@@ -33,4 +34,5 @@ func (s *Server) routes() {
 	// Register Routes
 	s.Handle("/", homeHandler)
 	s.Handle("/add", counterHandler)
+	s.Handle("/next-player", trackerHandler)
 }
