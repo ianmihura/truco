@@ -40,11 +40,11 @@
     - que chance hay que mis cartas sean las mejores de la mesa - strength
     - que cartas puede tener el otro
 
-
-
-### TODO backend 
+### add stats
 - chance that your hand is best in table, given known info
 - chance that your envido is best in table, given known info
+
+### TODO backend 
 - TrucoStrength does not capture the practical stregth, because there are some permutations that will never be reasoanably played. Eg:
     - Tie the first round, you should play your strongest card right away.
     - If you lost the first round, you should not tie any other round, unless you're loosing anyway.
@@ -57,11 +57,35 @@
         - information you have on others (their range)
         - information you gave away (your range)
     3. EV of each card played at each step
-- Implement for Uruguayan truco (make sure to reuse generic functions)
+
+### Uruguay
+- Make sure to reuse generic functions
 
 ### References
 https://quanam.com/todo-lo-que-siempre-quisiste-saber-del-truco-uruguayo/
 
-### Next steps
-- Reduce the amount of js in the matrix file. This can be done by passing some of the logic to go, and allow generation of html in the backend (as htmx is meant to do). It will help that later we need to be able to change the hand_stats.csv file dynamically (remove some impossible hands, given known information). This means that the function 
+----
 
+### Next steps
+- Track progress of a hand
+    As with GTOWizard, we need to be able to track the actions of every player during a hand. The matrix will constantly be updated every time some player makes an action
+- remake matrix to be a triangle - we dont really care for separation between envido and non envido
+    pasa que el envido es solo relevante en la primera mano
+        si ya anuncion que envido tiene, ya estamos mucho mas claros
+        pero si no anuncio, lo mas relevante va a ser que cartas tiene, y separarlas en 2 (en especial por la cuenta) seria medio dificil de ver en lo obvio
+- Element that shows list of cards, allows you to select a card
+- Finish selecting a hand in with a third click (maybe 2 clicks: number, suit)
+- Reduce the amount of js in the `matrix.html` file.
+    Pass some of the logic to go, and allow generation of html in the backend (as htmx is meant to do). It will help that later we need to be able to change the `hand_stats.csv` file dynamically (remove some impossible hands, given known information). 
+    This means that the function `CreatePairStatsCSV` will be called many times (every time we need to render the matrix)
+- Define what metrics are encoded with color in the matrix
+    We may need to show many stats, options:
+    - click and show a side panel of relevant info (current, all info, as in GTOWizard)
+    - color-code relevant stats for a first-glance intuition (use % bars in-hand to 2-3 dimensions)
+        color: can vary, but if its too complex, it breaks vertical and horizontal
+        vertical: must normalize
+        horizontal: must normalize
+
+        relevant metrics:
+        % strength (vary between combined and truco alone)
+        count (% chance that this is the hand)
