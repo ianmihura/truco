@@ -1,5 +1,7 @@
 # Solver for the game Truco, as played in Argentina and Uruguay
 
+![image](./screenshot.jpeg)
+
 ### Features
 1. Whats the chance of each sub-hand (given two best cards, with or without envido) -- only relevant if we have UI
 2. Given your hand
