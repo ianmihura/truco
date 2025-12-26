@@ -1,5 +1,8 @@
 package ar
 
+const MAX_ENVIDO = 33
+const NUM_PLAYERS = 4
+
 // Possible cards needed for an envido,
 // indexed by the envido amount,
 // mapped to a list of possible card number (Card.N)

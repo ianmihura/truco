@@ -41,6 +41,7 @@
     - que cartas puedo tener - my range
     - que chance hay que mis cartas sean las mejores de la mesa - strength
     - que cartas puede tener el otro
+- translate error messages from fsm
 
 ### add stats
 - chance that your hand is best in table, given known info
@@ -91,3 +92,44 @@ https://quanam.com/todo-lo-que-siempre-quisiste-saber-del-truco-uruguayo/
         relevant metrics:
         % strength (vary between combined and truco alone)
         count (% chance that this is the hand)
+
+### FSM
+[Example in golang](https://refactoring.guru/design-patterns/state/go/example)
+
+Actions:
+- jugar carta
+- cantar envido
+    - retrucar
+    - anunciar envido cant.
+- cantar truco
+    - retrucar
+    - quiero
+    - no quiero
+- al mazo
+
+Context:
+- players (4 players) and cards already played (round number)
+- current truco bet and who asked for it
+- current envido bet, who asked for it and score per player
+
+States (possible actions):
+- play (can play a card or ask for truco)
+- play env (same as play, and can ask for envido)
+- respond envido (can respond to asked)
+- respond real envido (can respond to asked)
+- respond falta envido (can respond to asked)
+- respond truco (can respond to asked)
+- respond retruco (can respond to asked)
+- respond vale 4 (can respond to asked)
+- announce (announces how much envido they have)
+
+Mechanics:
+- A chain (array or list) of actions
+- The frontend must: 
+    - Save the state
+    - Send it to the backend on each request
+    - UI interactions are easy: no state transition or interpretation
+- The backend must:
+    - Encode/decode state to and from the frontend
+    - Compute the FSM of possible jumps in state
+    - Enrich state with stats

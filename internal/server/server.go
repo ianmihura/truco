@@ -24,7 +24,6 @@ func NewServer(tmpl *template.Template) *Server {
 func (s *Server) routes() {
 	// Initialize Handlers
 	homeHandler := pages.NewHomeHandler(s.Tmpl)
-	counterHandler := partials.NewCounterHandler()
 	trackerHandler := partials.NewTrackerHandler(s.Tmpl)
 
 	// Serve static files
@@ -33,6 +32,5 @@ func (s *Server) routes() {
 
 	// Register Routes
 	s.Handle("/", homeHandler)
-	s.Handle("/add", counterHandler)
-	s.Handle("/next-player", trackerHandler)
+	s.Handle("/track-act", trackerHandler)
 }

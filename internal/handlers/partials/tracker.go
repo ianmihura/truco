@@ -7,15 +7,38 @@ import (
 
 type TrackerHandler struct {
 	tmpl *template.Template
+	data TrackerData
+}
+
+type TrackerData struct {
+	PlayerName string
+	Actions    []Action
+}
+
+// A single action a player can take
+type Action struct {
+	Name string
 }
 
 func NewTrackerHandler(tmpl *template.Template) *TrackerHandler {
-	return &TrackerHandler{tmpl: tmpl}
+	trackerData := TrackerData{
+		PlayerName: "tests",
+		Actions: []Action{
+			{"asd"},
+			{"asd"},
+		},
+	}
+	return &TrackerHandler{tmpl: tmpl, data: trackerData}
 }
 
 func (h *TrackerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// Simply return the player_card partial
-	err := h.tmpl.ExecuteTemplate(w, "player_card", nil)
+	// jsonData, err := json.Marshal(h.data)
+	// if err != nil {
+	// 	http.Error(w, "Failed to marshal stats", http.StatusInternalServerError)
+	// 	return
+	// }
+
+	err := h.tmpl.ExecuteTemplate(w, "action", h.data)
 	if err != nil {
 		http.Error(w, "Template error: "+err.Error(), http.StatusInternalServerError)
 	}
