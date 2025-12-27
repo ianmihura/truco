@@ -35,7 +35,7 @@ func (p *PlayingState) ask(requestE AskRequest) error {
 				}
 
 			} else {
-				p.match.cEnvidoAsk = (p.match.cEnvidoAsk + 1) % 4
+				p.match.cEnvidoAsk = (p.match.cEnvidoAsk + 1) % NUM_PLAYERS
 				if requestE == RequestFalta {
 					p.match.cEnvido = uint8(RequestFalta)
 					p.match.cEnvidoNo += 1 // TODO not correct

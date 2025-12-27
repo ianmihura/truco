@@ -16,8 +16,8 @@ func TestNewMatch(t *testing.T) {
 	if m.cState != m.playing {
 		t.Errorf("expected initial state to be playing")
 	}
-	if len(m.envidos) != 4 {
-		t.Errorf("expected 4 players in envidos, got %d", len(m.envidos))
+	if len(m.envidos) != NUM_PLAYERS {
+		t.Errorf("expected NUM_PLAYERS players in envidos, got %d", len(m.envidos))
 	}
 	for i, e := range m.envidos {
 		if e != 255 {

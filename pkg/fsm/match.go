@@ -11,6 +11,7 @@ const (
 	RequestEnvido AskRequest = 2
 	RequestReal   AskRequest = 3
 	RequestFalta  AskRequest = 255
+	NUM_PLAYERS              = 4
 )
 
 // FSM for a single match
@@ -65,12 +66,12 @@ type State interface {
 
 // Returns an empty object, with binding to all states
 func NewMatch() *Match {
-	cards := make([][]ar.Card, 4)
+	cards := make([][]ar.Card, NUM_PLAYERS)
 	for i := range cards {
 		cards[i] = make([]ar.Card, 3)
 	}
 
-	envidos := make([]uint8, 4)
+	envidos := make([]uint8, NUM_PLAYERS)
 	for i := range envidos {
 		envidos[i] = 255
 	}
@@ -135,12 +136,12 @@ func (m *Match) stateId() uint8 {
 
 // Truco player order
 func (m *Match) prevPlayer() uint8 {
-	return (m.cPlayer - 1) % 4
+	return (m.cPlayer - 1) % NUM_PLAYERS
 }
 
 // Truco player order
 func (m *Match) nextPlayer() uint8 {
-	return (m.cPlayer + 1) % 4
+	return (m.cPlayer + 1) % NUM_PLAYERS
 }
 
 // Current turn, 255=end
