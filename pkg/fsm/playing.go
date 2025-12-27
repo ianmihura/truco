@@ -19,6 +19,13 @@ func (p *PlayingState) play(card ar.Card) error {
 
 	p.match.Cards[p.match.CPlayer][turn] = card
 	p.match.CPlayer = p.match.nextPlayer()
+
+	turn = p.match.cTurn()
+	if turn == 255 {
+		// finished match
+		p.match.CState = p.match.End
+		return p.match.Play(card)
+	}
 	return nil
 }
 
@@ -86,21 +93,28 @@ func (p *PlayingState) stateId() uint8 {
 }
 
 func (p *PlayingState) validActions() []string {
-	// return []string{"play", "fold", "ask"}
-
-	// TODO check this:
 	actions := []string{"play", "fold"}
-	if p.match.CTruco < 4 && p.match.CTrucoAsk%2 != p.match.CPlayer%2 {
+
+	if p.match.CTruco == 1 {
 		actions = append(actions, "ask_truco")
+	} else if p.match.CTrucoAsk%2 != p.match.CPlayer%2 {
+		switch p.match.CTruco {
+		case 2:
+			actions = append(actions, "ask_retruco")
+		case 3:
+			actions = append(actions, "ask_vale_4")
+		}
 	}
+
 	if p.match.cTurn() == 0 {
 		if !p.match.IsEnvido {
-			if p.match.CPlayer >= 2 {
+			if p.match.CPlayer >= 2 && p.match.CEnvidoAsk == 255 {
 				actions = append(actions, "ask_envido")
 			}
 		} else {
 			actions = append(actions, "ask_envido")
 		}
 	}
+
 	return actions
 }
