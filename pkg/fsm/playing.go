@@ -22,6 +22,7 @@ func (p *PlayingState) play(card ar.Card) error {
 	return nil
 }
 
+// TODO make this into an ENUM
 // 0: truco, 1: envido, 2: real, 3: falta
 func (p *PlayingState) ask(requestE uint8) error {
 	if requestE > 0 {
@@ -42,6 +43,7 @@ func (p *PlayingState) ask(requestE uint8) error {
 				// TODO save complex envido info
 				p.match.cEnvido += 1 // TODO
 			}
+			p.match.cState = p.match.responding
 			return nil
 		} else {
 			return fmt.Errorf("You can't ask for envido")
@@ -56,6 +58,7 @@ func (p *PlayingState) ask(requestE uint8) error {
 			p.match.cTrucoAsk = p.match.cPlayer
 			p.match.isEnvido = false
 			// p.match.cTruco changes in accept action
+			p.match.cState = p.match.responding
 			return nil
 		} else {
 			return fmt.Errorf("You can't ask for truco")

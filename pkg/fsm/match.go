@@ -55,9 +55,9 @@ type State interface {
 
 // Returns an empty object, with binding to all states
 func NewMatch() *Match {
-	cards := make([][]ar.Card, 3)
+	cards := make([][]ar.Card, 4)
 	for i := range cards {
-		cards[i] = make([]ar.Card, 4)
+		cards[i] = make([]ar.Card, 3)
 	}
 
 	envidos := make([]uint8, 4)
@@ -101,6 +101,8 @@ func (m *Match) bindStates() {
 	m.end = &EndState{match: m}
 }
 
+// TODO dosctrings for functions
+
 func (m *Match) play(card ar.Card) error {
 	return m.cState.play(card)
 }
@@ -140,7 +142,7 @@ func (m *Match) cTurn() uint8 {
 	for t := range m.cards {
 		for p := range m.cards[t] {
 			if m.cards[t][p].N == 0 {
-				return uint8(t)
+				return uint8(p)
 			}
 		}
 	}

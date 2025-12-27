@@ -11,13 +11,14 @@ type RespondingState struct {
 
 // Playing is accepting
 func (r *RespondingState) play(card ar.Card) error {
+	// TODO only if its my turn
 	_ = r.accept()
 	return r.match.play(card)
 }
 
 // Asking is accepting
 func (r *RespondingState) ask(requestE uint8) error {
-	// TODO el envido va primero·
+	// TODO el envido va primero
 
 	_ = r.accept()
 	return r.match.ask(requestE)
@@ -25,8 +26,10 @@ func (r *RespondingState) ask(requestE uint8) error {
 
 func (r *RespondingState) accept() error {
 	if r.match.isEnvido {
+		// TODO can i accept
 		r.match.cState = r.match.announcing
 	} else {
+		// TODO can i accept
 		r.match.cTruco += 1
 		r.match.cState = r.match.playing
 	}
@@ -38,7 +41,7 @@ func (r *RespondingState) fold() {
 	if r.match.isEnvido {
 		r.match.isEnvido = false
 	} else {
-		r.match.winnerT = r.match.prevPlayer()
+		r.match.winnerT = r.match.cPlayer // TODO check if this is true always
 		r.match.cState = r.match.end
 	}
 }
