@@ -45,7 +45,7 @@ func TestPlayerOrder(t *testing.T) {
 	}
 }
 
-func TestCTurn(t *testing.T) { // TODO fail index out of range
+func TestCTurn(t *testing.T) {
 	m := NewMatch()
 
 	// Turn 0: initially no cards played

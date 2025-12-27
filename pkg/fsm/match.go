@@ -4,16 +4,26 @@ import (
 	"truco/pkg/ar"
 )
 
+type AskRequest uint8
+
+const (
+	RequestTruco  AskRequest = 0
+	RequestEnvido AskRequest = 2
+	RequestReal   AskRequest = 3
+	RequestFalta  AskRequest = 255
+)
+
 // FSM for a single match
 type Match struct {
 	// context
 	cards      [][]ar.Card // list of cards played: cards[player][turn]
 	cTruco     uint8       // current truco bet (1-4)
 	cTrucoAsk  uint8       // who asked for the last truco bet
+	cPlayer    uint8       // player that should perform next action (not for envido)
 	envidos    []uint8     // list of envidos declared per player: envidos[player] (default=255)
-	cEnvido    uint8       // current envido bet
+	cEnvido    uint8       // current envido bet 'quiero'
+	cEnvidoNo  uint8       // current envido bet 'no quiero'
 	cEnvidoAsk uint8       // who asked for the last envido bet
-	cPlayer    uint8       // player that should perform next action
 	isEnvido   bool        // so we don't duplicate response actions and states: false=truco (default), true=envido
 	winnerT    uint8       // id of a player in the team that won truco, 255 if still playing
 	// players are indexed as the match order:
@@ -45,11 +55,11 @@ type Score struct {
 // interface that implements all possible actions.
 // Identify the state by State.id()
 type State interface {
-	play(ar.Card) error       // play a card
-	ask(requestE uint8) error // ask for a bet increase (truco, or envido with size)
-	accept() error            // accepts a bet increase, passes to play or announce state
-	fold()                    // rejects a bet increase, 'son buenas' in envido, or simply ends match
-	announce(uint8) error     // announce how much envido you have
+	play(ar.Card) error            // play a card
+	ask(requestE AskRequest) error // ask for a bet increase (truco, or envido with size)
+	accept() error                 // accepts a bet increase
+	fold()                         // rejects a bet increase, 'son buenas' in envido, or simply ends match
+	announce(uint8) error          // announce how much envido you have
 	stateId() uint8
 }
 
@@ -71,6 +81,7 @@ func NewMatch() *Match {
 		cTrucoAsk:  255,
 		envidos:    envidos,
 		cEnvido:    0,
+		cEnvidoNo:  1,
 		cEnvidoAsk: 255,
 		cPlayer:    0,
 		isEnvido:   false,
@@ -83,16 +94,6 @@ func NewMatch() *Match {
 	return m
 }
 
-// Encodes a Match to a byte array that the frontend can save
-func (m *Match) Encode() {
-	// TODO
-}
-
-// Decodes a byte array match from the frontend
-func (m *Match) Decode() {
-	// TODO
-}
-
 // Binds the match to all states
 func (m *Match) bindStates() {
 	m.playing = &PlayingState{match: m}
@@ -101,24 +102,29 @@ func (m *Match) bindStates() {
 	m.end = &EndState{match: m}
 }
 
-// TODO dosctrings for functions
-
+// Plays a card
 func (m *Match) play(card ar.Card) error {
 	return m.cState.play(card)
 }
 
-func (m *Match) ask(requestE uint8) error {
+// Ask for a bet increase, envido or truco
+func (m *Match) ask(requestE AskRequest) error {
 	return m.cState.ask(requestE)
 }
 
+// Accept a bet increase
 func (m *Match) accept() error {
 	return m.cState.accept()
 }
 
+// If envido: rejects a bet increase.
+// If declaring envido score: 'son buenas'.
+// Else: ends match.
 func (m *Match) fold() {
 	m.cState.fold()
 }
 
+// Announce envido score
 func (m *Match) announce(score uint8) error {
 	return m.cState.announce(score)
 }
@@ -151,6 +157,7 @@ func (m *Match) cTurn() uint8 {
 
 // Will return true if all players declared envido,
 // false if there is at least one didn't (envidos[i] == 255).
+//
 // Note that it returns false if envido is never played.
 // (envidos array is initialized as full 255).
 func (m *Match) isEnvidoFull() bool {
@@ -170,10 +177,15 @@ func (m *Match) cPlayerE() int {
 
 // Returns winner envido and player id, played until now
 //
-// If envido is not played, returns (0, 0)
+// If envido is not asked, returns (0, 0)
+// If envido is 'no quiero', returns (0, score)
 func (m *Match) winnerE() (highest uint8, player uint8) {
-	// TODO recognize if no envido played but there is some score asked
 	highest = 0
+	if m.envidos[0] == 255 && m.cEnvido != 0 {
+		// envido asked, response was 'no quiero'
+		return highest, m.cEnvidoAsk
+	}
+
 	for i := range m.envidos {
 		cEnv := m.envidos[i]
 		if cEnv == 255 {

@@ -13,7 +13,7 @@ func TestTrucoFlow(t *testing.T) {
 		t.Errorf("expected state 1, got %d", m.stateId())
 	}
 
-	err := m.ask(0)
+	err := m.ask(RequestTruco)
 	if err != nil {
 		t.Fatalf("failed to ask truco: %v", err)
 	}
@@ -45,7 +45,7 @@ func TestEnvidoFlow(t *testing.T) {
 	m := NewMatch()
 
 	m.cPlayer = 2
-	err := m.ask(1) // envido
+	err := m.ask(RequestEnvido) // envido
 	if err != nil {
 		t.Fatalf("failed to ask envido: %v", err)
 	}
@@ -119,7 +119,7 @@ func TestEnvidoFlow(t *testing.T) {
 
 func TestFoldTrucoAndEndstate(t *testing.T) {
 	m := NewMatch()
-	m.ask(0)
+	m.ask(RequestTruco)
 	m.fold() // P1 folds
 
 	if m.stateId() != 0 { // EndState
@@ -134,7 +134,7 @@ func TestFoldTrucoAndEndstate(t *testing.T) {
 		t.Error("expected error playing in EndState")
 	}
 
-	err = m.ask(0)
+	err = m.ask(RequestTruco)
 	if err == nil {
 		t.Error("expected error asking in EndState")
 	}

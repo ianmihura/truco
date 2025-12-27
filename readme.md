@@ -133,3 +133,19 @@ Mechanics:
     - Encode/decode state to and from the frontend
     - Compute the FSM of possible jumps in state
     - Enrich state with stats
+
+Envido scores 
+
+tu| no  quiero
+1 | 1 - 2
+1 | 1 - 3
+1 | 1 - 255
+
+2 | 2 - 4
+2 | 2 - 5
+2 | 2 - 255
+
+3 | 4 - 7
+3 | 5 - 255
+
+4 | 7 - 255

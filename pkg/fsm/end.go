@@ -13,7 +13,7 @@ func (e *EndState) play(card ar.Card) error {
 	return fmt.Errorf("Can't play a finished game")
 }
 
-func (e *EndState) ask(requestE uint8) error {
+func (e *EndState) ask(requestE AskRequest) error {
 	return fmt.Errorf("Can't play a finished game")
 }
 

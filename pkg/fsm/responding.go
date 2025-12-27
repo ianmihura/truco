@@ -9,27 +9,32 @@ type RespondingState struct {
 	match *Match
 }
 
-// Playing is accepting
 func (r *RespondingState) play(card ar.Card) error {
-	// TODO only if its my turn
-	_ = r.accept()
-	return r.match.play(card)
+	return fmt.Errorf("You cannot play, accept first")
+	// _ = r.accept()
+	// return r.match.play(card)
 }
 
-// Asking is accepting
-func (r *RespondingState) ask(requestE uint8) error {
-	// TODO el envido va primero
-
-	_ = r.accept()
-	return r.match.ask(requestE)
+func (r *RespondingState) ask(requestE AskRequest) error {
+	return fmt.Errorf("You cannot ask, accept first")
+	// if !r.match.isEnvido && requestE != RequestTruco {
+	// 	_, winnerE := r.match.winnerE()
+	// 	if winnerE == 0 && r.match.cTurn() == 0 {
+	// 		// TODO el envido va primero
+	// 		return nil
+	// 	} else {
+	// 		return fmt.Errorf("You cannot ask for truco")
+	// 	}
+	// } else {
+	// 	_ = r.accept()
+	// 	return r.match.ask(requestE)
+	// }
 }
 
 func (r *RespondingState) accept() error {
 	if r.match.isEnvido {
-		// TODO can i accept
 		r.match.cState = r.match.announcing
 	} else {
-		// TODO can i accept
 		r.match.cTruco += 1
 		r.match.cState = r.match.playing
 	}

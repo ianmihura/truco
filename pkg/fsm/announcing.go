@@ -13,7 +13,7 @@ func (a *AnnouncingState) play(card ar.Card) error {
 	return fmt.Errorf("You must announce your envido")
 }
 
-func (a *AnnouncingState) ask(requestE uint8) error {
+func (a *AnnouncingState) ask(requestE AskRequest) error {
 	return fmt.Errorf("You must announce your envido")
 }
 

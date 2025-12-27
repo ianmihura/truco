@@ -22,27 +22,29 @@ func (p *PlayingState) play(card ar.Card) error {
 	return nil
 }
 
-// TODO make this into an ENUM
-// 0: truco, 1: envido, 2: real, 3: falta
-func (p *PlayingState) ask(requestE uint8) error {
-	if requestE > 0 {
+func (p *PlayingState) ask(requestE AskRequest) error {
+	if requestE != RequestTruco {
 		if p.match.cTurn() == 0 {
-			if !p.match.isEnvido {
-				// first envido request
-				if p.match.cPlayer >= 2 {
-					// only last two players can request it
+			if !p.match.isEnvido { // first envido request
+				if p.match.cPlayer >= 2 { // only last two players can request it
 					p.match.cEnvidoAsk = p.match.cPlayer
-					// TODO save complex envido info
-					p.match.cEnvido += 1 // TODO
+					p.match.cEnvido += uint8(requestE)
 					p.match.isEnvido = true
 				} else {
 					return fmt.Errorf("You can't ask for envido")
 				}
+
 			} else {
 				p.match.cEnvidoAsk = (p.match.cEnvidoAsk + 1) % 4
-				// TODO save complex envido info
-				p.match.cEnvido += 1 // TODO
+				if requestE == RequestFalta {
+					p.match.cEnvido = uint8(RequestFalta)
+					p.match.cEnvidoNo += 1 // TODO not correct
+				} else {
+					p.match.cEnvido += uint8(requestE)
+					p.match.cEnvidoNo += 1 // TODO not correct
+				}
 			}
+
 			p.match.cState = p.match.responding
 			return nil
 		} else {
