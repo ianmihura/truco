@@ -45,6 +45,7 @@ func (r *RespondingState) accept() error {
 func (r *RespondingState) fold() {
 	if r.match.IsEnvido {
 		r.match.IsEnvido = false
+		r.match.CState = r.match.Playing
 	} else {
 		r.match.WinnerT = r.match.CPlayer // TODO check if this is true always
 		r.match.CState = r.match.End
