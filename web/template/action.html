@@ -3,26 +3,17 @@
     <div class="bg-gradient-to-r from-blue-600/20 to-blue-400/10 p-4 border-b border-slate-700">
         <h3 class="text-white font-bold text-sm uppercase tracking-wider flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-            jugador
+            {{ .PlayerName }}
         </h3>
     </div>
     <div class="p-3 space-y-2">
+        {{ range .Actions }}
         <div class="action-btn p-2 rounded-lg bg-slate-900/50 border border-slate-700/30 text-slate-300 text-xs font-medium cursor-pointer transition-all hover:bg-slate-700/50 hover:border-slate-500/50 select-none"
-            hx-get="/track-act" hx-target="#tracker-grid" hx-swap="beforeend" hx-trigger="click once">
-            Juega
+            hx-get="/track-act?action={{ . }}&state={{ $.State }}" hx-target="#tracker-grid" hx-swap="outerHTML"
+            hx-trigger="click">
+            {{ . }}
         </div>
-        <div class="action-btn p-2 rounded-lg bg-slate-900/50 border border-slate-700/30 text-slate-300 text-xs font-medium cursor-pointer transition-all hover:bg-slate-700/50 hover:border-slate-500/50 select-none"
-            hx-get="/track-act" hx-target="#tracker-grid" hx-swap="beforeend" hx-trigger="click once">
-            Canta Truco
-        </div>
-        <div class="action-btn p-2 rounded-lg bg-slate-900/50 border border-slate-700/30 text-slate-300 text-xs font-medium cursor-pointer transition-all hover:bg-slate-700/50 hover:border-slate-500/50 select-none"
-            hx-get="/track-act" hx-target="#tracker-grid" hx-swap="beforeend" hx-trigger="click once">
-            Al mazo
-        </div>
-        <div class="action-btn p-2 rounded-lg bg-slate-900/50 border border-slate-700/30 text-slate-300 text-xs font-medium cursor-pointer transition-all hover:bg-slate-700/50 hover:border-slate-500/50 select-none"
-            hx-get="/track-act" hx-target="#tracker-grid" hx-swap="beforeend" hx-trigger="click once">
-            Canta envido
-        </div>
+        {{ end }}
     </div>
 </div>
 {{ end }}

@@ -7,19 +7,19 @@ import (
 
 func TestNewMatch(t *testing.T) {
 	m := NewMatch()
-	if m.cTruco != 1 {
-		t.Errorf("expected cTruco 1, got %d", m.cTruco)
+	if m.CTruco != 1 {
+		t.Errorf("expected CTruco 1, got %d", m.CTruco)
 	}
-	if m.cPlayer != 0 {
-		t.Errorf("expected cPlayer 0, got %d", m.cPlayer)
+	if m.CPlayer != 0 {
+		t.Errorf("expected CPlayer 0, got %d", m.CPlayer)
 	}
-	if m.cState != m.playing {
+	if m.CState != m.Playing {
 		t.Errorf("expected initial state to be playing")
 	}
-	if len(m.envidos) != NUM_PLAYERS {
-		t.Errorf("expected NUM_PLAYERS players in envidos, got %d", len(m.envidos))
+	if len(m.Envidos) != NUM_PLAYERS {
+		t.Errorf("expected NUM_PLAYERS players in envidos, got %d", len(m.Envidos))
 	}
-	for i, e := range m.envidos {
+	for i, e := range m.Envidos {
 		if e != 255 {
 			t.Errorf("expected player %d envido to be 255, got %d", i, e)
 		}
@@ -28,7 +28,7 @@ func TestNewMatch(t *testing.T) {
 
 func TestPlayerOrder(t *testing.T) {
 	m := NewMatch()
-	m.cPlayer = 0
+	m.CPlayer = 0
 	if m.nextPlayer() != 1 {
 		t.Errorf("next of 0 should be 1, got %d", m.nextPlayer())
 	}
@@ -36,7 +36,7 @@ func TestPlayerOrder(t *testing.T) {
 		t.Errorf("prev of 0 should be 3, got %d", m.prevPlayer())
 	}
 
-	m.cPlayer = 3
+	m.CPlayer = 3
 	if m.nextPlayer() != 0 {
 		t.Errorf("next of 3 should be 0, got %d", m.nextPlayer())
 	}
@@ -54,10 +54,10 @@ func TestCTurn(t *testing.T) {
 	}
 
 	// Play cards for all players in turn 0
-	m.cards[0][0] = ar.Card{N: 1, S: 'e'}
-	m.cards[1][0] = ar.Card{N: 1, S: 'b'}
-	m.cards[2][0] = ar.Card{N: 1, S: 'o'}
-	m.cards[3][0] = ar.Card{N: 1, S: 'c'}
+	m.Cards[0][0] = ar.Card{N: 1, S: 'e'}
+	m.Cards[1][0] = ar.Card{N: 1, S: 'b'}
+	m.Cards[2][0] = ar.Card{N: 1, S: 'o'}
+	m.Cards[3][0] = ar.Card{N: 1, S: 'c'}
 
 	// Should be turn 1
 	if m.cTurn() != 1 {
@@ -65,10 +65,10 @@ func TestCTurn(t *testing.T) {
 	}
 
 	// Play cards for all players in turn 1
-	m.cards[0][1] = ar.Card{N: 7, S: 'c'}
-	m.cards[1][1] = ar.Card{N: 7, S: 'b'}
-	m.cards[2][1] = ar.Card{N: 7, S: 'o'}
-	m.cards[3][1] = ar.Card{N: 7, S: 'e'}
+	m.Cards[0][1] = ar.Card{N: 7, S: 'c'}
+	m.Cards[1][1] = ar.Card{N: 7, S: 'b'}
+	m.Cards[2][1] = ar.Card{N: 7, S: 'o'}
+	m.Cards[3][1] = ar.Card{N: 7, S: 'e'}
 
 	// Should be turn 2
 	if m.cTurn() != 2 {
@@ -76,10 +76,10 @@ func TestCTurn(t *testing.T) {
 	}
 
 	// Play cards for all players in turn 2
-	m.cards[0][2] = ar.Card{N: 3, S: 'c'}
-	m.cards[1][2] = ar.Card{N: 3, S: 'b'}
-	m.cards[2][2] = ar.Card{N: 3, S: 'o'}
-	m.cards[3][2] = ar.Card{N: 3, S: 'e'}
+	m.Cards[0][2] = ar.Card{N: 3, S: 'c'}
+	m.Cards[1][2] = ar.Card{N: 3, S: 'b'}
+	m.Cards[2][2] = ar.Card{N: 3, S: 'o'}
+	m.Cards[3][2] = ar.Card{N: 3, S: 'e'}
 
 	// Should be 255 (match end)
 	if m.cTurn() != 255 {
@@ -98,14 +98,14 @@ func TestEnvidoHelpers(t *testing.T) {
 		t.Errorf("expected player 0 to declare envido, got %d", m.cPlayerE())
 	}
 
-	m.envidos[0] = 20
+	m.Envidos[0] = 20
 	if m.cPlayerE() != 1 {
 		t.Errorf("expected player 1 to declare envido, got %d", m.cPlayerE())
 	}
 
-	m.envidos[1] = 22
-	m.envidos[2] = 122
-	m.envidos[3] = 25
+	m.Envidos[1] = 22
+	m.Envidos[2] = 122
+	m.Envidos[3] = 25
 
 	if !m.isEnvidoFull() {
 		t.Errorf("expected envido full")

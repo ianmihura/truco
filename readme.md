@@ -97,19 +97,17 @@ https://quanam.com/todo-lo-que-siempre-quisiste-saber-del-truco-uruguayo/
 [Example in golang](https://refactoring.guru/design-patterns/state/go/example)
 
 Mechanics:
-- A chain (array or list) of actions
-- The frontend must: 
+- The frontend must:
     - Save the state
     - Send it to the backend on each request
     - UI interactions are easy: no state transition or interpretation
 - The backend must:
     - Encode/decode state to and from the frontend
-    - Compute the FSM of possible jumps in state
-    - Enrich state with stats
+- Generalizer for uy
 
-Envido scores 
-
-tu| no  quiero
+Envido scores:
+```
+tn| nq  quiero
 1 | 1 - 2
 1 | 1 - 3
 1 | 1 - 255
@@ -122,3 +120,4 @@ tu| no  quiero
 3 | 5 - 255
 
 4 | 7 - 255
+```

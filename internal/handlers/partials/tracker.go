@@ -3,42 +3,60 @@ package partials
 import (
 	"html/template"
 	"net/http"
+	"truco/pkg/ar"
+	"truco/pkg/fsm"
 )
 
 type TrackerHandler struct {
 	tmpl *template.Template
-	data TrackerData
 }
 
 type TrackerData struct {
 	PlayerName string
-	Actions    []Action
-}
-
-// A single action a player can take
-type Action struct {
-	Name string
+	Actions    []string
+	State      string
 }
 
 func NewTrackerHandler(tmpl *template.Template) *TrackerHandler {
-	trackerData := TrackerData{
-		PlayerName: "tests",
-		Actions: []Action{
-			{"asd"},
-			{"asd"},
-		},
-	}
-	return &TrackerHandler{tmpl: tmpl, data: trackerData}
+	return &TrackerHandler{tmpl: tmpl}
 }
 
 func (h *TrackerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// jsonData, err := json.Marshal(h.data)
-	// if err != nil {
-	// 	http.Error(w, "Failed to marshal stats", http.StatusInternalServerError)
-	// 	return
-	// }
+	stateParam := r.URL.Query().Get("state")
+	actionParam := r.URL.Query().Get("action")
 
-	err := h.tmpl.ExecuteTemplate(w, "action", h.data)
+	var match *fsm.Match
+	if stateParam == "" {
+		match = fsm.NewMatch()
+	} else {
+		match = fsm.Decode([]byte(stateParam))
+	}
+
+	if actionParam != "" {
+		switch actionParam {
+		case "play":
+			// Hardcoded for now as requested
+			_ = match.Play(ar.Card{N: 1, S: 'e'})
+		case "ask_truco":
+			_ = match.Ask(fsm.RequestTruco)
+		case "ask_envido":
+			_ = match.Ask(fsm.RequestEnvido)
+		case "accept":
+			_ = match.Accept()
+		case "fold":
+			match.Fold()
+		case "announce":
+			_ = match.Announce(20)
+		}
+	}
+
+	data := TrackerData{
+		PlayerName: "Jugador " + string(rune('1'+match.CPlayer)),
+		Actions:    match.ValidActions(),
+		State:      string(match.Encode()),
+	}
+
+	err := h.tmpl.ExecuteTemplate(w, "tracker", data)
 	if err != nil {
 		http.Error(w, "Template error: "+err.Error(), http.StatusInternalServerError)
 	}

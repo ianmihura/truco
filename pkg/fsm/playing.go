@@ -13,54 +13,54 @@ func (p *PlayingState) play(card ar.Card) error {
 	turn := p.match.cTurn()
 	if turn == 255 {
 		// finished match
-		p.match.cState = p.match.end
-		return p.match.play(card)
+		p.match.CState = p.match.End
+		return p.match.Play(card)
 	}
 
-	p.match.cards[p.match.cPlayer][turn] = card
-	p.match.cPlayer = p.match.nextPlayer()
+	p.match.Cards[p.match.CPlayer][turn] = card
+	p.match.CPlayer = p.match.nextPlayer()
 	return nil
 }
 
 func (p *PlayingState) ask(requestE AskRequest) error {
 	if requestE != RequestTruco {
 		if p.match.cTurn() == 0 {
-			if !p.match.isEnvido { // first envido request
-				if p.match.cPlayer >= 2 { // only last two players can request it
-					p.match.cEnvidoAsk = p.match.cPlayer
-					p.match.cEnvido += uint8(requestE)
-					p.match.isEnvido = true
+			if !p.match.IsEnvido { // first envido request
+				if p.match.CPlayer >= 2 { // only last two players can request it
+					p.match.CEnvidoAsk = p.match.CPlayer
+					p.match.CEnvido += uint8(requestE)
+					p.match.IsEnvido = true
 				} else {
 					return fmt.Errorf("You can't ask for envido")
 				}
 
 			} else {
-				p.match.cEnvidoAsk = (p.match.cEnvidoAsk + 1) % NUM_PLAYERS
+				p.match.CEnvidoAsk = (p.match.CEnvidoAsk + 1) % NUM_PLAYERS
 				if requestE == RequestFalta {
-					p.match.cEnvido = uint8(RequestFalta)
-					p.match.cEnvidoNo += 1 // TODO not correct
+					p.match.CEnvido = uint8(RequestFalta)
+					p.match.CEnvidoNo += 1 // TODO not correct
 				} else {
-					p.match.cEnvido += uint8(requestE)
-					p.match.cEnvidoNo += 1 // TODO not correct
+					p.match.CEnvido += uint8(requestE)
+					p.match.CEnvidoNo += 1 // TODO not correct
 				}
 			}
 
-			p.match.cState = p.match.responding
+			p.match.CState = p.match.Responding
 			return nil
 		} else {
 			return fmt.Errorf("You can't ask for envido")
 		}
 
 	} else {
-		if p.match.cTruco == 4 {
+		if p.match.CTruco == 4 {
 			return fmt.Errorf("Truco is highest")
 		}
 
-		if p.match.cTrucoAsk%2 != p.match.cPlayer%2 {
-			p.match.cTrucoAsk = p.match.cPlayer
-			p.match.isEnvido = false
+		if p.match.CTrucoAsk%2 != p.match.CPlayer%2 {
+			p.match.CTrucoAsk = p.match.CPlayer
+			p.match.IsEnvido = false
 			// p.match.cTruco changes in accept action
-			p.match.cState = p.match.responding
+			p.match.CState = p.match.Responding
 			return nil
 		} else {
 			return fmt.Errorf("You can't ask for truco")
@@ -73,8 +73,8 @@ func (p *PlayingState) accept() error {
 }
 
 func (p *PlayingState) fold() {
-	p.match.winnerT = p.match.prevPlayer()
-	p.match.cState = p.match.end
+	p.match.WinnerT = p.match.prevPlayer()
+	p.match.CState = p.match.End
 }
 
 func (p *PlayingState) announce(score uint8) error {
@@ -83,4 +83,24 @@ func (p *PlayingState) announce(score uint8) error {
 
 func (p *PlayingState) stateId() uint8 {
 	return 1
+}
+
+func (p *PlayingState) validActions() []string {
+	// return []string{"play", "fold", "ask"}
+
+	// TODO check this:
+	actions := []string{"play", "fold"}
+	if p.match.CTruco < 4 && p.match.CTrucoAsk%2 != p.match.CPlayer%2 {
+		actions = append(actions, "ask_truco")
+	}
+	if p.match.cTurn() == 0 {
+		if !p.match.IsEnvido {
+			if p.match.CPlayer >= 2 {
+				actions = append(actions, "ask_envido")
+			}
+		} else {
+			actions = append(actions, "ask_envido")
+		}
+	}
+	return actions
 }

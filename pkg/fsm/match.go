@@ -17,16 +17,16 @@ const (
 // FSM for a single match
 type Match struct {
 	// context
-	cards      [][]ar.Card // list of cards played: cards[player][turn]
-	cTruco     uint8       // current truco bet (1-4)
-	cTrucoAsk  uint8       // who asked for the last truco bet
-	cPlayer    uint8       // player that should perform next action (not for envido)
-	envidos    []uint8     // list of envidos declared per player: envidos[player] (default=255)
-	cEnvido    uint8       // current envido bet 'quiero'
-	cEnvidoNo  uint8       // current envido bet 'no quiero'
-	cEnvidoAsk uint8       // who asked for the last envido bet
-	isEnvido   bool        // so we don't duplicate response actions and states: false=truco (default), true=envido
-	winnerT    uint8       // id of a player in the team that won truco, 255 if still playing
+	Cards      [][]ar.Card `json:"cards"`        // list of cards played: cards[player][turn]
+	CTruco     uint8       `json:"c_truco"`      // current truco bet (1-4)
+	CTrucoAsk  uint8       `json:"c_truco_ask"`  // who asked for the last truco bet
+	CPlayer    uint8       `json:"c_player"`     // player that should perform next action (not for envido)
+	Envidos    []uint8     `json:"envidos"`      // list of envidos declared per player: envidos[player] (default=255)
+	CEnvido    uint8       `json:"c_envido"`     // current envido bet 'quiero'
+	CEnvidoNo  uint8       `json:"c_envido_no"`  // current envido bet 'no quiero'
+	CEnvidoAsk uint8       `json:"c_envido_ask"` // who asked for the last envido bet
+	IsEnvido   bool        `json:"is_envido"`    // so we don't duplicate response actions and states: false=truco (default), true=envido
+	WinnerT    uint8       `json:"winner_t"`     // id of a player in the team that won truco, 255 if still playing
 	// players are indexed as the match order:
 	// 	- counter-clockwise, dealer last
 	//  - 255=none
@@ -37,11 +37,13 @@ type Match struct {
 	//  - 255:     undeclared
 
 	// states
-	playing    State // can play a card or ask for truco
-	responding State // can respond to asked bet
-	announcing State // can announce envido amount
-	end        State
-	cState     State // current state
+	Playing    State `json:"-"` // can play a card or ask for truco
+	Responding State `json:"-"` // can respond to asked bet
+	Announcing State `json:"-"` // can announce envido amount
+	End        State `json:"-"` // endstate
+	CState     State `json:"-"` // current state
+
+	CStateId uint8 `json:"c_state_id"` // Helper for marshaling
 }
 
 type Score struct {
@@ -62,6 +64,7 @@ type State interface {
 	fold()                         // rejects a bet increase, 'son buenas' in envido, or simply ends match
 	announce(uint8) error          // announce how much envido you have
 	stateId() uint8
+	validActions() []string
 }
 
 // Returns an empty object, with binding to all states
@@ -77,78 +80,83 @@ func NewMatch() *Match {
 	}
 
 	m := &Match{
-		cards:      cards,
-		cTruco:     1,
-		cTrucoAsk:  255,
-		envidos:    envidos,
-		cEnvido:    0,
-		cEnvidoNo:  1,
-		cEnvidoAsk: 255,
-		cPlayer:    0,
-		isEnvido:   false,
-		winnerT:    255,
+		Cards:      cards,
+		CTruco:     1,
+		CTrucoAsk:  255,
+		Envidos:    envidos,
+		CEnvido:    0,
+		CEnvidoNo:  1,
+		CEnvidoAsk: 255,
+		CPlayer:    0,
+		IsEnvido:   false,
+		WinnerT:    255,
 	}
 
 	m.bindStates()
-	m.cState = m.playing
+	m.CState = m.Playing
+	m.CStateId = m.CState.stateId()
 
 	return m
 }
 
 // Binds the match to all states
 func (m *Match) bindStates() {
-	m.playing = &PlayingState{match: m}
-	m.responding = &RespondingState{match: m}
-	m.announcing = &AnnouncingState{match: m}
-	m.end = &EndState{match: m}
+	m.Playing = &PlayingState{match: m}
+	m.Responding = &RespondingState{match: m}
+	m.Announcing = &AnnouncingState{match: m}
+	m.End = &EndState{match: m}
 }
 
 // Plays a card
-func (m *Match) play(card ar.Card) error {
-	return m.cState.play(card)
+func (m *Match) Play(card ar.Card) error {
+	return m.CState.play(card)
 }
 
 // Ask for a bet increase, envido or truco
-func (m *Match) ask(requestE AskRequest) error {
-	return m.cState.ask(requestE)
+func (m *Match) Ask(requestE AskRequest) error {
+	return m.CState.ask(requestE)
 }
 
 // Accept a bet increase
-func (m *Match) accept() error {
-	return m.cState.accept()
+func (m *Match) Accept() error {
+	return m.CState.accept()
 }
 
 // If envido: rejects a bet increase.
 // If declaring envido score: 'son buenas'.
 // Else: ends match.
-func (m *Match) fold() {
-	m.cState.fold()
+func (m *Match) Fold() {
+	m.CState.fold()
 }
 
 // Announce envido score
-func (m *Match) announce(score uint8) error {
-	return m.cState.announce(score)
+func (m *Match) Announce(score uint8) error {
+	return m.CState.announce(score)
 }
 
 func (m *Match) stateId() uint8 {
-	return m.cState.stateId()
+	return m.CState.stateId()
+}
+
+func (m *Match) ValidActions() []string {
+	return m.CState.validActions()
 }
 
 // Truco player order
 func (m *Match) prevPlayer() uint8 {
-	return (m.cPlayer - 1) % NUM_PLAYERS
+	return (m.CPlayer - 1) % NUM_PLAYERS
 }
 
 // Truco player order
 func (m *Match) nextPlayer() uint8 {
-	return (m.cPlayer + 1) % NUM_PLAYERS
+	return (m.CPlayer + 1) % NUM_PLAYERS
 }
 
 // Current turn, 255=end
 func (m *Match) cTurn() uint8 {
-	for t := range m.cards {
-		for p := range m.cards[t] {
-			if m.cards[t][p].N == 0 {
+	for t := range m.Cards {
+		for p := range m.Cards[t] {
+			if m.Cards[t][p].N == 0 {
 				return uint8(p)
 			}
 		}
@@ -168,8 +176,8 @@ func (m *Match) isEnvidoFull() bool {
 // Return index of next player that needs to declare,
 // returns 255 if all players declared already
 func (m *Match) cPlayerE() int {
-	for i := range m.envidos {
-		if m.envidos[i] == 255 {
+	for i := range m.Envidos {
+		if m.Envidos[i] == 255 {
 			return i
 		}
 	}
@@ -182,13 +190,13 @@ func (m *Match) cPlayerE() int {
 // If envido is 'no quiero', returns (0, score)
 func (m *Match) winnerE() (highest uint8, player uint8) {
 	highest = 0
-	if m.envidos[0] == 255 && m.cEnvido != 0 {
+	if m.Envidos[0] == 255 && m.CEnvido != 0 {
 		// envido asked, response was 'no quiero'
-		return highest, m.cEnvidoAsk
+		return highest, m.CEnvidoAsk
 	}
 
-	for i := range m.envidos {
-		cEnv := m.envidos[i]
+	for i := range m.Envidos {
+		cEnv := m.Envidos[i]
 		if cEnv == 255 {
 			// unfinished round
 			break
@@ -207,9 +215,9 @@ func (m *Match) winnerE() (highest uint8, player uint8) {
 func (m *Match) getScore() *Score {
 	winnerE, _ := m.winnerE()
 	return &Score{
-		winnerT: m.winnerT,
-		pointsT: m.cTruco,
+		winnerT: m.WinnerT,
+		pointsT: m.CTruco,
 		winnerE: winnerE,
-		pointsE: m.cEnvido,
+		pointsE: m.CEnvido,
 	}
 }

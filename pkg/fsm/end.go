@@ -30,3 +30,7 @@ func (e *EndState) announce(score uint8) error {
 func (e *EndState) stateId() uint8 {
 	return 0
 }
+
+func (e *EndState) validActions() []string {
+	return []string{}
+}

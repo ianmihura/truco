@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"html/template"
 	"net/http"
+	"truco/internal/handlers/partials"
+	"truco/pkg/fsm"
 )
 
 type HomeHandler struct {
@@ -30,8 +32,23 @@ func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to marshal stats", http.StatusInternalServerError)
 		return
 	}
-	// passing template.JS allows the content to be written unescaped into the script tag
-	if err := h.Tmpl.ExecuteTemplate(w, "index.html", template.JS(jsonData)); err != nil {
+
+	match := fsm.NewMatch()
+	trackerData := partials.TrackerData{
+		PlayerName: "Jugador 1",
+		Actions:    match.ValidActions(),
+		State:      string(match.Encode()),
+	}
+
+	data := struct {
+		Stats   template.JS
+		Tracker partials.TrackerData
+	}{
+		Stats:   template.JS(jsonData),
+		Tracker: trackerData,
+	}
+
+	if err := h.Tmpl.ExecuteTemplate(w, "index.html", data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
