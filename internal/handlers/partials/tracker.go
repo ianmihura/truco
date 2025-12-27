@@ -15,6 +15,7 @@ type TrackerData struct {
 	PlayerName string
 	Actions    []string
 	State      string
+	PlayedCard string // Add this to show what was played
 }
 
 func NewTrackerHandler(tmpl *template.Template) *TrackerHandler {
@@ -32,22 +33,21 @@ func (h *TrackerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		match = fsm.Decode([]byte(stateParam))
 	}
 
-	if actionParam != "" {
-		switch actionParam {
-		case "play":
-			// Hardcoded for now as requested
-			_ = match.Play(ar.Card{N: 1, S: 'e'})
-		case "ask_truco", "ask_retruco", "ask_vale_4":
-			_ = match.Ask(fsm.RequestTruco)
-		case "ask_envido":
-			_ = match.Ask(fsm.RequestEnvido)
-		case "accept":
-			_ = match.Accept()
-		case "fold":
-			match.Fold()
-		case "announce":
-			_ = match.Announce(20)
+	switch actionParam {
+	case "play":
+		if h.handlePlay(w, r, match) {
+			return
 		}
+	case "ask_truco", "ask_retruco", "ask_vale_4":
+		_ = match.Ask(fsm.RequestTruco)
+	case "ask_envido":
+		_ = match.Ask(fsm.RequestEnvido)
+	case "accept":
+		_ = match.Accept()
+	case "fold":
+		match.Fold()
+	case "announce":
+		_ = match.Announce(20)
 	}
 
 	data := TrackerData{
@@ -60,4 +60,28 @@ func (h *TrackerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Template error: "+err.Error(), http.StatusInternalServerError)
 	}
+}
+
+// Returns true if we send cards.html list to the frontend: early return
+func (h *TrackerHandler) handlePlay(w http.ResponseWriter, r *http.Request, match *fsm.Match) bool {
+	card := r.URL.Query().Get("card")
+	if card != "" {
+		_ = match.Play(ar.NewCard(card))
+		return false
+	}
+
+	// If no card specified, return the cards template
+	cards := ar.ALL_CARDS // TODO reduce card options
+	data := struct {
+		Cards []ar.Card
+		State string
+	}{
+		Cards: cards,
+		State: string(match.Encode()),
+	}
+	err := h.tmpl.ExecuteTemplate(w, "cards", data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	return true
 }
