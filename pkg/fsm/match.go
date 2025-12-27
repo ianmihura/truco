@@ -7,11 +7,13 @@ import (
 type AskRequest uint8
 
 const (
-	RequestTruco  AskRequest = 0
-	RequestEnvido AskRequest = 2
-	RequestReal   AskRequest = 3
-	RequestFalta  AskRequest = 255
-	NUM_PLAYERS              = 4
+	RequestTruco   AskRequest = 0
+	RequestRetruco AskRequest = 1 // TODO make sure this is necesary
+	RequestVale4   AskRequest = 4 // TODO make sure this is necesary
+	RequestEnvido  AskRequest = 2
+	RequestReal    AskRequest = 3
+	RequestFalta   AskRequest = 255
+	NUM_PLAYERS               = 4
 )
 
 // FSM for a single match
@@ -154,11 +156,9 @@ func (m *Match) nextPlayer() uint8 {
 
 // Current turn, 255=end
 func (m *Match) cTurn() uint8 {
-	for t := range m.Cards {
-		for p := range m.Cards[t] {
-			if m.Cards[t][p].N == 0 {
-				return uint8(p)
-			}
+	for t := range m.Cards[NUM_PLAYERS-1] {
+		if m.Cards[NUM_PLAYERS-1][t].N == 0 {
+			return uint8(t)
 		}
 	}
 	return 255
