@@ -37,7 +37,7 @@ func (h *TrackerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		case "play":
 			// Hardcoded for now as requested
 			_ = match.Play(ar.Card{N: 1, S: 'e'})
-		case "ask_truco":
+		case "ask_truco", "ask_retruco", "ask_vale_4":
 			_ = match.Ask(fsm.RequestTruco)
 		case "ask_envido":
 			_ = match.Ask(fsm.RequestEnvido)
@@ -56,7 +56,7 @@ func (h *TrackerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		State:      string(match.Encode()),
 	}
 
-	err := h.tmpl.ExecuteTemplate(w, "tracker", data)
+	err := h.tmpl.ExecuteTemplate(w, "action", data)
 	if err != nil {
 		http.Error(w, "Template error: "+err.Error(), http.StatusInternalServerError)
 	}
