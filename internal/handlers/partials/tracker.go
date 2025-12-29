@@ -27,6 +27,9 @@ func NewTrackerHandler(tmpl *template.Template) *TrackerHandler {
 func (h *TrackerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	stateParam := r.URL.Query().Get("state")
 	actionParam := r.URL.Query().Get("action")
+	fmatrixParam := r.URL.Query().Get("fmatrix")
+
+	// TODO separate the stats and action endpoints : one returns the matrix and the other returns a new tracker element
 
 	var match *fsm.Match
 	if stateParam == "" {
@@ -52,8 +55,15 @@ func (h *TrackerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		_ = match.Announce(20)
 	}
 
-	// TODO recalculate stats
-	stats, err := ar.LoadPairStats("web/static/pair_stats.csv")
+	var csvPath string
+	if fmatrixParam == "true" {
+		csvPath = "web/static/pair_stats.csv"
+	} else {
+		csvPath = "web/static/pair_stats_no_e.csv"
+	}
+
+	// TODO recalculate stats, not with CSV
+	stats, err := ar.LoadPairStats(csvPath)
 	if err != nil {
 		http.Error(w, "Failed to load stats: "+err.Error(), http.StatusInternalServerError)
 		return

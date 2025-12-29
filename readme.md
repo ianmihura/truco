@@ -70,6 +70,12 @@ https://quanam.com/todo-lo-que-siempre-quisiste-saber-del-truco-uruguayo/
 ----
 
 ### Next steps
+- host in a free tier server (fly.io, gcp, render)
+- hover on different elements also shows hints in the bottom, explaining UI
+    - tutorial?
+- hover changes sidebar
+- ? delimiter in frontend from {{}} to <go></go> 
+    with `.Delims("<go>", "</go>")`
 - return updated stats when FSM action is taken
 - Track progress of a hand
     - scrollable action tracker

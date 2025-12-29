@@ -309,8 +309,7 @@ func CreatePairStatsCSV(inputPath, outputPath string, withEnvido bool) error {
 	return nil
 }
 
-// preliminary function - will be removed:
-// we will return the content itself
+// preliminary function - we will not use CSV, but recalc the stats on every request
 func LoadPairStats(csvPath string) (map[string]PairStat, error) {
 	records, err := getCSVReader(csvPath)
 	if err != nil {
