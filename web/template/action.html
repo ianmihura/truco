@@ -8,15 +8,20 @@
     </div>
     <div class="py-1">
         {{ range .Actions }}
+        {{ if eq . "play" }}
         <div class="action-btn px-3 py-1 text-slate-300 text-xs font-medium cursor-pointer transition-all hover:bg-slate-700/50 hover:border-slate-500/50 select-none"
-            {{ if eq . "play" }} hx-get="/track-act?action={{ . }}&state={{ $.State }}" hx-target="body"
-            hx-swap="beforeend"
-            hx-on:click="document.querySelectorAll('.action-btn').forEach(b => b.classList.remove('active-play')); this.classList.add('active-play')"
-            {{ else }} hx-get="/track-act?action={{ . }}&state={{ $.State }}" hx-target="#tracker-grid"
-            hx-swap="beforeend" hx-trigger="click once"
-            hx-on:click="this.closest('.player-card').classList.add('pointer-events-none', 'opacity-60')" {{ end }}>
+            hx-get="/track-act?action={{ . }}&state={{ $.State }}" hx-target="body" hx-swap="beforeend"
+            hx-on:click="document.querySelectorAll('.action-btn').forEach(b => b.classList.remove('active-play')); this.classList.add('active-play')">
             {{ . }}
         </div>
+        {{ else }}
+        <div class="action-btn px-3 py-1 text-slate-300 text-xs font-medium cursor-pointer transition-all hover:bg-slate-700/50 hover:border-slate-500/50 select-none"
+            hx-get="/track-act?action={{ . }}&state={{ $.State }}" hx-target="#tracker-grid" hx-swap="beforeend"
+            hx-trigger="click once"
+            hx-on:click="this.closest('.player-card').classList.add('pointer-events-none', 'opacity-60')">
+            {{ . }}
+        </div>
+        {{ end }}
         {{ end }}
     </div>
 </div>
