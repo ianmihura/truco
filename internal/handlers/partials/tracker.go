@@ -12,10 +12,10 @@ type TrackerHandler struct {
 }
 
 type TrackerData struct {
-	PlayerName string
-	Actions    []string
-	State      string
-	PlayedCard string // Add this to show what was played
+	ActionTitle string
+	Actions     []string
+	State       string
+	PlayedCard  string // Add this to show what was played
 }
 
 func NewTrackerHandler(tmpl *template.Template) *TrackerHandler {
@@ -50,10 +50,13 @@ func (h *TrackerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		_ = match.Announce(20)
 	}
 
+	// TODO recalculate stats
+	// TODO resend stats and force recompute matrix in front
+
 	data := TrackerData{
-		PlayerName: "Jugador " + string(rune('1'+match.CPlayer)),
-		Actions:    match.ValidActions(),
-		State:      string(match.Encode()),
+		ActionTitle: "Jugador " + string(rune('1'+match.CPlayer)),
+		Actions:     match.ValidActions(),
+		State:       string(match.Encode()),
 	}
 
 	err := h.tmpl.ExecuteTemplate(w, "action", data)

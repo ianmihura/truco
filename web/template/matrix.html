@@ -1,18 +1,102 @@
 {{ define "matrix" }}
-<div class="grid grid-cols-[repeat(14,minmax(0,1fr))] gap-px bg-slate-900 border border-slate-900 rounded-lg overflow-hidden shadow-2xl max-w-5xl w-full"
-    id="matrix">
-    <!-- JS will populate this -->
+<div class="flex flex-col items-center w-full max-w-5xl">
+    <div class="flex justify-between items-center w-full mb-6">
+        <div class="flex flex-wrap gap-2 p-1.5 bg-slate-800/80 rounded-xl border border-slate-700/50 backdrop-blur-md">
+            <button onclick="setMetric('combined_score')" id="btn-combined_score"
+                class="metric-btn px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200">
+                Fuerza
+            </button>
+            <button onclick="setMetric('truco_mean')" id="btn-truco_mean"
+                class="metric-btn px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200">
+                Truco
+            </button>
+            <button onclick="setMetric('envido_mean')" id="btn-envido_mean"
+                class="metric-btn px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200">
+                Envido
+            </button>
+            <button onclick="setMetric('count')" id="btn-count"
+                class="metric-btn px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200">
+                Probabilidad
+            </button>
+        </div>
+
+        <div
+            class="flex items-center gap-3 bg-slate-800/80 p-1.5 rounded-xl border border-slate-700/50 backdrop-blur-md h-fit">
+            <button onclick="toggleMatrix()" id="envido-toggle"
+                class="relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 bg-slate-700">
+                <span id="envido-toggle-dot"
+                    class="inline-block h-4 w-4 transform rounded-full bg-slate-200 transition-all duration-300 translate-x-1"></span>
+            </button>
+            <span id="label-com"
+                class="text-[10px] font-bold tracking-widest text-slate-400 pr-2 transition-colors duration-300">
+                COMPLETA 14x14
+            </span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-[repeat(14,minmax(0,1fr))] gap-px bg-slate-900 border border-slate-900 rounded-lg overflow-hidden shadow-2xl w-full"
+        id="matrix">
+        <!-- JS will populate this -->
+    </div>
 </div>
 
 <script>
     let pairStats = {};
     let currentSelectedKey = null;
+    let currentMetric = 'combined_score';
+    let showFullMatrix = false;
+
+    function toggleMatrix() {
+        showFullMatrix = !showFullMatrix;
+        const toggle = document.getElementById('envido-toggle');
+        const dot = document.getElementById('envido-toggle-dot');
+        const textLabel = document.getElementById('label-com');
+
+        if (showFullMatrix) {
+            toggle.classList.remove('bg-slate-700');
+            toggle.classList.add('bg-blue-600');
+            dot.classList.remove('translate-x-1');
+            dot.classList.add('translate-x-6');
+            textLabel.classList.add('text-blue-400');
+            textLabel.classList.remove('text-slate-400');
+        } else {
+            toggle.classList.remove('bg-blue-600');
+            toggle.classList.add('bg-slate-700');
+            dot.classList.remove('translate-x-6');
+            dot.classList.add('translate-x-1');
+            textLabel.classList.remove('text-blue-400');
+            textLabel.classList.add('text-slate-400');
+        }
+        initMatrix();
+    }
+
+    const METRIC_CONFIGS = {
+        'combined_score': { key: 'combined_mean', range: 1, label: 'Combined Score' },
+        'truco_mean': { key: 'truco_mean', range: 1, label: 'Truco Mean' },
+        'envido_mean': { key: 'envido_mean', range: 33, label: 'Envido Mean' },
+        'count': { key: 'count', range: 300, label: 'Count' }
+    };
 
     const COLOR_CONFIG = {
         lowScore: [25, 85, 40],
         highScore: [90, 85, 50],
         textThreshold: 0.6
     };
+
+    function setMetric(metric) {
+        currentMetric = metric;
+        // Update button styles
+        document.querySelectorAll('.metric-btn').forEach(btn => {
+            btn.classList.remove('bg-blue-600', 'text-white', 'shadow-lg', 'shadow-blue-900/40');
+            btn.classList.add('text-slate-400', 'hover:text-slate-200', 'hover:bg-slate-700/50');
+        });
+        const activeBtn = document.getElementById('btn-' + metric);
+        if (activeBtn) {
+            activeBtn.classList.remove('text-slate-400', 'hover:text-slate-200', 'hover:bg-slate-700/50');
+            activeBtn.classList.add('bg-blue-600', 'text-white', 'shadow-lg', 'shadow-blue-900/40');
+        }
+        initMatrix();
+    }
 
     // score: value to map color to
     // range: max value score can have
@@ -24,7 +108,7 @@
         }
         const [h1, s1, l1] = COLOR_CONFIG.lowScore;
         const [h2, s2, l2] = COLOR_CONFIG.highScore;
-        const t = score / range;
+        const t = Math.min(Math.max(score / range, 0), 1);
         const h = h1 + (h2 - h1) * t;
         const s = s1 + (s2 - s1) * t;
         const l = l1 + (l2 - l1) * t;
@@ -45,7 +129,7 @@
                     if (index === 0) {
                         data[col] = values[index]
                     } else if (col === 'is_envido') {
-                        data[col] = values[index]
+                        data[col] = values[index] === 'true'
                     } else {
                         data[col] = parseFloat(values[index]);
                     }
@@ -54,7 +138,7 @@
                     pairStats[data.pair + ' ' + data.is_envido] = data;
                 }
             }
-            initMatrix();
+            setMetric('combined_score');
         } catch (error) {
             console.error('Failed to load pair strengths:', error);
         }
@@ -156,27 +240,15 @@
     }
 
     function initMatrix() {
-        const ranks = [
-            "1e",
-            "1b",
-            "7e",
-            "7o",
-            "3",
-            "2",
-            "1f",
-            "12",
-            "11",
-            "10",
-            "7f",
-            "6",
-            "5",
-            "4"
-        ];
+        const ranks = ["1e", "1b", "7e", "7o", "3", "2", "1f", "12", "11", "10", "7f", "6", "5", "4"];
         const matrix = document.getElementById('matrix');
+        matrix.innerHTML = ''; // Clear existing matrix
 
         const baseCellClass = 'p-1 flex items-start justify-start font-medium cursor-pointer transition-all duration-200 select-none aspect-[2/1] relative leading-tight uppercase text-[12px]';
         const hoverEffects = 'hover:scale-105 hover:z-10 hover:shadow-lg';
         const activeEffects = 'active:scale-95';
+
+        const config = METRIC_CONFIGS[currentMetric];
 
         ranks.forEach((rowRank, i) => {
             ranks.forEach((colRank, j) => {
@@ -194,18 +266,10 @@
                         data = pairStats[key];
                     }
                     if (data) {
-                        console.log(data)
                         const isEnvido = data.is_envido;
-                        const val = data.combined_mean;
+                        const val = data[config.key];
 
-                        // let val;
-                        // if (isEnvido) {
-                        //     val = data.truco_mean;
-                        // } else {
-                        //     val = data.truco_mean;
-                        // }
-
-                        const bgColor = getColorForScore(val, 1);
+                        const bgColor = getColorForScore(val, config.range);
 
                         cell.className = `${cellClasses} ${hoverEffects}`;
                         cell.style.backgroundColor = bgColor;
@@ -218,10 +282,14 @@
                         }
 
                         cell.onclick = () => {
-                            // Highlight selection (optional enhancement)
-                            document.querySelectorAll('#matrix > div').forEach(c => c.style.outline = 'none');
+                            // Highlight selection
+                            document.querySelectorAll('#matrix > div').forEach(c => {
+                                c.style.outline = 'none';
+                                c.style.zIndex = '0';
+                            });
                             cell.style.outline = '2px solid white';
                             cell.style.outlineOffset = '-2px';
+                            cell.style.zIndex = '20';
                             updateStatsPanel(key, isEnvido);
                         };
                     } else {

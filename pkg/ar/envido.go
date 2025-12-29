@@ -127,10 +127,3 @@ func PEnvido(score uint8) float32 {
 func PHighestEnvido(score uint8, mCards, kCards []Card) float32 {
 	return 0.0 // TODO
 }
-
-/*
-que preguntas me hago en el envido:
-1. que probabilidad de que mi envido sea el mas alto de la mesa
-2. dado un envido, mCards y kCards, que cartas podria tener (card range)
-	yo y otro jugador
-*/
