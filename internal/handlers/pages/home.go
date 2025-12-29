@@ -5,12 +5,12 @@ import (
 	"html/template"
 	"net/http"
 	"truco/internal/handlers/partials"
+	"truco/pkg/ar"
 	"truco/pkg/fsm"
 )
 
 type HomeHandler struct {
 	Tmpl *template.Template
-	Data map[string]float64
 }
 
 func NewHomeHandler(tmpl *template.Template) *HomeHandler {
@@ -18,9 +18,15 @@ func NewHomeHandler(tmpl *template.Template) *HomeHandler {
 }
 
 func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	jsonData, err := json.Marshal(h.Data)
+	stats, err := ar.LoadPairStats("web/static/pair_stats.csv")
 	if err != nil {
-		http.Error(w, "Failed to marshal stats", http.StatusInternalServerError)
+		http.Error(w, "Failed to load stats: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	statsJSON, err := json.Marshal(stats)
+	if err != nil {
+		http.Error(w, "Failed to marshal stats: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -35,7 +41,7 @@ func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Stats   template.JS
 		Tracker partials.TrackerData
 	}{
-		Stats:   template.JS(jsonData),
+		Stats:   template.JS(statsJSON),
 		Tracker: trackerData,
 	}
 

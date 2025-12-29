@@ -1,6 +1,7 @@
 package partials
 
 import (
+	"encoding/json"
 	"html/template"
 	"net/http"
 	"truco/pkg/ar"
@@ -15,7 +16,8 @@ type TrackerData struct {
 	ActionTitle string
 	Actions     []string
 	State       string
-	PlayedCard  string // Add this to show what was played
+	PlayedCard  string
+	Stats       template.JS
 }
 
 func NewTrackerHandler(tmpl *template.Template) *TrackerHandler {
@@ -51,15 +53,26 @@ func (h *TrackerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO recalculate stats
-	// TODO resend stats and force recompute matrix in front
+	stats, err := ar.LoadPairStats("web/static/pair_stats.csv")
+	if err != nil {
+		http.Error(w, "Failed to load stats: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	statsJSON, err := json.Marshal(stats)
+	if err != nil {
+		http.Error(w, "Failed to marshal stats: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	data := TrackerData{
 		ActionTitle: "Jugador " + string(rune('1'+match.CPlayer)),
 		Actions:     match.ValidActions(),
 		State:       string(match.Encode()),
+		Stats:       template.JS(statsJSON),
 	}
 
-	err := h.tmpl.ExecuteTemplate(w, "action", data)
+	err = h.tmpl.ExecuteTemplate(w, "action", data)
 	if err != nil {
 		http.Error(w, "Template error: "+err.Error(), http.StatusInternalServerError)
 	}

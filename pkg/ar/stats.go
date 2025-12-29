@@ -13,13 +13,28 @@ import (
 	"truco/pkg/math"
 )
 
+type PairStat struct {
+	Pair         string  `json:"pair"`
+	IsEnvido     bool    `json:"is_envido"`
+	TrucoMax     float64 `json:"truco_max"`
+	TrucoMin     float64 `json:"truco_min"`
+	TrucoMean    float64 `json:"truco_mean"`
+	TrucoMedian  float64 `json:"truco_median"`
+	EnvidoMax    int     `json:"envido_max"`
+	EnvidoMin    int     `json:"envido_min"`
+	EnvidoMean   float64 `json:"envido_mean"`
+	EnvidoMedian float64 `json:"envido_median"`
+	CombinedMean float64 `json:"combined_mean"`
+	Count        int     `json:"count"`
+}
+
 // Creates a csv file that lists all possible hands with:
-//   - their truco strength (beatness against other hands)
+//   - truco strength (beatness against other hands)
 //   - envido
 //   - combined strength: (envido/33 + (strength+36)/72) / 2
 //
 // Hands are sorted by strength.
-// Cards in each hand are also sorted by truco strength.
+// Cards in each hand are sorted by truco strength.
 func CreateHandStatsCSV(outputPath string) error {
 	handsIter := math.Combinations(ALL_CARDS, 3)
 
@@ -57,7 +72,7 @@ func CreateHandStatsCSV(outputPath string) error {
 
 				strength := (h.TrucoStrength() + 36.0) / 72
 				envido := h.Envido()
-				combined := (float32(envido)/33.0 + strength) / 2.0
+				combined := (float32(envido)/MAX_ENVIDO + strength) / 2.0
 
 				resultsChan <- result{
 					handStr:  handStr.String(),
@@ -141,11 +156,11 @@ func getCSVReader(csvPath string) ([][]string, error) {
 	return r, nil
 }
 
-// Reads hand strengths (output of previous function) and computes stats per pair,
+// Reads hand strengths (output of CreateHandStatsCSV) and computes stats per pair,
 // including max, min, mean, and median envido scores.
 //
 // This will get executed very often: every time there's a state change in the frontend.
-// The frontend uses it's output for stats and color coding the matrix
+// The frontend uses this output for stats and color coding the matrix.
 func CreatePairStatsCSV(inputPath, outputPath string) error {
 	records, err := getCSVReader(inputPath)
 	if err != nil {
@@ -163,6 +178,7 @@ func CreatePairStatsCSV(inputPath, outputPath string) error {
 	}
 	statsMap := make(map[statsKey]*pairData)
 
+	// Create stats
 	for i, row := range records {
 		if i == 0 && (strings.HasPrefix(row[0], "hand") || strings.Contains(row[0], "score")) {
 			continue // Skip Header
@@ -289,7 +305,7 @@ func CreatePairStatsCSV(inputPath, outputPath string) error {
 			medianE = float64(d.envidos[count/2-1]+d.envidos[count/2]) / 2.0
 		}
 
-		meanC := (meanT + meanE/33) / 2
+		meanC := (meanT + meanE/MAX_ENVIDO) / 2
 
 		writer.Write([]string{
 			k.pair,
@@ -301,11 +317,67 @@ func CreatePairStatsCSV(inputPath, outputPath string) error {
 			fmt.Sprintf("%d", maxE),
 			fmt.Sprintf("%d", minE),
 			fmt.Sprintf("%.2f", meanE),
-			fmt.Sprintf("%.1f", medianE),
+			fmt.Sprintf("%.2f", medianE),
 			fmt.Sprintf("%.6f", meanC),
 			fmt.Sprintf("%d", count),
 		})
 	}
 
 	return nil
+}
+
+func LoadPairStats(csvPath string) (map[string]PairStat, error) {
+	records, err := getCSVReader(csvPath)
+	if err != nil {
+		return nil, err
+	}
+
+	stats := make(map[string]PairStat)
+	header := records[0]
+
+	for i := 1; i < len(records); i++ {
+		row := records[i]
+		if len(row) < len(header) {
+			continue
+		}
+
+		data := PairStat{}
+		for idx, col := range header {
+			val := row[idx]
+			switch col {
+			case "pair":
+				data.Pair = val
+			case "is_envido":
+				data.IsEnvido = val == "true"
+			case "truco_max":
+				data.TrucoMax, _ = strconv.ParseFloat(val, 64)
+			case "truco_min":
+				data.TrucoMin, _ = strconv.ParseFloat(val, 64)
+			case "truco_mean":
+				data.TrucoMean, _ = strconv.ParseFloat(val, 64)
+			case "truco_median":
+				data.TrucoMedian, _ = strconv.ParseFloat(val, 64)
+			case "envido_max":
+				v, _ := strconv.Atoi(val)
+				data.EnvidoMax = v
+			case "envido_min":
+				v, _ := strconv.Atoi(val)
+				data.EnvidoMin = v
+			case "envido_mean":
+				data.EnvidoMean, _ = strconv.ParseFloat(val, 64)
+			case "envido_median":
+				data.EnvidoMedian, _ = strconv.ParseFloat(val, 64)
+			case "combined_mean":
+				data.CombinedMean, _ = strconv.ParseFloat(val, 64)
+			case "count":
+				v, _ := strconv.Atoi(val)
+				data.Count = v
+			}
+		}
+
+		key := fmt.Sprintf("%s %v", data.Pair, data.IsEnvido)
+		stats[key] = data
+	}
+
+	return stats, nil
 }

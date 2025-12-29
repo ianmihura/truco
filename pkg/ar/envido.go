@@ -124,6 +124,6 @@ func PEnvido(score uint8) float32 {
 }
 
 // Probability a given envido is the highest of the table, given mCards and other kCards
-func PHighestEnvido(score uint8, mCards, kCards []Card) float32 {
+func PEnvidoHighest(score uint8, mCards, kCards []Card) float32 {
 	return 0.0 // TODO
 }

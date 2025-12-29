@@ -20,4 +20,9 @@
         {{ end }}
     </div>
 </div>
+<script>
+    if (typeof updateMatrixStats === 'function') {
+        updateMatrixStats({{ .Stats }});
+    }
+</script>
 {{ end }}
