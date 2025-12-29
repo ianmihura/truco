@@ -159,9 +159,14 @@ func getCSVReader(csvPath string) ([][]string, error) {
 // Reads hand strengths (output of CreateHandStatsCSV) and computes stats per pair,
 // including max, min, mean, and median envido scores.
 //
+// Input params:
+//   - inputPath (output of CreateHandStatsCSV)
+//   - outputPath (csv output file)
+//   - withEnvido (true = discriminates between hands w & w/o envido, output PK = pair + is_envido)
+//
 // This will get executed very often: every time there's a state change in the frontend.
 // The frontend uses this output for stats and color coding the matrix.
-func CreatePairStatsCSV(inputPath, outputPath string) error {
+func CreatePairStatsCSV(inputPath, outputPath string, withEnvido bool) error {
 	records, err := getCSVReader(inputPath)
 	if err != nil {
 		return err
@@ -177,14 +182,12 @@ func CreatePairStatsCSV(inputPath, outputPath string) error {
 		envidos []int
 	}
 	statsMap := make(map[statsKey]*pairData)
+	statsKeys := make([]statsKey, 0, len(statsMap))
 
 	// Create stats
 	for i, row := range records {
 		if i == 0 && (strings.HasPrefix(row[0], "hand") || strings.Contains(row[0], "score")) {
 			continue // Skip Header
-		}
-		if len(row) < 2 {
-			continue
 		}
 
 		handStr := row[0]
@@ -205,15 +208,21 @@ func CreatePairStatsCSV(inputPath, outputPath string) error {
 		envido := int(h.Envido())
 		isEnvido := envido >= 20
 
-		// Key: first two cards (matches existing PairStrengths logic)
+		// Key: first two cards (asumes cards are sorted in given csv)
 		r0 := NewCard(cards[0]).ToRank()
 		r1 := NewCard(cards[1]).ToRank()
 		pairKey := fmt.Sprintf("%s %s", r0, r1)
 
-		key := statsKey{pair: pairKey, isEnvido: isEnvido}
+		var key statsKey
+		if withEnvido {
+			key = statsKey{pair: pairKey, isEnvido: isEnvido}
+		} else {
+			key = statsKey{pair: pairKey, isEnvido: false}
+		}
 
 		if statsMap[key] == nil {
 			statsMap[key] = &pairData{}
+			statsKeys = append(statsKeys, key)
 		}
 		statsMap[key].scores = append(statsMap[key].scores, score)
 		statsMap[key].envidos = append(statsMap[key].envidos, envido)
@@ -247,26 +256,19 @@ func CreatePairStatsCSV(inputPath, outputPath string) error {
 		return err
 	}
 
-	// Sort keys for stable output
-	type sortedKey struct {
-		pair     string
-		isEnvido bool
-	}
-	sortedKeys := make([]sortedKey, 0, len(statsMap))
-	for k := range statsMap {
-		sortedKeys = append(sortedKeys, sortedKey{k.pair, k.isEnvido})
-	}
-	sort.Slice(sortedKeys, func(i, j int) bool {
-		if sortedKeys[i].pair != sortedKeys[j].pair {
-			return sortedKeys[i].pair < sortedKeys[j].pair
+	// Sort keys for sorted output
+	sort.Slice(statsKeys, func(i, j int) bool {
+		if statsKeys[i].pair != statsKeys[j].pair {
+			return statsKeys[i].pair < statsKeys[j].pair
+		} else {
+			return statsKeys[i].isEnvido && !statsKeys[j].isEnvido // envido (true) first
 		}
-		return sortedKeys[i].isEnvido && !sortedKeys[j].isEnvido // envido (true) first
 	})
 
-	for _, k := range sortedKeys {
-		mapKey := statsKey{k.pair, k.isEnvido}
+	for _, mapKey := range statsKeys {
 		d := statsMap[mapKey]
 		if len(d.scores) == 0 {
+			// empty pair, should not happen
 			continue
 		}
 
@@ -275,41 +277,22 @@ func CreatePairStatsCSV(inputPath, outputPath string) error {
 		count := len(d.scores)
 		minT := d.scores[0]
 		maxT := d.scores[count-1]
-		var sumS float64
-		for _, s := range d.scores {
-			sumS += s
-		}
-		meanT := sumS / float64(count)
-
-		var medianT float64
-		if count%2 == 1 {
-			medianT = float64(d.scores[count/2])
-		} else {
-			medianT = float64(d.scores[count/2-1]+d.scores[count/2]) / 2.0
-		}
+		meanT := math.Mean(d.scores)
+		medianT := math.Median(d.scores)
 
 		// Envido stats
 		sort.Ints(d.envidos)
 		minE := d.envidos[0]
 		maxE := d.envidos[count-1]
-		var sumE int
-		for _, e := range d.envidos {
-			sumE += e
-		}
+		sumE := math.Sum(d.envidos)
 		meanE := float64(sumE) / float64(count)
-
-		var medianE float64
-		if count%2 == 1 {
-			medianE = float64(d.envidos[count/2])
-		} else {
-			medianE = float64(d.envidos[count/2-1]+d.envidos[count/2]) / 2.0
-		}
+		medianE := math.Median(d.envidos)
 
 		meanC := (meanT + meanE/MAX_ENVIDO) / 2
 
 		writer.Write([]string{
-			k.pair,
-			fmt.Sprintf("%v", k.isEnvido),
+			mapKey.pair,
+			fmt.Sprintf("%v", mapKey.isEnvido),
 			fmt.Sprintf("%.6f", maxT),
 			fmt.Sprintf("%.6f", minT),
 			fmt.Sprintf("%.6f", meanT),
@@ -317,7 +300,7 @@ func CreatePairStatsCSV(inputPath, outputPath string) error {
 			fmt.Sprintf("%d", maxE),
 			fmt.Sprintf("%d", minE),
 			fmt.Sprintf("%.2f", meanE),
-			fmt.Sprintf("%.2f", medianE),
+			fmt.Sprintf("%d", medianE),
 			fmt.Sprintf("%.6f", meanC),
 			fmt.Sprintf("%d", count),
 		})
@@ -326,6 +309,8 @@ func CreatePairStatsCSV(inputPath, outputPath string) error {
 	return nil
 }
 
+// preliminary function - will be removed:
+// we will return the content itself
 func LoadPairStats(csvPath string) (map[string]PairStat, error) {
 	records, err := getCSVReader(csvPath)
 	if err != nil {
