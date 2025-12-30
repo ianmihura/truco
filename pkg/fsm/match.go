@@ -5,6 +5,7 @@ import (
 )
 
 type AskRequest uint8
+type ValidAction string
 
 const (
 	RequestTruco   AskRequest = 0
@@ -13,7 +14,22 @@ const (
 	RequestEnvido  AskRequest = 2
 	RequestReal    AskRequest = 3
 	RequestFalta   AskRequest = 255
-	NUM_PLAYERS               = 4
+
+	PLAY    ValidAction = "Carta"
+	ASK_T   ValidAction = "Truco"
+	ASK_RT  ValidAction = "Retruco"
+	ASK_V4  ValidAction = "Vale 4"
+	ASK_E   ValidAction = "Envido"
+	ASK_RE  ValidAction = "Real envido"
+	ASK_FE  ValidAction = "Falta envido"
+	ACCEPT  ValidAction = "Quiero"
+	ANNOUN  ValidAction = "Canta"
+	FOLD    ValidAction = "Al mazo"
+	FOLD_NQ ValidAction = "No quiero"
+	FOLD_SB ValidAction = "Son buenas"
+	// FLOR    ValidAction = "Flor" // TODO uy
+
+	NUM_PLAYERS = 4
 )
 
 // FSM for a single match
@@ -66,7 +82,7 @@ type State interface {
 	fold()                         // rejects a bet increase, 'son buenas' in envido, or simply ends match
 	announce(uint8) error          // announce how much envido you have
 	stateId() uint8
-	validActions() []string
+	validActions() []ValidAction
 }
 
 // Returns an empty object, with binding to all states
@@ -140,9 +156,11 @@ func (m *Match) stateId() uint8 {
 	return m.CState.stateId()
 }
 
-func (m *Match) ValidActions() []string {
+func (m *Match) ValidActions() []ValidAction {
 	return m.CState.validActions()
 }
+
+// TODO get relevant info to filter out impossible hands
 
 // Truco player order
 func (m *Match) prevPlayer() uint8 {
@@ -186,8 +204,8 @@ func (m *Match) cPlayerE() int {
 
 // Returns winner envido and player id, played until now
 //
-// If envido is not asked, returns (0, 0)
-// If envido is 'no quiero', returns (0, score)
+//   - If envido is not asked, returns (0, 0)
+//   - If envido is 'no quiero', returns (0, score)
 func (m *Match) winnerE() (highest uint8, player uint8) {
 	highest = 0
 	if m.Envidos[0] == 255 && m.CEnvido != 0 {
@@ -212,8 +230,8 @@ func (m *Match) winnerE() (highest uint8, player uint8) {
 	return highest, player
 }
 
-func (m *Match) getScore() *Score {
-	winnerE, _ := m.winnerE()
+func (m *Match) GetScore() *Score {
+	_, winnerE := m.winnerE()
 	return &Score{
 		winnerT: m.WinnerT,
 		pointsT: m.CTruco,

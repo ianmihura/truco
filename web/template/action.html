@@ -1,5 +1,5 @@
 {{ define "action" }}
-<div
+<div id="current-action"
     class="player-card bg-slate-800 border border-slate-700 rounded-md overflow-hidden shadow-xl animate-in slide-in-from-left duration-300">
     <div class="px-3 py-2">
         <h3 class="text-white font-bold text-xs tracking-wider flex items-center gap-2">
@@ -7,8 +7,20 @@
         </h3>
     </div>
     <div class="py-1">
+        {{ range .DoneActions }}
+        <div
+            class="px-3 py-1 text-blue-400 text-xs font-bold border-l-2 border-blue-500 bg-blue-500/10 select-none mb-1">
+            ✓ {{ . }}
+        </div>
+        {{ end }}
+
         {{ range .Actions }}
-        {{ if eq . "play" }}
+        {{ if or (eq . "Truco") (eq . "Retruco") (eq . "Vale 4") }}
+        <div class="action-btn px-3 py-1 text-slate-300 text-xs font-medium cursor-pointer transition-all hover:bg-slate-700/50 hover:border-slate-500/50 select-none"
+            hx-get="/track-act?action={{ . }}&state={{ $.State }}" hx-target="#modal-container" hx-swap="innerHTML">
+            {{ . }}
+        </div>
+        {{ else if eq . "Carta" }}
         <div class="action-btn px-3 py-1 text-slate-300 text-xs font-medium cursor-pointer transition-all hover:bg-slate-700/50 hover:border-slate-500/50 select-none"
             hx-get="/track-act?action={{ . }}&state={{ $.State }}" hx-target="body" hx-swap="beforeend"
             hx-on:click="document.querySelectorAll('.action-btn').forEach(b => b.classList.remove('active-play')); this.classList.add('active-play')">
@@ -16,18 +28,35 @@
         </div>
         {{ else }}
         <div class="action-btn px-3 py-1 text-slate-300 text-xs font-medium cursor-pointer transition-all hover:bg-slate-700/50 hover:border-slate-500/50 select-none"
-            hx-get="/track-act?action={{ . }}&state={{ $.State }}" hx-vals='js:{fmatrix: showFullMatrix}'
-            hx-target="#tracker-grid" hx-swap="beforeend" hx-trigger="click once"
+            hx-get="/track-act?action={{ . }}&state={{ $.State }}" hx-target="#tracker-grid" hx-swap="beforeend"
+            hx-trigger="click once"
             hx-on:click="this.closest('.player-card').classList.add('pointer-events-none', 'opacity-60')">
             {{ . }}
         </div>
         {{ end }}
         {{ end }}
     </div>
+    <div hx-get="/track-stats?state={{ .State }}" hx-vals='js:{fmatrix: showFullMatrix}' hx-trigger="load"
+        hx-swap="none" hx-on::after-request="updateMatrixStats(JSON.parse(event.detail.xhr.response))">
+    </div>
+    <script>
+        window.currentTrucoState = "{{ .State }}";
+        // Ensure only the latest action card has the 'current-action' ID
+        (function () {
+            const allActions = document.querySelectorAll('.player-card');
+            allActions.forEach(card => {
+                if (card !== document.getElementById('current-action')) {
+                    // This is not the one we just injected or replaced
+                }
+            });
+            // Actually, HTMX will handle it if we are careful, but let's be safe:
+            const elements = document.querySelectorAll('#current-action');
+            if (elements.length > 1) {
+                for (let i = 0; i < elements.length - 1; i++) {
+                    elements[i].id = '';
+                }
+            }
+        })();
+    </script>
 </div>
-<script>
-    if (typeof updateMatrixStats === 'function') {
-        updateMatrixStats({{ .Stats }});
-    }
-</script>
 {{ end }}

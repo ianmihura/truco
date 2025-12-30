@@ -138,28 +138,29 @@ func Pick(n, k int) float32 {
 	return float32(Fact(n, n-k+1)) / float32(Fact(k, 1))
 }
 
-// Type T=numeric is limited, consider adding more types as needed
-type numeric interface {
+// Type Numeric is limited to types used in this project
+// consider adding more types as needed
+type Numeric interface {
 	int | uint8 | float32 | float64
 }
 
-func Sum[T numeric](ar []T) T {
+func Sum[T Numeric](arr []T) T {
 	var sum T
-	for _, s := range ar {
+	for _, s := range arr {
 		sum += s
 	}
 	return sum
 }
 
-func Mean[T numeric](ar []T) T {
-	return Sum(ar) / T(len(ar))
+func Mean[T Numeric](arr []T) T {
+	return Sum(arr) / T(len(arr))
 }
 
-func Median[T numeric](ar []T) T {
-	count := len(ar)
+func Median[T Numeric](arr []T) T {
+	count := len(arr)
 	if count%2 == 1 {
-		return T(ar[count/2])
+		return T(arr[count/2])
 	} else {
-		return T(ar[count/2-1]+ar[count/2]) / 2.0
+		return T(arr[count/2-1]+arr[count/2]) / 2.0
 	}
 }

@@ -17,6 +17,7 @@ func (r *RespondingState) play(card ar.Card) error {
 
 func (r *RespondingState) ask(requestE AskRequest) error {
 	return fmt.Errorf("You cannot ask, accept first")
+	// TODO this should work
 	// if !r.match.IsEnvido && requestE != RequestTruco {
 	// 	_, winnerE := r.match.winnerE()
 	// 	if winnerE == 0 && r.match.cTurn() == 0 {
@@ -60,6 +61,6 @@ func (r *RespondingState) stateId() uint8 {
 	return 3
 }
 
-func (r *RespondingState) validActions() []string {
-	return []string{"accept", "fold"}
+func (r *RespondingState) validActions() []ValidAction {
+	return []ValidAction{ACCEPT, FOLD_NQ}
 }

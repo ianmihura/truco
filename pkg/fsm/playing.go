@@ -80,7 +80,7 @@ func (p *PlayingState) accept() error {
 }
 
 func (p *PlayingState) fold() {
-	p.match.WinnerT = p.match.prevPlayer()
+	p.match.WinnerT = p.match.prevPlayer() // TODO make sure this works
 	p.match.CState = p.match.End
 }
 
@@ -92,27 +92,28 @@ func (p *PlayingState) stateId() uint8 {
 	return 1
 }
 
-func (p *PlayingState) validActions() []string {
-	actions := []string{"play", "fold"}
+func (p *PlayingState) validActions() []ValidAction {
+	actions := []ValidAction{PLAY, FOLD}
 
 	if p.match.CTruco == 1 {
-		actions = append(actions, "ask_truco")
+		actions = append(actions, ASK_T)
 	} else if p.match.CTrucoAsk%2 != p.match.CPlayer%2 {
 		switch p.match.CTruco {
 		case 2:
-			actions = append(actions, "ask_retruco")
+			actions = append(actions, ASK_RT)
 		case 3:
-			actions = append(actions, "ask_vale_4")
+			actions = append(actions, ASK_V4)
 		}
 	}
 
 	if p.match.cTurn() == 0 {
 		if !p.match.IsEnvido {
 			if p.match.CPlayer >= 2 && p.match.CEnvidoAsk == 255 {
-				actions = append(actions, "ask_envido")
+				actions = append(actions, ASK_E)
 			}
 		} else {
-			actions = append(actions, "ask_envido")
+			// TODO other envidos
+			actions = append(actions, ASK_E)
 		}
 	}
 

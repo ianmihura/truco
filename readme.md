@@ -23,6 +23,9 @@
     - Individual cards
 
 ### TODO UI:
+- track user data beside their name: declared envido / shown cards
+    - once you click on any player action, the matrix should reflect the changes of stats relevant to this user
+- unify envido into same tracker action
 - settings on top
     - num players
     - Separate between arg & uru

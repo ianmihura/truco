@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"truco/pkg/fsm"
 )
 
@@ -18,4 +19,8 @@ func main() {
 	// }
 
 	fsm.NewMatch()
+
+	fmt.Println('a', 'b', 'c', 'd', 'e')
+
+	fmt.Println(fsm.ValidAction("asdf"))
 }

@@ -24,7 +24,7 @@ func (a *AnnouncingState) accept() error {
 // Players announce 'son buenas' by folding
 func (a *AnnouncingState) fold() {
 	if a.match.isEnvidoFull() {
-		// should never happen
+		// should never happen - we close the state at the end
 		a.match.CState = a.match.Playing
 		a.match.IsEnvido = false
 		return
@@ -42,19 +42,18 @@ func (a *AnnouncingState) fold() {
 
 func (a *AnnouncingState) announce(score uint8) error {
 	if a.match.isEnvidoFull() {
-		// should never happen
+		// should never happen - we close the state at the end
 		a.match.CState = a.match.Playing
 		a.match.IsEnvido = false
-		return fmt.Errorf("Announcing already finished")
+		return nil
 	}
 
-	highestE, _ := a.match.winnerE()
-
 	if score <= 7 || (score >= 20 && score <= ar.MAX_ENVIDO) {
+		highestE, _ := a.match.winnerE()
 		if highestE < score {
 			a.match.Envidos[a.match.cPlayerE()] = score
 		} else {
-			// player announced loosing envido (lower than highest): should never happen
+			// player announced loosing envido (lower than highest)
 			a.match.Fold()
 		}
 
@@ -74,6 +73,6 @@ func (a *AnnouncingState) stateId() uint8 {
 	return 2
 }
 
-func (a *AnnouncingState) validActions() []string {
-	return []string{"announce", "fold"}
+func (a *AnnouncingState) validActions() []ValidAction {
+	return []ValidAction{ANNOUN, FOLD_SB}
 }

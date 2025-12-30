@@ -20,9 +20,10 @@
             </button>
         </div>
 
-        <div
-            class="flex items-center gap-3 bg-slate-800/80 p-1.5 rounded-xl border border-slate-700/50 backdrop-blur-md h-fit">
-            <button onclick="toggleMatrix()" id="envido-toggle" hx-target="#tracker-grid"
+        <div class="flex items-center gap-3 bg-slate-800/80 p-1.5 rounded-xl border border-slate-700/50 h-fit">
+            <button onclick="toggleMatrix()" id="envido-toggle" hx-get="/track-stats"
+                hx-vals='js:{state: window.currentTrucoState, fmatrix: showFullMatrix}' hx-trigger="click"
+                hx-swap="none" hx-on::after-request="(JSON.parse(event.detail.xhr.response))"
                 class="relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 bg-blue-600">
                 <span id="envido-toggle-dot"
                     class="inline-block h-4 w-4 transform rounded-full bg-slate-200 transition-all duration-300 translate-x-6"></span>
@@ -36,7 +37,6 @@
 
     <div class="grid grid-cols-[repeat(14,minmax(0,1fr))] gap-px bg-slate-900 border border-slate-900 rounded-lg overflow-hidden shadow-2xl w-full"
         id="matrix">
-        <!-- JS will populate this -->
     </div>
 </div>
 
@@ -286,7 +286,9 @@
         });
     }
 
-    // Initial load from template data
-    updateMatrixStats({{ . }});
+
+    // TODO check if this is not needed
+    // window.currentTrucoState = "{{ . }}"
+    // updateMatrixStats(JSON.parse(window.currentTrucoState));
 </script>
 {{ end }}

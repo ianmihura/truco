@@ -31,6 +31,6 @@ func (e *EndState) stateId() uint8 {
 	return 0
 }
 
-func (e *EndState) validActions() []string {
-	return []string{}
+func (e *EndState) validActions() []ValidAction {
+	return []ValidAction{}
 }
