@@ -70,3 +70,16 @@ func (c Card) Print() {
 func (c Card) Println() {
 	fmt.Printf("%d%c\n", c.N, c.S)
 }
+
+// TODO helper function, may be removed later
+func FlattenCardList(cardss [][]Card) []Card {
+	cards := make([]Card, 0, len(cardss)*len(cardss[0]))
+	for cc := range cardss {
+		for c := range cardss[cc] {
+			if cardss[cc][c].N != 0 {
+				cards = append(cards, cardss[cc][c])
+			}
+		}
+	}
+	return cards
+}

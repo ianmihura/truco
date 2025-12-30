@@ -55,17 +55,14 @@ func (h *TrackerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		_ = match.Announce(20)
 	}
 
-	var csvPath string
-	if fmatrixParam == "true" {
-		csvPath = "web/static/pair_stats.csv"
-	} else {
-		csvPath = "web/static/pair_stats_no_e.csv"
+	filter := ar.FilterHands{
+		KCards: ar.FlattenCardList(match.Cards),
 	}
 
-	// TODO recalculate stats, not with CSV
-	stats, err := ar.LoadPairStats(csvPath)
+	// Recalculate stats dynamically based on the current matrix mode
+	stats, err := ar.ComputePairStats("web/static/hand_stats.csv", fmatrixParam == "true", filter)
 	if err != nil {
-		http.Error(w, "Failed to load stats: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Failed to compute stats: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
