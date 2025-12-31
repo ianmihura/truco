@@ -23,6 +23,9 @@
     - Individual cards
 
 ### TODO UI:
+- select past turns:
+    - without breaking history
+    - enable undo logic (change card or action)
 - track user data beside their name: declared envido / shown cards
     - once you click on any player action, the matrix should reflect the changes of stats relevant to this user
 - unify envido into same tracker action
@@ -50,7 +53,7 @@
 - chance that your hand is best in table, given known info
 - chance that your envido is best in table, given known info
 
-### TODO backend 
+### TODO backend
 - TrucoStrength does not capture the practical stregth, because there are some permutations that will never be reasoanably played. Eg:
     - Tie the first round, you should play your strongest card right away.
     - If you lost the first round, you should not tie any other round, unless you're loosing anyway.
@@ -67,54 +70,17 @@
 ### Uruguay
 - Make sure to reuse generic functions
 
-### References
-https://quanam.com/todo-lo-que-siempre-quisiste-saber-del-truco-uruguayo/
-
-----
-
 ### Next steps
 - host in a free tier server (fly.io, gcp, render)
 - hover on different elements also shows hints in the bottom, explaining UI
     - tutorial?
-- hover changes sidebar
-- ? delimiter in frontend from {{}} to <go></go> 
-    with `.Delims("<go>", "</go>")`
-- return updated stats when FSM action is taken
 - Track progress of a hand
     - scrollable action tracker
     - The matrix will constantly be updated every time some player makes an action
     - make a nicer card chooser (and reduce the options based on info available)
 - remake matrix to be a triangle - we dont really care for separation between envido and non envido
-    - pasa que el envido es solo relevante en la primera mano
-        si ya anuncion que envido tiene, ya estamos mucho mas claros
-        pero si no anuncio, lo mas relevante va a ser que cartas tiene, y separarlas en 2 (en especial por la cuenta) seria medio dificil de ver en lo obvio
     - Finish selecting a hand in with a third click (maybe 2 clicks: number, suit)
-- Reduce the amount of js in the `matrix.html` file.
-    Pass some of the logic to go, and allow generation of html in the backend (as htmx is meant to do). It will help that later we need to be able to change the `hand_stats.csv` file dynamically (remove some impossible hands, given known information). 
-    This means that the function `CreatePairStatsCSV` will be called many times (every time we need to render the matrix)
 - Define what metrics are encoded with color in the matrix
-    We may need to show many stats, options:
-    - click and show a side panel of relevant info (current, all info, as in GTOWizard)
-    - color-code relevant stats for a first-glance intuition (use % bars in-hand to 2-3 dimensions)
-        color: can vary, but if its too complex, it breaks vertical and horizontal
-        vertical: must normalize
-        horizontal: must normalize
-
-        relevant metrics:
-        % strength (vary between combined and truco alone)
-        count (% chance that this is the hand)
-
-### FSM
-[Example in golang](https://refactoring.guru/design-patterns/state/go/example)
-
-Mechanics:
-- The frontend must:
-    - Save the state
-    - Send it to the backend on each request
-    - UI interactions are easy: no state transition or interpretation
-- The backend must:
-    - Encode/decode state to and from the frontend
-- Generalizer for uy
 
 Envido scores:
 ```
@@ -132,3 +98,6 @@ tn| nq  quiero
 
 4 | 7 - 255
 ```
+
+### References
+https://quanam.com/todo-lo-que-siempre-quisiste-saber-del-truco-uruguayo/
