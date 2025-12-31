@@ -1,41 +1,15 @@
 package partials
 
 import (
-	"encoding/json"
-	"html/template"
 	"net/http"
+	"slices"
 	"truco/pkg/ar"
 	"truco/pkg/fsm"
 )
 
-type TrackerHandler struct {
-	tmpl *template.Template
-}
-
-type TrackerData struct {
-	ActionTitle string
-	Actions     []fsm.ValidAction
-	DoneActions []fsm.ValidAction
-	State       string
-	PlayedCard  string
-	Stats       template.JS
-	// Score       fsm.Score
-}
-
-func NewTrackerHandler(tmpl *template.Template) *TrackerHandler {
-	return &TrackerHandler{tmpl: tmpl}
-}
-
-func (h *TrackerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	stateParam := r.URL.Query().Get("state")
+func (h *Handler) TrackAct(w http.ResponseWriter, r *http.Request) {
 	actionParam := r.URL.Query().Get("action")
-
-	var match *fsm.Match
-	if stateParam == "" {
-		match = fsm.NewMatch()
-	} else {
-		match = fsm.Decode([]byte(stateParam))
-	}
+	match := GetMatch(r)
 
 	var doneActions []fsm.ValidAction
 
@@ -43,7 +17,7 @@ func (h *TrackerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch action {
 	case fsm.PLAY:
 		if h.handlePlay(w, r, match) {
-			return // early return to skip return of new tracker
+			return // early return: skip new tracker
 		}
 	case fsm.ASK_T, fsm.ASK_RT, fsm.ASK_V4:
 		_ = match.Ask(fsm.RequestTruco)
@@ -61,10 +35,13 @@ func (h *TrackerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		return
-	case fsm.ASK_E, fsm.ASK_RE, fsm.ASK_FE:
-		// TODO other envido types
+		return // early return: skip new tracker
+	case fsm.ASK_E:
 		_ = match.Ask(fsm.RequestEnvido)
+	case fsm.ASK_RE:
+		_ = match.Ask(fsm.RequestReal)
+	case fsm.ASK_FE:
+		_ = match.Ask(fsm.RequestFalta)
 	case fsm.ACCEPT:
 		prevTruco := match.CTruco
 		_ = match.Accept()
@@ -89,7 +66,6 @@ func (h *TrackerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Actions:     match.ValidActions(),
 		DoneActions: doneActions,
 		State:       string(match.Encode()),
-		// Score:       *match.GetScore(),
 	}
 
 	err := h.tmpl.ExecuteTemplate(w, "action", data)
@@ -98,32 +74,8 @@ func (h *TrackerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *TrackerHandler) HandleStats(w http.ResponseWriter, r *http.Request) {
-	stateParam := r.URL.Query().Get("state")
-	fmatrixParam := r.URL.Query().Get("fmatrix")
-
-	var match *fsm.Match
-	if stateParam == "" {
-		match = fsm.NewMatch()
-	} else {
-		match = fsm.Decode([]byte(stateParam))
-	}
-
-	// Recalculate stats dynamically based on the current matrix mode
-	stats, err := ar.ComputePairStats(fmatrixParam == "true", match.GetStatsFilter())
-	if err != nil {
-		http.Error(w, "Failed to compute stats: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(stats); err != nil {
-		http.Error(w, "Failed to marshal stats: "+err.Error(), http.StatusInternalServerError)
-	}
-}
-
 // Returns true if we send cards.html list to the frontend: early return
-func (h *TrackerHandler) handlePlay(w http.ResponseWriter, r *http.Request, match *fsm.Match) bool {
+func (h *Handler) handlePlay(w http.ResponseWriter, r *http.Request, match *fsm.Match) bool {
 	card := r.URL.Query().Get("card")
 	if card != "" {
 		// If user specified a card, return the next action
@@ -132,6 +84,15 @@ func (h *TrackerHandler) handlePlay(w http.ResponseWriter, r *http.Request, matc
 	}
 	// If no card specified, return the cards template
 
+	// We use different cards for UI
+	// to track selectable and unselectable cards
+	type CardUI struct {
+		N  uint8 // Number: 1,2,3,4,5,6,7,10,11,12
+		S  uint8 // Suit: e,b,o,c (espada, basto, oro, copa)
+		OK bool
+	}
+
+	slices.SortFunc(ar.ALL_CARDS, ar.SortForTruco)
 	cards := ar.ALL_CARDS // TODO reduce card options
 	data := struct {
 		Cards  []ar.Card

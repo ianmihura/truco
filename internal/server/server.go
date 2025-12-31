@@ -24,7 +24,7 @@ func NewServer(tmpl *template.Template) *Server {
 func (s *Server) routes() {
 	// Initialize Handlers
 	homeHandler := pages.NewHomeHandler(s.Tmpl)
-	trackerHandler := partials.NewTrackerHandler(s.Tmpl)
+	handler := partials.NewHandler(s.Tmpl)
 
 	// Serve static files
 	fs := http.FileServer(http.Dir("web/static"))
@@ -32,6 +32,6 @@ func (s *Server) routes() {
 
 	// Register Routes
 	s.Handle("/", homeHandler)
-	s.Handle("/track-act", trackerHandler)
-	s.HandleFunc("/track-stats", trackerHandler.HandleStats)
+	s.HandleFunc("/track-act", handler.TrackAct)
+	s.HandleFunc("/track-stats", handler.TrackStats)
 }
