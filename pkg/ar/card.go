@@ -71,15 +71,13 @@ func (c Card) Println() {
 	fmt.Printf("%d%c\n", c.N, c.S)
 }
 
-// TODO helper function, may be removed later
-func FlattenCardList(cardss [][]Card) []Card {
-	cards := make([]Card, 0, len(cardss)*len(cardss[0]))
-	for cc := range cardss {
-		for c := range cardss[cc] {
-			if cardss[cc][c].N != 0 {
-				cards = append(cards, cardss[cc][c])
-			}
+// Given a list of cards, returns a list of non-null cards
+func RealCards(cards []Card) []Card {
+	cards_ := make([]Card, 0, len(cards))
+	for c := range cards {
+		if cards[c].N != 0 {
+			cards_ = append(cards_, cards[c])
 		}
 	}
-	return cards
+	return cards_
 }

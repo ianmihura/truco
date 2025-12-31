@@ -109,12 +109,8 @@ func (h *TrackerHandler) HandleStats(w http.ResponseWriter, r *http.Request) {
 		match = fsm.Decode([]byte(stateParam))
 	}
 
-	filter := ar.FilterHands{
-		KCards: ar.FlattenCardList(match.Cards),
-	}
-
 	// Recalculate stats dynamically based on the current matrix mode
-	stats, err := ar.ComputePairStats("web/static/hand_stats.csv", fmatrixParam == "true", filter)
+	stats, err := ar.ComputePairStats(fmatrixParam == "true", match.GetStatsFilter())
 	if err != nil {
 		http.Error(w, "Failed to compute stats: "+err.Error(), http.StatusInternalServerError)
 		return

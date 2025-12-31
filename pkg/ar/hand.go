@@ -3,10 +3,26 @@ package ar
 import (
 	"fmt"
 	"slices"
+	"strings"
 )
 
 // Slice of Cards of any length
 type Hand []Card
+
+// Returns a new Hand from a string: Hand{NewCard(c[0]), ...}.
+// Expects cards to be separated by a single space.
+// Will use the function `NewCard` to create cards from each card
+// (see that function for more details)
+//
+//	"1e 1b 1c" -> Hand{{1, 'e'}, {1, 'b'}, {1, 'c'}}
+func NewHand(handStr string) Hand {
+	cards := strings.Split(handStr, " ")
+	hand := make([]Card, 0, len(cards))
+	for c := range cards {
+		hand = append(hand, NewCard(cards[c]))
+	}
+	return Hand(hand)
+}
 
 // SortForEnvido cmp func to sort Cards in a Hand, highest envido value first:
 // 7-1,10,11,12

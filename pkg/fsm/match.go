@@ -160,7 +160,25 @@ func (m *Match) ValidActions() []ValidAction {
 	return m.CState.validActions()
 }
 
-// TODO get relevant info to filter out impossible hands
+func (m *Match) GetStatsFilter() ar.FilterHands {
+	kCards := make([]ar.Card, 0, len(m.Cards)*len(m.Cards[0]))
+	for player := range m.Cards {
+		if player != int(m.CPlayer) {
+			for turn := range m.Cards[player] {
+				if m.Cards[player][turn].N != 0 {
+					kCards = append(kCards, m.Cards[player][turn])
+				}
+			}
+		}
+	}
+
+	return ar.FilterHands{
+		KCards:  kCards,
+		MCards:  ar.RealCards(m.Cards[m.CPlayer]),
+		MEnvido: m.Envidos[m.CPlayer],
+		// KEnvido: , // TODO is this useful?
+	}
+}
 
 // Truco player order
 func (m *Match) prevPlayer() uint8 {

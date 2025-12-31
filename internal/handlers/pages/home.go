@@ -19,7 +19,7 @@ func NewHomeHandler(tmpl *template.Template) *HomeHandler {
 
 func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Compute initial stats (default to full matrix mode)
-	stats, err := ar.ComputePairStats("web/static/hand_stats.csv", true, ar.FilterHands{})
+	stats, err := ar.ComputePairStats(true, ar.FilterHands{})
 	if err != nil {
 		http.Error(w, "Failed to compute stats: "+err.Error(), http.StatusInternalServerError)
 		return
