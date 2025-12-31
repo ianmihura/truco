@@ -3,6 +3,7 @@ package ar
 import (
 	"slices"
 	"truco/pkg/math"
+	"truco/pkg/truco"
 )
 
 // Simulates two hands being played in Truco, in the orther they were given
@@ -80,7 +81,7 @@ func (mHand Hand) TrucoBeatsAll(oHand Hand) (score int) {
 // range of score = (-36 to 36)
 func (mHand Hand) TrucoStrength() float32 {
 	mPerms := math.Permutations(mHand, 3)
-	aCards := CardsExcluding(ALL_CARDS, mHand)
+	aCards := CardsExcluding(truco.ALL_CARDS, mHand)
 	oPerms := math.Permutations(aCards, 3)
 	var score int
 	for mH := range mPerms {

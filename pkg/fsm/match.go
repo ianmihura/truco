@@ -2,18 +2,17 @@ package fsm
 
 import (
 	"truco/pkg/ar"
+	"truco/pkg/truco"
 )
 
 type AskRequest uint8
 type ValidAction string
 
 const (
-	RequestTruco   AskRequest = 0
-	RequestRetruco AskRequest = 1 // TODO make sure this is necesary
-	RequestVale4   AskRequest = 4 // TODO make sure this is necesary
-	RequestEnvido  AskRequest = 2
-	RequestReal    AskRequest = 3
-	RequestFalta   AskRequest = 255
+	RequestTruco  AskRequest = 0
+	RequestEnvido AskRequest = 2
+	RequestReal   AskRequest = 3
+	RequestFalta  AskRequest = 255
 
 	PLAY    ValidAction = "Carta"
 	ASK_T   ValidAction = "Truco"
@@ -35,16 +34,16 @@ const (
 // FSM for a single match
 type Match struct {
 	// context
-	Cards      [][]ar.Card `json:"cards"`        // list of cards played: cards[player][turn]
-	CTruco     uint8       `json:"c_truco"`      // current truco bet (1-4)
-	CTrucoAsk  uint8       `json:"c_truco_ask"`  // who asked for the last truco bet
-	CPlayer    uint8       `json:"c_player"`     // player that should perform next action (not for envido)
-	Envidos    []uint8     `json:"envidos"`      // list of envidos declared per player: envidos[player] (default=255)
-	CEnvido    uint8       `json:"c_envido"`     // current envido bet 'quiero'
-	CEnvidoNo  uint8       `json:"c_envido_no"`  // current envido bet 'no quiero'
-	CEnvidoAsk uint8       `json:"c_envido_ask"` // who asked for the last envido bet
-	IsEnvido   bool        `json:"is_envido"`    // so we don't duplicate response actions and states: false=truco (default), true=envido
-	WinnerT    uint8       `json:"winner_t"`     // id of a player in the team that won truco, 255 if still playing
+	Cards      [][]truco.Card `json:"cards"`        // list of cards played: cards[player][turn]
+	CTruco     uint8          `json:"c_truco"`      // current truco bet (1-4)
+	CTrucoAsk  uint8          `json:"c_truco_ask"`  // who asked for the last truco bet
+	CPlayer    uint8          `json:"c_player"`     // player that should perform next action (not for envido)
+	Envidos    []uint8        `json:"envidos"`      // list of envidos declared per player: envidos[player] (default=255)
+	CEnvido    uint8          `json:"c_envido"`     // current envido bet 'quiero'
+	CEnvidoNo  uint8          `json:"c_envido_no"`  // current envido bet 'no quiero'
+	CEnvidoAsk uint8          `json:"c_envido_ask"` // who asked for the last envido bet
+	IsEnvido   bool           `json:"is_envido"`    // so we don't duplicate response actions and states: false=truco (default), true=envido
+	WinnerT    uint8          `json:"winner_t"`     // id of a player in the team that won truco, 255 if still playing
 	// players are indexed as the match order:
 	// 	- counter-clockwise, dealer last
 	//  - 255=none
@@ -76,7 +75,7 @@ type Score struct {
 // interface that implements all possible actions.
 // Identify the state by State.id()
 type State interface {
-	play(ar.Card) error            // play a card
+	play(truco.Card) error         // play a card
 	ask(requestE AskRequest) error // ask for a bet increase (truco, or envido with size)
 	accept() error                 // accepts a bet increase
 	fold()                         // rejects a bet increase, 'son buenas' in envido, or simply ends match
@@ -87,9 +86,9 @@ type State interface {
 
 // Returns an empty object, with binding to all states
 func NewMatch() *Match {
-	cards := make([][]ar.Card, NUM_PLAYERS)
+	cards := make([][]truco.Card, NUM_PLAYERS)
 	for i := range cards {
-		cards[i] = make([]ar.Card, 3)
+		cards[i] = make([]truco.Card, 3)
 	}
 
 	envidos := make([]uint8, NUM_PLAYERS)
@@ -126,7 +125,7 @@ func (m *Match) bindStates() {
 }
 
 // Plays a card
-func (m *Match) Play(card ar.Card) error {
+func (m *Match) Play(card truco.Card) error {
 	return m.CState.play(card)
 }
 
@@ -161,7 +160,7 @@ func (m *Match) ValidActions() []ValidAction {
 }
 
 func (m *Match) GetStatsFilter() ar.FilterHands {
-	kCards := make([]ar.Card, 0, len(m.Cards)*len(m.Cards[0]))
+	kCards := make([]truco.Card, 0, len(m.Cards)*len(m.Cards[0]))
 	for player := range m.Cards {
 		if player != int(m.CPlayer) {
 			for turn := range m.Cards[player] {
@@ -174,7 +173,7 @@ func (m *Match) GetStatsFilter() ar.FilterHands {
 
 	return ar.FilterHands{
 		KCards:  kCards,
-		MCards:  ar.RealCards(m.Cards[m.CPlayer]),
+		MCards:  truco.RealCards(m.Cards[m.CPlayer]),
 		MEnvido: m.Envidos[m.CPlayer],
 		// KEnvido: , // TODO is this useful?
 	}

@@ -1,10 +1,14 @@
-package uy
+package truco
 
-import "fmt"
+import (
+	"fmt"
+)
 
 /*
+TODO what to do with uy cards
 We have 3 ideas to encode the muestra and figuras:
-- bool in the Card struct isFigura
+
+-NO- bool in the Card struct isFigura
 	pro: self contained
 	pro: keep function ifaces intact
 	con: complex iface for card
@@ -93,4 +97,21 @@ func (c Card) Print() {
 
 func (c Card) Println() {
 	fmt.Printf("%d%c\n", c.N, c.S)
+}
+
+// Given a list of cards, returns a list of non-null cards
+func RealCards(cards []Card) []Card {
+	cards_ := make([]Card, 0, len(cards))
+	for c := range cards {
+		if cards[c].N != 0 {
+			cards_ = append(cards_, cards[c])
+		}
+	}
+	return cards_
+}
+
+// returns a list of all suits of the same n, eg.
+// n=1, returns []Card{1e, 1b, 1o, 1c}
+func GetSuitCards(n uint8) []Card {
+	return []Card{{n, 'e'}, {n, 'b'}, {n, 'o'}, {n, 'c'}}
 }

@@ -3,7 +3,9 @@ package partials
 import (
 	"html/template"
 	"net/http"
+	"truco/pkg/ar"
 	"truco/pkg/fsm"
+	"truco/pkg/truco"
 )
 
 type TrackerData struct {
@@ -32,4 +34,30 @@ func GetMatch(r *http.Request) *fsm.Match {
 	} else {
 		return fsm.Decode([]byte(stateParam))
 	}
+}
+
+// Derived from truco.Card.
+// We use different cards for UI
+// to track selectable and unselectable cards
+type CardUI struct {
+	truco.Card
+	OK bool
+}
+
+// Returns a copy of ALL_CARDS, excluding all cards in
+// filter.MCards and filter.KCards
+func GetAvailableCards(filter ar.FilterHands) []CardUI {
+	excluded := make(map[truco.Card]bool, len(filter.KCards)*2)
+	for _, c := range filter.KCards {
+		excluded[c] = true
+	}
+	for _, c := range filter.MCards {
+		excluded[c] = true
+	}
+
+	res := make([]CardUI, 0, len(truco.ALL_CARDS))
+	for _, c := range truco.ALL_CARDS {
+		res = append(res, CardUI{Card: c, OK: !excluded[c]})
+	}
+	return res
 }

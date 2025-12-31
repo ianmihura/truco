@@ -2,7 +2,7 @@ package fsm
 
 import (
 	"testing"
-	"truco/pkg/ar"
+	"truco/pkg/truco"
 )
 
 func TestTrucoFlow(t *testing.T) {
@@ -129,7 +129,7 @@ func TestFoldTrucoAndEndstate(t *testing.T) {
 		t.Errorf("expected winner 0, got %d", m.WinnerT)
 	}
 
-	err := m.Play(ar.Card{N: 1, S: 'e'})
+	err := m.Play(truco.Card{N: 1, S: 'e'})
 	if err == nil {
 		t.Error("expected error playing in EndState")
 	}

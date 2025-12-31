@@ -3,12 +3,13 @@ package ar
 import (
 	"slices"
 	"truco/pkg/math"
+	"truco/pkg/truco"
 )
 
 // Return all cards in `cards` that dont belong to list eCards
-func CardsExcluding(cards, eCards []Card) []Card {
-	cards_ := make([]Card, 0, len(cards))
-	excluded := make(map[Card]bool)
+func CardsExcluding(cards, eCards []truco.Card) []truco.Card {
+	cards_ := make([]truco.Card, 0, len(cards))
+	excluded := make(map[truco.Card]bool)
 	for _, c := range eCards {
 		excluded[c] = true
 	}
@@ -21,7 +22,7 @@ func CardsExcluding(cards, eCards []Card) []Card {
 }
 
 // Returns true only if all `cards` belong in `iCards`
-func isEveryCardIncluded(cards, iCards []Card) bool {
+func isEveryCardIncluded(cards, iCards []truco.Card) bool {
 	for _, card := range cards {
 		if !slices.Contains(iCards, card) {
 			return false
@@ -36,7 +37,7 @@ func isEveryCardIncluded(cards, iCards []Card) bool {
 // Consider that:
 // - if len(mCards) == 3, then len(hands) == 1
 // - if len(mCards) == 0, then len(hands) == pick(aCards, 3)
-func cardRangeNoEnvido(aCards, mCards []Card) []Hand {
+func cardRangeNoEnvido(aCards, mCards []truco.Card) []Hand {
 	hands := make([]Hand, 0, int(math.Pick(len(aCards), 3)))
 
 	var hand Hand
@@ -60,8 +61,8 @@ func cardRangeNoEnvido(aCards, mCards []Card) []Hand {
 // - if len(mCards) == 3, then len(hands) == 1
 // - as len(kCards) grows, len(hands) shrinks
 // - len(hands) is not homogeneous over all envido scores
-func CardRange(score uint8, mCards, kCards []Card) []Hand {
-	aCards := CardsExcluding(ALL_CARDS, kCards)
+func CardRange(score uint8, mCards, kCards []truco.Card) []Hand {
+	aCards := CardsExcluding(truco.ALL_CARDS, kCards)
 	hands_ := cardRangeNoEnvido(aCards, mCards)
 	hands := make([]Hand, 0, len(hands_))
 

@@ -5,6 +5,7 @@ import (
 	"slices"
 	"truco/pkg/ar"
 	"truco/pkg/fsm"
+	"truco/pkg/truco"
 )
 
 func (h *Handler) TrackAct(w http.ResponseWriter, r *http.Request) {
@@ -79,27 +80,18 @@ func (h *Handler) handlePlay(w http.ResponseWriter, r *http.Request, match *fsm.
 	card := r.URL.Query().Get("card")
 	if card != "" {
 		// If user specified a card, return the next action
-		_ = match.Play(ar.NewCard(card))
+		_ = match.Play(truco.NewCard(card))
 		return false
 	}
 	// If no card specified, return the cards template
 
-	// We use different cards for UI
-	// to track selectable and unselectable cards
-	type CardUI struct {
-		N  uint8 // Number: 1,2,3,4,5,6,7,10,11,12
-		S  uint8 // Suit: e,b,o,c (espada, basto, oro, copa)
-		OK bool
-	}
-
-	slices.SortFunc(ar.ALL_CARDS, ar.SortForTruco)
-	cards := ar.ALL_CARDS // TODO reduce card options
+	slices.SortFunc(truco.ALL_CARDS, ar.SortForTruco)
 	data := struct {
-		Cards  []ar.Card
+		Cards  []CardUI
 		State  string
 		Action fsm.ValidAction
 	}{
-		Cards:  cards,
+		Cards:  GetAvailableCards(match.GetStatsFilter()),
 		State:  string(match.Encode()),
 		Action: fsm.PLAY,
 	}

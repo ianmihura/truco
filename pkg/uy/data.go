@@ -1,5 +1,7 @@
 package uy
 
+import "truco/pkg/truco"
+
 const MAX_ENVIDO = 37
 
 // Possible cards needed for an envido,
@@ -42,57 +44,18 @@ var ENVIDOS = map[uint8][][]uint8{
 }
 
 // list of all figures
-var FIGURES = []Card{
+var FIGURES = []truco.Card{
 	{10, 'e'}, {10, 'b'}, {10, 'o'}, {10, 'c'},
 	{11, 'e'}, {11, 'b'}, {11, 'o'}, {11, 'c'},
 	{12, 'e'}, {12, 'b'}, {12, 'o'}, {12, 'c'},
 }
 
-var PIEZAS = []Card{
+var PIEZAS = []truco.Card{
 	{2, 'p'}, {4, 'p'}, {5, 'p'}, {11, 'p'}, {10, 'p'},
 }
 
-// list of all cards
-var ALL_CARDS = []Card{
-	{1, 'e'}, {1, 'b'}, {1, 'o'}, {1, 'c'},
-	{2, 'e'}, {2, 'b'}, {2, 'o'}, {2, 'c'},
-	{3, 'e'}, {3, 'b'}, {3, 'o'}, {3, 'c'},
-	{4, 'e'}, {4, 'b'}, {4, 'o'}, {4, 'c'},
-	{5, 'e'}, {5, 'b'}, {5, 'o'}, {5, 'c'},
-	{6, 'e'}, {6, 'b'}, {6, 'o'}, {6, 'c'},
-	{7, 'e'}, {7, 'b'}, {7, 'o'}, {7, 'c'},
-	{10, 'e'}, {10, 'b'}, {10, 'o'}, {10, 'c'},
-	{11, 'e'}, {11, 'b'}, {11, 'o'}, {11, 'c'},
-	{12, 'e'}, {12, 'b'}, {12, 'o'}, {12, 'c'},
-}
-
-// maps every card to a relative score for game truco:
-// - if TRUCO[i] > TRUCO[j], then i beats j in truco
-// - same score tie
-var TRUCO = map[Card]uint8{
-	{2, 'p'}:  19,
-	{4, 'p'}:  18,
-	{5, 'p'}:  17,
-	{11, 'p'}: 16,
-	{10, 'p'}: 15,
-	{1, 'e'}:  14,
-	{1, 'b'}:  13,
-	{7, 'e'}:  12,
-	{7, 'o'}:  11,
-	{3, 'e'}:  10, {3, 'b'}: 10, {3, 'o'}: 10, {3, 'c'}: 10,
-	{2, 'e'}: 9, {2, 'b'}: 9, {2, 'o'}: 9, {2, 'c'}: 9,
-	{1, 'c'}: 8, {1, 'o'}: 8,
-	{12, 'e'}: 7, {12, 'b'}: 7, {12, 'o'}: 7, {12, 'c'}: 7,
-	{11, 'e'}: 6, {11, 'b'}: 6, {11, 'o'}: 6, {11, 'c'}: 6,
-	{10, 'e'}: 5, {10, 'b'}: 5, {10, 'o'}: 5, {10, 'c'}: 5,
-	{7, 'c'}: 4, {7, 'b'}: 4,
-	{6, 'e'}: 3, {6, 'b'}: 3, {6, 'o'}: 3, {6, 'c'}: 3,
-	{5, 'e'}: 2, {5, 'b'}: 2, {5, 'o'}: 2, {5, 'c'}: 2,
-	{4, 'e'}: 1, {4, 'b'}: 1, {4, 'o'}: 1, {4, 'c'}: 1,
-}
-
 // envido each pieza card brings
-var ENVIDO_PIEZA = map[Card]uint8{
+var ENVIDO_PIEZA = map[truco.Card]uint8{
 	{2, 'p'}:  10,
 	{4, 'p'}:  9,
 	{5, 'p'}:  8,

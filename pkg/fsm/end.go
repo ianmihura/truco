@@ -2,14 +2,14 @@ package fsm
 
 import (
 	"fmt"
-	"truco/pkg/ar"
+	"truco/pkg/truco"
 )
 
 type EndState struct {
 	match *Match
 }
 
-func (e *EndState) play(card ar.Card) error {
+func (e *EndState) play(card truco.Card) error {
 	return fmt.Errorf("Can't play a finished game")
 }
 

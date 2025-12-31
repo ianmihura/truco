@@ -3,13 +3,14 @@ package fsm
 import (
 	"fmt"
 	"truco/pkg/ar"
+	"truco/pkg/truco"
 )
 
 type AnnouncingState struct {
 	match *Match
 }
 
-func (a *AnnouncingState) play(card ar.Card) error {
+func (a *AnnouncingState) play(card truco.Card) error {
 	return fmt.Errorf("You must announce your envido")
 }
 

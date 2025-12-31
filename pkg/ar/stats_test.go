@@ -3,6 +3,7 @@ package ar
 import (
 	"reflect"
 	"testing"
+	"truco/pkg/truco"
 )
 
 func TestFilterRecords(t *testing.T) {
@@ -22,7 +23,7 @@ func TestFilterRecords(t *testing.T) {
 		{
 			name: "Filter KCards - exclude 1e",
 			filter: FilterHands{
-				KCards:  []Card{{1, 'e'}},
+				KCards:  []truco.Card{{1, 'e'}},
 				MEnvido: 255,
 			},
 			expected: [][]string{
@@ -34,8 +35,8 @@ func TestFilterRecords(t *testing.T) {
 		{
 			name: "Filter MCards - must have 1e, exclude 4b",
 			filter: FilterHands{
-				KCards:  []Card{{4, 'b'}},
-				MCards:  []Card{{1, 'e'}},
+				KCards:  []truco.Card{{4, 'b'}},
+				MCards:  []truco.Card{{1, 'e'}},
 				MEnvido: 255,
 			},
 			expected: [][]string{
@@ -45,8 +46,8 @@ func TestFilterRecords(t *testing.T) {
 		{
 			name: "Filter MEnvido - exactly 27",
 			filter: FilterHands{
-				KCards:  []Card{},
-				MCards:  []Card{},
+				KCards:  []truco.Card{},
+				MCards:  []truco.Card{},
 				MEnvido: 27,
 			},
 			expected: [][]string{
@@ -56,8 +57,8 @@ func TestFilterRecords(t *testing.T) {
 		{
 			name: "Filter MCards and KCards",
 			filter: FilterHands{
-				KCards:  []Card{{7, 'e'}}, // Exclude hand 0
-				MCards:  []Card{{1, 'e'}}, // Must have 1e (Hands 0, 1)
+				KCards:  []truco.Card{{7, 'e'}}, // Exclude hand 0
+				MCards:  []truco.Card{{1, 'e'}}, // Must have 1e (Hands 0, 1)
 				MEnvido: 255,
 			},
 			expected: [][]string{
@@ -76,8 +77,8 @@ func TestFilterRecords(t *testing.T) {
 		{
 			name: "Exclude all",
 			filter: FilterHands{
-				KCards:  []Card{{4, 'b'}},
-				MCards:  []Card{{1, 'e'}},
+				KCards:  []truco.Card{{4, 'b'}},
+				MCards:  []truco.Card{{1, 'e'}},
 				MEnvido: 124,
 			},
 			expected: [][]string{},
@@ -112,8 +113,8 @@ func TestFilterRecordsMoreCases(t *testing.T) {
 		{
 			name: "Filter MCards - must have 1e, exclude 4b",
 			filter: FilterHands{
-				KCards:  []Card{{11, 'b'}},
-				MCards:  []Card{{3, 'c'}},
+				KCards:  []truco.Card{{11, 'b'}},
+				MCards:  []truco.Card{{3, 'c'}},
 				MEnvido: 130,
 			},
 			expected: [][]string{

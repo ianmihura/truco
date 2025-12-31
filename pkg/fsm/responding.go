@@ -2,14 +2,14 @@ package fsm
 
 import (
 	"fmt"
-	"truco/pkg/ar"
+	"truco/pkg/truco"
 )
 
 type RespondingState struct {
 	match *Match
 }
 
-func (r *RespondingState) play(card ar.Card) error {
+func (r *RespondingState) play(card truco.Card) error {
 	return fmt.Errorf("You cannot play, accept first")
 	// _ = r.accept()
 	// return r.match.Play(card)

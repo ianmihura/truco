@@ -2,14 +2,14 @@ package fsm
 
 import (
 	"fmt"
-	"truco/pkg/ar"
+	"truco/pkg/truco"
 )
 
 type PlayingState struct {
 	match *Match
 }
 
-func (p *PlayingState) play(card ar.Card) error {
+func (p *PlayingState) play(card truco.Card) error {
 	turn := p.match.cTurn()
 	if turn == 255 {
 		// finished match

@@ -2,7 +2,7 @@ package fsm
 
 import (
 	"testing"
-	"truco/pkg/ar"
+	"truco/pkg/truco"
 )
 
 func TestNewMatch(t *testing.T) {
@@ -54,10 +54,10 @@ func TestCTurn(t *testing.T) {
 	}
 
 	// Play cards for all players in turn 0
-	m.Cards[0][0] = ar.Card{N: 1, S: 'e'}
-	m.Cards[1][0] = ar.Card{N: 1, S: 'b'}
-	m.Cards[2][0] = ar.Card{N: 1, S: 'o'}
-	m.Cards[3][0] = ar.Card{N: 1, S: 'c'}
+	m.Cards[0][0] = truco.Card{N: 1, S: 'e'}
+	m.Cards[1][0] = truco.Card{N: 1, S: 'b'}
+	m.Cards[2][0] = truco.Card{N: 1, S: 'o'}
+	m.Cards[3][0] = truco.Card{N: 1, S: 'c'}
 
 	// Should be turn 1
 	if m.cTurn() != 1 {
@@ -65,10 +65,10 @@ func TestCTurn(t *testing.T) {
 	}
 
 	// Play cards for all players in turn 1
-	m.Cards[0][1] = ar.Card{N: 7, S: 'c'}
-	m.Cards[1][1] = ar.Card{N: 7, S: 'b'}
-	m.Cards[2][1] = ar.Card{N: 7, S: 'o'}
-	m.Cards[3][1] = ar.Card{N: 7, S: 'e'}
+	m.Cards[0][1] = truco.Card{N: 7, S: 'c'}
+	m.Cards[1][1] = truco.Card{N: 7, S: 'b'}
+	m.Cards[2][1] = truco.Card{N: 7, S: 'o'}
+	m.Cards[3][1] = truco.Card{N: 7, S: 'e'}
 
 	// Should be turn 2
 	if m.cTurn() != 2 {
@@ -76,10 +76,10 @@ func TestCTurn(t *testing.T) {
 	}
 
 	// Play cards for all players in turn 2
-	m.Cards[0][2] = ar.Card{N: 3, S: 'c'}
-	m.Cards[1][2] = ar.Card{N: 3, S: 'b'}
-	m.Cards[2][2] = ar.Card{N: 3, S: 'o'}
-	m.Cards[3][2] = ar.Card{N: 3, S: 'e'}
+	m.Cards[0][2] = truco.Card{N: 3, S: 'c'}
+	m.Cards[1][2] = truco.Card{N: 3, S: 'b'}
+	m.Cards[2][2] = truco.Card{N: 3, S: 'o'}
+	m.Cards[3][2] = truco.Card{N: 3, S: 'e'}
 
 	// Should be 255 (match end)
 	if m.cTurn() != 255 {
