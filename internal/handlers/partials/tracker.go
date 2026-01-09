@@ -28,7 +28,7 @@ func (h *Handler) TrackAct(w http.ResponseWriter, r *http.Request) {
 			Action fsm.ValidAction
 			State  string
 		}{
-			Player: (match.CPlayer+1)%fsm.NUM_PLAYERS + 1, // Next player to act
+			Player: match.CPlayer + 1,
 			Action: action,
 			State:  string(match.Encode()),
 		}
