@@ -19,22 +19,29 @@
             }
         }
     </script>
+    <style>
+        @layer base {
+
+            input[type="number"]::-webkit-inner-spin-button,
+            input[type="number"]::-webkit-outer-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+        }
+    </style>
 </head>
 
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen py-4 flex justify-center">
     <div class="flex flex-col gap-8 max-w-[1400px] w-full">
-        <!-- Tracker spans full width -->
         <div class="w-full">
             {{ template "tracker" .Tracker }}
         </div>
 
         <div class="flex flex-col lg:flex-row gap-8 w-full items-start">
-            <!-- Matrix Column -->
             <div class="flex-1 flex flex-col items-center">
                 {{ template "matrix" .Stats }}
             </div>
 
-            <!-- Stats Panel Column -->
             <div id="stats-panel-container" class="lg:w-80 w-full shrink-0">
                 <div id="stats-placeholder"
                     class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 h-full flex flex-col items-center justify-center text-slate-400 text-center space-y-4">
