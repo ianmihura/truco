@@ -32,6 +32,7 @@ func (s *Server) routes() {
 
 	// Register Routes
 	s.Handle("/", homeHandler)
+	s.HandleFunc("/get-cards", handler.GetCards)
 	s.HandleFunc("/track-act", handler.TrackAct)
 	s.HandleFunc("/track-stats", handler.TrackStats)
 }
