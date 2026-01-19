@@ -167,8 +167,7 @@ func (m *Match) ValidEnvidos() [][]ValidAction {
 		{ASK_FE},
 		{ASK_E, ASK_E},
 		{ASK_E, ASK_RE},
-		{ASK_E, ASK_FE},
-		// TODO add all
+		{ASK_E, ASK_E, ASK_RE},
 	}
 }
 

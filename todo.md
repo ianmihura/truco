@@ -28,7 +28,6 @@
     - enable undo logic (change card or action)
 - track user data beside their name: declared envido / shown cards
     - once you click on any player action, the matrix should reflect the changes of stats relevant to this user
-- unify envido into same tracker action
 - settings on top
     - num players
     - Separate between arg & uru
@@ -48,6 +47,7 @@
     - que chance hay que mis cartas sean las mejores de la mesa - strength
     - que cartas puede tener el otro
 - translate error messages from fsm
+- reactive matrix when user clicks on toggle switch
 
 ### add stats
 - chance that your hand is best in table, given known info
