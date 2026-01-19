@@ -146,7 +146,7 @@ func (m *Match) Fold() {
 	m.CState.fold()
 }
 
-// Announce envido score
+// Announce envido score. Automatically declares 'son buenas' if score is less than winner
 func (m *Match) Announce(score uint8) error {
 	return m.CState.announce(score)
 }
@@ -157,6 +157,19 @@ func (m *Match) stateId() uint8 {
 
 func (m *Match) ValidActions() []ValidAction {
 	return m.CState.validActions()
+}
+
+// List of all possible envido combinations
+func (m *Match) ValidEnvidos() [][]ValidAction {
+	return [][]ValidAction{
+		{ASK_E},
+		{ASK_RE},
+		{ASK_FE},
+		{ASK_E, ASK_E},
+		{ASK_E, ASK_RE},
+		{ASK_E, ASK_FE},
+		// TODO add all
+	}
 }
 
 func (m *Match) GetStatsFilter() ar.FilterHands {
@@ -205,12 +218,12 @@ func (m *Match) cTurn() uint8 {
 // Note that it returns false if envido is never played.
 // (envidos array is initialized as full 255).
 func (m *Match) isEnvidoFull() bool {
-	return m.cPlayerE() == 255
+	return m.CPlayerE() == 255
 }
 
 // Return index of next player that needs to declare,
 // returns 255 if all players declared already
-func (m *Match) cPlayerE() int {
+func (m *Match) CPlayerE() int {
 	for i := range m.Envidos {
 		if m.Envidos[i] == 255 {
 			return i

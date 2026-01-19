@@ -68,9 +68,9 @@ func TestEnvidoFlow(t *testing.T) {
 		t.Errorf("expected state 2, got %d", m.stateId())
 	}
 
-	// P0 starts announcing (cPlayerE returns first 255)
-	if m.cPlayerE() != 0 {
-		t.Errorf("expected player 0 to announce, got %d", m.cPlayerE())
+	// P0 starts announcing (CPlayerE returns first 255)
+	if m.CPlayerE() != 0 {
+		t.Errorf("expected player 0 to announce, got %d", m.CPlayerE())
 	}
 
 	// P0
@@ -90,11 +90,11 @@ func TestEnvidoFlow(t *testing.T) {
 
 	// P2
 	err = m.Announce(70)
-	if err == nil || m.cPlayerE() != 2 {
+	if err == nil || m.CPlayerE() != 2 {
 		t.Fatalf("should fail to announce wrong envido, but didnt")
 	}
 	err = m.Announce(13)
-	if err == nil || m.cPlayerE() != 2 {
+	if err == nil || m.CPlayerE() != 2 {
 		t.Fatalf("should fail to announce wrong envido, but didnt")
 	}
 

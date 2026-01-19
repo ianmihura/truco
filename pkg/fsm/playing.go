@@ -80,7 +80,7 @@ func (p *PlayingState) accept() error {
 }
 
 func (p *PlayingState) fold() {
-	p.match.WinnerT = p.match.prevPlayer() // TODO make sure this works
+	p.match.WinnerT = p.match.prevPlayer()
 	p.match.CState = p.match.End
 }
 
@@ -109,11 +109,14 @@ func (p *PlayingState) validActions() []ValidAction {
 	if p.match.cTurn() == 0 {
 		if !p.match.IsEnvido {
 			if p.match.CPlayer >= 2 && p.match.CEnvidoAsk == 255 {
-				actions = append(actions, ASK_E)
+				// First time asking envido
+				actions = append(actions, ASK_E) // TODO: ASK_RE, ASK_FE
 			}
 		} else {
-			// TODO other envidos
-			actions = append(actions, ASK_E)
+			if p.match.CEnvido < 255 { // if not Falta Envido
+				// Double down on envido bet
+				actions = append(actions, ASK_E) // TODO: ASK_RE, ASK_FE
+			}
 		}
 	}
 

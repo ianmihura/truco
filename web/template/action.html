@@ -9,8 +9,8 @@
     <div class="py-1">
         {{ range .DoneActions }}
         <div
-            class="px-3 py-1 text-blue-400 text-xs font-bold border-l-2 border-blue-500 bg-blue-500/10 select-none mb-1">
-            ✓ {{ . }}
+            class="px-3 py-1 text-blue-400 text-xs font-bold border-l-2 border-blue-500 bg-blue-500/10 select-none mb-1 flex justify-between items-center">
+            <span>✓ {{ . }}</span>
         </div>
         {{ end }}
 
@@ -23,9 +23,17 @@
                 {{ . }}
             </div>
         </div>
+        {{ else if or (eq . "Envido") (eq . "Real envido") (eq . "Falta envido") }}
+        <div class="relative">
+            <div class="action-btn px-3 py-1 text-slate-300 text-xs font-medium cursor-pointer transition-all hover:bg-slate-700/50 hover:border-slate-500/50 select-none"
+                hx-get="/track-act?action={{ . }}&state={{ $.State }}" hx-target="#current-action" hx-swap="outerHTML"
+                hx-on:click="const old = this.parentNode.querySelector('#envido-dropdown'); if(old) old.remove()">
+                {{ . }}
+            </div>
+        </div>
         {{ else if eq . "Carta" }}
         <div class="action-btn px-3 py-1 text-slate-300 text-xs font-medium cursor-pointer transition-all hover:bg-slate-700/50 hover:border-slate-500/50 select-none"
-            hx-get="/track-act?action={{ . }}&state={{ $.State }}" hx-target="body" hx-swap="beforeend"
+            hx-get="/get-cards?action={{ . }}&state={{ $.State }}" hx-target="body" hx-swap="beforeend"
             hx-on:click="document.querySelectorAll('.action-btn').forEach(b => b.classList.remove('active-play')); this.classList.add('active-play')">
             {{ . }}
         </div>

@@ -94,13 +94,13 @@ func TestEnvidoHelpers(t *testing.T) {
 		t.Errorf("expected envido not full")
 	}
 
-	if m.cPlayerE() != 0 {
-		t.Errorf("expected player 0 to declare envido, got %d", m.cPlayerE())
+	if m.CPlayerE() != 0 {
+		t.Errorf("expected player 0 to declare envido, got %d", m.CPlayerE())
 	}
 
 	m.Envidos[0] = 20
-	if m.cPlayerE() != 1 {
-		t.Errorf("expected player 1 to declare envido, got %d", m.cPlayerE())
+	if m.CPlayerE() != 1 {
+		t.Errorf("expected player 1 to declare envido, got %d", m.CPlayerE())
 	}
 
 	m.Envidos[1] = 22
@@ -110,8 +110,8 @@ func TestEnvidoHelpers(t *testing.T) {
 	if !m.isEnvidoFull() {
 		t.Errorf("expected envido full")
 	}
-	if m.cPlayerE() != 255 {
-		t.Errorf("expected playerE 255, got %d", m.cPlayerE())
+	if m.CPlayerE() != 255 {
+		t.Errorf("expected playerE 255, got %d", m.CPlayerE())
 	}
 
 	highest, player := m.winnerE()

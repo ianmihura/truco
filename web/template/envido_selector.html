@@ -1,0 +1,62 @@
+{{ define "envido_selector" }}
+<div id="current-action"
+    class="player-card bg-slate-800 border border-slate-700 rounded-md shadow-xl p-4 animate-in slide-in-from-left duration-300">
+    <style>
+        #current-action input:invalid {
+            border-color: #ef4444;
+        }
+    </style>
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-white font-bold text-sm tracking-wider">Envido</h3>
+        <button onclick="this.closest('#current-action').remove()" class="text-slate-400 hover:text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+
+    <form hx-get="/track-act" hx-target="#tracker-grid" hx-swap="beforeend" hx-include="this">
+        <input type="hidden" name="action" value="Canta">
+        <input type="hidden" name="state" value="{{ .State }}">
+
+        <!-- Envido Combination Selection -->
+        <div class="mb-4">
+            <div class="relative">
+                <select name="combination_idx"
+                    class="w-full appearance-none bg-slate-900 border border-slate-600 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 cursor-pointer">
+                    {{ range $i, $combo := .Envidos }}
+                    <option value="{{ $i }}">
+                        {{ range $j, $act := $combo }}{{ if $j }} + {{ end }}{{ $act }}{{ end }}
+                    </option>
+                    {{ end }}
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
+                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <div class="">
+                {{ range .Players }}
+                <div class="flex flex-row items-center">
+                    <input type="number" name="score_{{ . }}" min="0" max="33" required
+                        class="w-full bg-slate-900 border border-slate-600 rounded px-1 py-1 text-center text-xs text-white focus:outline-none focus:border-blue-500"
+                        placeholder="Jugador {{.}}">
+                </div>
+                {{ end }}
+            </div>
+        </div>
+
+        <!-- Validation logic: checkValidity/reportValidity before disabling the card -->
+        <button type="submit"
+            onclick="if(!this.form.reportValidity()) { event.preventDefault(); return false; } this.closest('.player-card').classList.add('pointer-events-none', 'opacity-60')"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors uppercase tracking-wider text-xs">
+            Ok
+        </button>
+    </form>
+</div>
+{{ end }}

@@ -32,7 +32,7 @@ func (a *AnnouncingState) fold() {
 
 	} else {
 		highestE, _ := a.match.winnerE()
-		a.match.Envidos[a.match.cPlayerE()] = highestE + 100
+		a.match.Envidos[a.match.CPlayerE()] = highestE + 100
 	}
 
 	if a.match.isEnvidoFull() {
@@ -52,7 +52,7 @@ func (a *AnnouncingState) announce(score uint8) error {
 	if score <= 7 || (score >= 20 && score <= ar.MAX_ENVIDO) {
 		highestE, _ := a.match.winnerE()
 		if highestE < score {
-			a.match.Envidos[a.match.cPlayerE()] = score
+			a.match.Envidos[a.match.CPlayerE()] = score
 		} else {
 			// player announced loosing envido (lower than highest)
 			a.match.Fold()
