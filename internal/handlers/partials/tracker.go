@@ -69,8 +69,7 @@ func processActionFSM(action fsm.ValidAction, match *fsm.Match, r *http.Request)
 		match.Fold()
 
 	case fsm.ANNOUN:
-		// TODO revise this
-		// 1. Process Betting Sequence
+		// Envido Betting Sequence
 		idxStr := r.URL.Query().Get("combination_idx")
 		if idx, err := strconv.Atoi(idxStr); err == nil {
 			combos := match.ValidEnvidos()
@@ -90,8 +89,7 @@ func processActionFSM(action fsm.ValidAction, match *fsm.Match, r *http.Request)
 		}
 		_ = match.Accept()
 
-		// 2. Process Announcements
-		// Loop while someone needs to announce
+		// Announcements: loop while someone needs to announce
 		for {
 			p := match.CPlayerE()
 			if p == 255 {
@@ -104,7 +102,7 @@ func processActionFSM(action fsm.ValidAction, match *fsm.Match, r *http.Request)
 			}
 			_ = match.Announce(uint8(score))
 		}
-		doneActions = append(doneActions, fsm.ValidAction("Canta"))
+		doneActions = append(doneActions, fsm.ASK_E)
 	}
 
 	// default: next action tracker (next player's turn)

@@ -26,8 +26,13 @@
 - select past turns:
     - without breaking history
     - enable undo logic (change card or action)
-- track user data beside their name: declared envido / shown cards
     - once you click on any player action, the matrix should reflect the changes of stats relevant to this user
+    """
+    save every state-change action (and params) to a map
+    send this past actions to the frontend separately, with the turn id
+    on-request past action: recreate the match with the past actions
+    frontend: on click any action in a tracker box, delete all next (if any) and concat incoming
+    """
 - settings on top
     - num players
     - Separate between arg & uru
@@ -47,7 +52,7 @@
     - que chance hay que mis cartas sean las mejores de la mesa - strength
     - que cartas puede tener el otro
 - translate error messages from fsm
-- reactive matrix when user clicks on toggle switch
+    - toast
 
 ### add stats
 - chance that your hand is best in table, given known info
@@ -78,9 +83,6 @@
     - scrollable action tracker
     - The matrix will constantly be updated every time some player makes an action
     - make a nicer card chooser (and reduce the options based on info available)
-- remake matrix to be a triangle - we dont really care for separation between envido and non envido
-    - Finish selecting a hand in with a third click (maybe 2 clicks: number, suit)
-- Define what metrics are encoded with color in the matrix
 
 Envido scores:
 ```

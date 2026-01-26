@@ -63,7 +63,7 @@ func (p *PlayingState) ask(requestE AskRequest) error {
 			return fmt.Errorf("Truco is highest")
 		}
 
-		if p.match.CTrucoAsk%2 != p.match.CPlayer%2 {
+		if p.match.CTruco == 1 || p.match.CTrucoAsk%2 != p.match.CPlayer%2 {
 			p.match.CTrucoAsk = p.match.CPlayer
 			p.match.IsEnvido = false
 			// p.match.cTruco changes in accept action
