@@ -10,6 +10,8 @@ The webapp is still being built. We'll have a working version, hosted live, this
 
 # Representation
 
+![image](./screenshot.jpeg)
+
 ### Matrix
 
 Each hand consists of 3 cards. To represent the hands appropriately in a 2x2 matrix, we pick the two best cards of each hand and add count the remaining third card as part of the hand. 
