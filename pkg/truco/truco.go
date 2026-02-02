@@ -1,16 +1,16 @@
 package truco
 
 import (
-	"slices"
 	"truco/pkg/math"
 )
 
-// Simulates two hands being played in Truco, in the orther they were given
+// Simulates two hands being played in Truco,
+// cards are played in the orther they were given (by index)
 //
 // returns:
 //   - 1 if mHand beats oHand
 //   - -1 if mHand looses against oHand
-//   - 0 if there's a tie (usually the first player wins)
+//   - 0 if there's a tie
 func TrucoBeats(mHand, oHand Hand) int {
 	score := make([]int, 3)
 	for i := range 3 {
@@ -50,15 +50,6 @@ func TrucoBeats(mHand, oHand Hand) int {
 		// first two round alternate winners, last round defines
 		return s2
 	}
-}
-
-// returns true if my sorted hand beats the other sorted hand, or if there's
-// a full tie (assumes mHand wins ties: is first player)
-func (mHand Hand) TrucoBeatsSorted(oHand Hand) bool {
-	slices.SortFunc(mHand, SortForTruco)
-	slices.SortFunc(oHand, SortForTruco)
-
-	return TrucoBeats(mHand, oHand) >= 0
 }
 
 // returns count of beats-losses of all permutations of mHand against oHand

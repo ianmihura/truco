@@ -1,5 +1,5 @@
 {{ define "matrix" }}
-<div class="flex flex-col items-center w-full max-w-5xl">
+<div class="flex flex-col items-center w-full max-w-xl">
     <div class="flex justify-between items-center w-full mb-6">
         <div class="flex flex-wrap gap-2 p-1.5 bg-slate-800/80 rounded-xl border border-slate-700/50 backdrop-blur-md">
             <button onclick="setMetric('combined_mean')" id="btn-combined_score"
@@ -16,7 +16,7 @@
             </button>
             <button onclick="setMetric('count')" id="btn-count"
                 class="metric-btn px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200">
-                Manos posibles
+                Manos
             </button>
         </div>
 
@@ -97,7 +97,7 @@
     //   or pass 1 if value is already normalized
     function getColorForScore(score, range) {
         if (score === undefined || isNaN(score)) {
-            return 'hsl(220, 15%, 30%)';
+            return 'hsl(220,15%,30%)';
         }
         const [h1, s1, l1] = COLOR_CONFIG.lowScore;
         const [h2, s2, l2] = COLOR_CONFIG.highScore;
@@ -105,7 +105,7 @@
         const h = h1 + (h2 - h1) * t;
         const s = s1 + (s2 - s1) * t;
         const l = l1 + (l2 - l1) * t;
-        return `hsl(${h}, ${s}%, ${l}%)`;
+        return `hsl(${h},${s}%,${l}%)`;
     }
 
     function updateMatrixStats(newStats) {
@@ -119,8 +119,7 @@
         return val.toFixed(precision);
     }
 
-    function updateStatsPanel(key, isEnvido) {
-        const data = pairStats[key];
+    function updateStatsPanel(data, key) {
         const placeholder = document.getElementById('stats-placeholder');
         const content = document.getElementById('stats-content');
 
@@ -133,90 +132,34 @@
         placeholder.classList.add('hidden');
         content.classList.remove('hidden');
 
-        const [c1, c2, env] = key.split(' ');
+        const [c1, c2] = key.split(' ');
 
-        content.innerHTML = `
-            <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-xl animate-in fade-in slide-in-from-right-4 duration-300">
-                <div class="bg-gradient-to-r from-blue-600/20 to-emerald-600/20 p-6 border-b border-slate-700">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="text-slate-400 text-xs font-bold uppercase tracking-wider">Mejor par</span>
-                        <span class="bg-slate-700 text-slate-300 text-[10px] px-2 py-0.5 rounded-full font-mono">${data.count} manos posibles</span>
-                    </div>
-                    <h2 class="text-4xl font-black text-white flex items-center gap-3 mb-3">
-                        ${c1}<span class="text-slate-500 font-light">&</span>${c2}
-                    </h2>
-                    <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
-                        <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Resumen (envido y truco)</p>
-                        <p class="text-xl font-bold text-slate-200">${formatValue(data.combined_mean, 3)}</p>
-                    </div>
-                </div>
-                
-                <div class="p-6 space-y-6">
-                    <section>
-                        <h3 class="text-blue-400 text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                            Truco
-                        </h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
-                                <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Promedio</p>
-                                <p class="text-xl font-bold text-slate-200">${formatValue(data.truco_mean, 3)}</p>
-                            </div>
-                            <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
-                                <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Mediana</p>
-                                <p class="text-xl font-bold text-slate-200">${formatValue(data.truco_median, 3)}</p>
-                            </div>
-                            <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
-                                <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Max</p>
-                                <p class="text-xl font-bold text-emerald-400">${formatValue(data.truco_max, 3)}</p>
-                            </div>
-                            <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
-                                <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Min</p>
-                                <p class="text-xl font-bold text-red-400">${formatValue(data.truco_min, 3)}</p>
-                            </div>
-                        </div>
-                    </section>
+        // Update basic info
+        document.getElementById('stats-card1').textContent = c1;
+        document.getElementById('stats-card2').textContent = c2;
+        document.getElementById('stats-count').textContent = `${data.count} manos posibles`;
+        document.getElementById('stats-combined').textContent = formatValue(data.combined_mean, 3);
 
-                    <!-- Divider -->
-                    <div class="border-t border-slate-700/50"></div>
+        // Update Truco section
+        document.getElementById('stats-truco-mean').textContent = formatValue(data.truco_mean, 3);
+        document.getElementById('stats-truco-median').textContent = formatValue(data.truco_median, 3);
+        document.getElementById('stats-truco-max').textContent = formatValue(data.truco_max, 3);
+        document.getElementById('stats-truco-min').textContelnt = formatValue(data.truco_min, 3);
 
-                    <section>
-                        <h3 class="text-emerald-400 text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                            Envido
-                        </h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
-                                <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Promedio</p>
-                                <p class="text-xl font-bold text-slate-200">${formatValue(data.envido_mean, 1)}</p>
-                            </div>
-                            <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
-                                <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Mediana</p>
-                                <p class="text-xl font-bold text-slate-200">${formatValue(data.envido_median, 0)}</p>
-                            </div>
-                            <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
-                                <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Max</p>
-                                <p class="text-xl font-bold text-emerald-400 font-mono">${data.envido_max || 0}</p>
-                            </div>
-                            <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
-                                <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Min</p>
-                                <p class="text-xl font-bold text-red-400 font-mono">${data.envido_min || 0}</p>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-            </div>
-        `;
+        // Update Envido section
+        document.getElementById('stats-envido-mean').textContent = formatValue(data.envido_mean, 1);
+        document.getElementById('stats-envido-median').textContent = formatValue(data.envido_median, 0);
+        document.getElementById('stats-envido-max').textContent = data.envido_max || 0;
+        document.getElementById('stats-envido-min').textContent = data.envido_min || 0;
     }
 
     function initMatrix() {
         const ranks = ["1e", "1b", "7e", "7o", "3", "2", "1f", "12", "11", "10", "7f", "6", "5", "4"];
         const matrix = document.getElementById('matrix');
-        matrix.innerHTML = ''; // Clear existing matrix
+        matrix.innerHTML = '';
 
-        const baseCellClass = 'p-1 flex items-start justify-start font-medium cursor-pointer transition-all duration-200 select-none aspect-[2/1] relative leading-tight uppercase text-[12px]';
-        const hoverEffects = 'hover:scale-105 hover:z-10 hover:shadow-lg';
-        const activeEffects = 'active:scale-95';
+        const baseCellClass = 'p-1 flex items-start justify-start font-medium cursor-pointer transition-all duration-200 select-none aspect-[1.1/0.5] relative leading-tight uppercase text-[14px]';
+        const emptyCellClass = 'bg-slate-700 text-slate-400 cursor-default';
 
         const metrics = Object.values(pairStats).map(item => item[currentMetric]);
         const cRange = Math.max(...metrics);
@@ -226,51 +169,35 @@
                 if (!showFullMatrix && j > i) return;
 
                 const cell = document.createElement('div');
-                const cellClasses = `${baseCellClass} ${activeEffects}`;
+                cell.className = `${baseCellClass} col-start-[${j + 1}] row-start-[${i + 1}]`;
 
-                // Force grid position to keep layout correct even when cells are missing
-                cell.style.gridRow = i + 1;
-                cell.style.gridColumn = j + 1;
+                const isDiag = i === j;
+                const isTopFigure = ["1e", "1b", "7e", "7o"].includes(rowRank);
 
-                if (i === j && ["1e", "1b", "7e", "7o"].includes(rowRank)) {
-                    cell.className = `${baseCellClass} bg-slate-700 text-slate-400 cursor-default`;
-                    cell.innerHTML = `${rowRank}<br>&nbsp;`; // placeholder whitespace keeps same height
+                if (isDiag && isTopFigure) {
+                    cell.classList.add(...emptyCellClass.split(' '));
+                    cell.innerHTML = `${rowRank}<br>&nbsp;`;
                 } else {
-                    let key = `${rowRank} ${colRank} ${j > i}`;
-                    let data = pairStats[key];
-                    if (!data) {
-                        key = `${colRank} ${rowRank} ${j > i}`;
-                        data = pairStats[key];
-                    }
-                    if (data) {
-                        const isEnvido = data.is_envido;
-                        const val = data[currentMetric];
+                    const key = `${rowRank} ${colRank} ${j > i}`;
+                    const data = pairStats[key] || pairStats[`${colRank} ${rowRank} ${j > i}`];
 
+                    if (data) {
+                        const val = data[currentMetric];
                         const bgColor = getColorForScore(val, cRange);
 
-                        cell.className = `${cellClasses} ${hoverEffects}`;
-                        cell.style.backgroundColor = bgColor;
-                        cell.style.color = 'rgb(15, 23, 42)';
+                        cell.classList.add(`bg-[${bgColor}]`, 'hover:scale-105', 'hover:z-10', 'hover:shadow-lg', 'active:scale-95', 'text-slate-900');
 
-                        if (isEnvido) {
-                            cell.innerHTML = `${rowRank}<br>${colRank}`;
-                        } else {
-                            cell.innerHTML = `${colRank}<br>${rowRank}`;
-                        }
+                        cell.innerHTML = data.is_envido ? `${rowRank}<br>${colRank}` : `${colRank}<br>${rowRank}`;
 
                         cell.onmouseover = () => {
-                            // Highlight selection
                             document.querySelectorAll('#matrix > div').forEach(c => {
-                                c.style.outline = 'none';
-                                c.style.zIndex = '0';
+                                c.classList.remove('outline', 'outline-2', 'outline-white', 'outline-offset-[-2px]', 'z-20');
                             });
-                            cell.style.outline = '2px solid white';
-                            cell.style.outlineOffset = '-2px';
-                            cell.style.zIndex = '20';
-                            updateStatsPanel(key, isEnvido);
+                            cell.classList.add('outline', 'outline-2', 'outline-white', 'outline-offset-[-2px]', 'z-20');
+                            updateStatsPanel(data, key);
                         };
                     } else {
-                        cell.className = `${baseCellClass} bg-slate-700 text-slate-400 cursor-default`;
+                        cell.classList.add(...emptyCellClass.split(' '));
                         cell.innerHTML = `${rowRank}<br>${colRank}`;
                     }
                 }

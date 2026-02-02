@@ -41,9 +41,11 @@ func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		Stats   template.JS
 		Tracker partials.TrackerData
+		// Cards   []partials.CardUI
 	}{
 		Stats:   template.JS(statsJSON),
 		Tracker: trackerData,
+		// Cards:   partials.GetAvailableCards(match.GetStatsFilter()),
 	}
 
 	if err := h.Tmpl.ExecuteTemplate(w, "index.html", data); err != nil {

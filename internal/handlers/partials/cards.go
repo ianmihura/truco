@@ -2,15 +2,12 @@ package partials
 
 import (
 	"net/http"
-	"slices"
 	"truco/pkg/fsm"
-	"truco/pkg/truco"
 )
 
 func (h *Handler) GetCards(w http.ResponseWriter, r *http.Request) {
 	match := GetMatch(r)
 
-	slices.SortFunc(truco.ALL_CARDS, truco.SortForTruco)
 	data := struct {
 		Cards  []CardUI
 		State  string

@@ -62,19 +62,17 @@
     - chance that your envido is best in table
 
 ### TODO backend
-- TrucoStrength does not capture the practical stregth, because there are some permutations that will never be reasoanably played. Eg:
+- TrucoStrength (brute force) does not capture the practical stregth, because there are some permutations that will never be reasoanably played. Eg:
     - Tie the first round, you should play your strongest card right away.
     - If you lost the first round, you should not tie any other round, unless you're loosing anyway.
     Meaning, some hands seem stronger, or weaker, than they should. My intuition is that real strength polarizes scores even more: as strong hands would not loose is dumb ways, and viceversa (as score is calculated by averaging agains all possible hands). Mid-range hands would also tend to stay mid-range. I expect there to be no extreme cases where this drastically changes a hand's overall score.
-    - Also, this is mechanically 1v1, not 2v2 as its usually played.
-- EV features (harder):
-    1. EV of playing your envido. Considering
-        - You may lose
-        - You give away information
-    2. EV of calling truco. Considering
-        - information you have on others (their range)
-        - information you gave away (your range)
-    3. EV of each card played at each step
+- TrucoStrength is also 1v1; 2v2 should have a different beatness model
+    - mCards, kCards, pCards (partner cards): I may have a value, range or unknown a pCard
+    - we can model the match as 6_cards vs 6_cards, each turn of 4 cards, keeping first card of each turn invariant (mCard)
+        mkpk|mkpk|mkpk
+- How to play: given your hand (and known cards)
+    - what's the best card to play
+    - what's the chance you win (ask for truco)
 
 ### Uruguay
 - Make sure to reuse generic functions

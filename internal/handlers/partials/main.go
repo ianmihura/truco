@@ -43,7 +43,7 @@ type CardUI struct {
 	OK bool
 }
 
-// Returns a copy of ALL_CARDS, excluding all cards in
+// Returns a copy of ALL_CARDS, excluding cards in
 // filter.MCards and filter.KCards
 func GetAvailableCards(filter truco.FilterHands) []CardUI {
 	excluded := make(map[truco.Card]bool, len(filter.KCards)*2)
