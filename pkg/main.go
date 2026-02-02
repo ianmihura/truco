@@ -1,8 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"truco/pkg/fsm"
+	"truco/pkg/truco"
 )
 
 func main() {
@@ -18,9 +17,12 @@ func main() {
 	// 	fmt.Println("Successfully generated pair stats with envido info in web/static/pair_stats.csv")
 	// }
 
-	fsm.NewMatch()
+	// fsm.NewMatch()
 
-	fmt.Println('a', 'b', 'c', 'd', 'e')
+	// fmt.Println('a', 'b', 'c', 'd', 'e')
 
-	fmt.Println(fsm.ValidAction("asdf"))
+	// fmt.Println(fsm.ValidAction("asdf"))
+
+	hand := truco.Hand{{7, 'e'}, {2, 'c'}, {4, 'c'}}
+	hand.TrucoStrengthStats([]truco.Card{{12, 'o'}}, []truco.Card{}).PPrint()
 }

@@ -24,6 +24,16 @@ func NewHand(handStr string) Hand {
 	return Hand(hand)
 }
 
+// Returns true if the hand has all specified cards
+func (hand Hand) HasAll(kCards []Card) bool {
+	for _, kCard := range kCards {
+		if !slices.Contains(hand, kCard) {
+			return false
+		}
+	}
+	return true
+}
+
 // SortForEnvido cmp func to sort Cards in a Hand, highest envido value first:
 // 7-1,10,11,12
 func SortForEnvido(a, b Card) int {

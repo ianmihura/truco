@@ -7,6 +7,10 @@ import (
 
 // Return all cards in `cards` that dont belong to list eCards
 func CardsExcluding(cards, eCards []Card) []Card {
+	if len(eCards) == 0 {
+		return cards
+	}
+
 	cards_ := make([]Card, 0, len(cards))
 	excluded := make(map[Card]bool)
 	for _, c := range eCards {
