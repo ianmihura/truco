@@ -97,7 +97,7 @@ func TestEnvidoPairsCount(t *testing.T) {
 
 // for testing purposes: counts expected result of EnvidoPairs
 func envidoPairsCount(score uint8) uint8 {
-	cardVal := ENVIDOS[score]
+	cardVal := ENVIDOS_AR[score]
 	partial := uint8(len(cardVal) * 4)
 
 	if score == 0 {
@@ -148,7 +148,7 @@ func TestEnvidoHands(t *testing.T) {
 
 	// Test envido 7 (single Card 7, or pair {1,6} no {1,6} is 27. Envido 7 is just 7?)
 	// Actually EnvidoPairs(7) returns {{7}} for each suit? No check data.go
-	// ENVIDOS[7] = {{'7'}}
+	// ENVIDOS_AR[7] = {{'7'}}
 	// So 4 single cards: 7e, 7b, 7o, 7c.
 	// For 7e:
 	// Need 2 cards c2, c3 such that suit(c2)!=e, suit(c3)!=e, suit(c2)!=suit(c3)
@@ -191,7 +191,7 @@ func TestEnvidoHands(t *testing.T) {
 
 	// Test Envido 25
 	// Calculation:
-	// ENVIDOS[25] = {{'f', 5}, {1, 4}, {2, 3}}
+	// ENVIDOS_AR[25] = {{'f', 5}, {1, 4}, {2, 3}}
 	// 1. {Figure, 5}: Figures {10,11,12}. Pairs {10,5}, {11,5}, {12,5}. 3 per suit -> 12 total.
 	// 2. {1, 4}: Pairs {1,4}. 1 per suit -> 4 total.
 	// 3. {2, 3}: Pairs {2,3}. 1 per suit -> 4 total.

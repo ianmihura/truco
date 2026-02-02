@@ -18,7 +18,7 @@ func getListofOneCardHands(cards []Card) []Hand {
 // score=33, result={6e 7e} {6b 7b} {6o 7o} {6c 7c}
 func envidoPairs(score uint8) (comb []Hand) {
 	// assert score >= 0 and score <= 33, "Envido must be between 0 and 33"
-	cardVal := ENVIDOS[score]
+	cardVal := ENVIDOS_AR[score]
 
 	if score < 20 {
 		// single card
