@@ -10,7 +10,7 @@ The webapp is still being built. We'll have a working version, hosted live, this
 
 # Representation
 
-![image](./screenshot.jpeg)
+![image](./screenshot.png)
 
 ### Matrix
 
