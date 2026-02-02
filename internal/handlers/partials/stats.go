@@ -3,7 +3,7 @@ package partials
 import (
 	"encoding/json"
 	"net/http"
-	"truco/pkg/ar"
+	"truco/pkg/truco"
 )
 
 func (h *Handler) TrackStats(w http.ResponseWriter, r *http.Request) {
@@ -11,7 +11,7 @@ func (h *Handler) TrackStats(w http.ResponseWriter, r *http.Request) {
 	match := GetMatch(r)
 
 	// Recalculate stats dynamically based on the current matrix mode
-	stats, err := ar.ComputePairStats(fmatrixParam == "true", match.GetStatsFilter())
+	stats, err := truco.ComputePairStats(fmatrixParam == "true", match.GetStatsFilter())
 	if err != nil {
 		http.Error(w, "Failed to compute stats: "+err.Error(), http.StatusInternalServerError)
 		return

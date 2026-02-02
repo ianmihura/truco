@@ -1,21 +1,20 @@
-package ar
+package truco
 
 import (
 	"slices"
 	"testing"
-	"truco/pkg/truco"
 )
 
 func TestSortCards(t *testing.T) {
 	strs := Hand{
-		truco.Card{12, 0},
-		truco.Card{5, 0},
-		truco.Card{7, 0},
-		truco.Card{1, 0},
-		truco.Card{10, 0},
-		truco.Card{3, 0},
-		truco.Card{11, 0},
-		truco.Card{1, 0},
+		Card{12, 0},
+		Card{5, 0},
+		Card{7, 0},
+		Card{1, 0},
+		Card{10, 0},
+		Card{3, 0},
+		Card{11, 0},
+		Card{1, 0},
 	}
 	slices.SortFunc(strs, SortForEnvido)
 
@@ -30,52 +29,52 @@ func TestSortCards(t *testing.T) {
 
 func TestEnvidoScore(t *testing.T) {
 	var envido uint8
-	envido = Hand{truco.Card{1, 'e'}, truco.Card{7, 'e'}, truco.Card{6, 'o'}}.Envido()
+	envido = Hand{Card{1, 'e'}, Card{7, 'e'}, Card{6, 'o'}}.Envido()
 	if envido != 28 {
 		t.Errorf("Error in envido got %d expected %d", envido, 28)
 	}
 
-	envido = Hand{truco.Card{1, 'e'}, truco.Card{7, 'e'}, truco.Card{10, 'e'}}.Envido()
+	envido = Hand{Card{1, 'e'}, Card{7, 'e'}, Card{10, 'e'}}.Envido()
 	if envido != 28 {
 		t.Errorf("Error in envido got %d expected %d", envido, 28)
 	}
 
-	envido = Hand{truco.Card{1, 'e'}, truco.Card{7, 'e'}, truco.Card{2, 'e'}}.Envido()
+	envido = Hand{Card{1, 'e'}, Card{7, 'e'}, Card{2, 'e'}}.Envido()
 	if envido != 29 {
 		t.Errorf("Error in envido got %d expected %d", envido, 29)
 	}
 
-	envido = Hand{truco.Card{1, 'e'}, truco.Card{7, 'b'}, truco.Card{6, 'e'}}.Envido()
+	envido = Hand{Card{1, 'e'}, Card{7, 'b'}, Card{6, 'e'}}.Envido()
 	if envido != 27 {
 		t.Errorf("Error in envido got %d expected %d", envido, 27)
 	}
 
-	envido = Hand{truco.Card{1, 'e'}, truco.Card{7, 'b'}, truco.Card{6, 'o'}}.Envido()
+	envido = Hand{Card{1, 'e'}, Card{7, 'b'}, Card{6, 'o'}}.Envido()
 	if envido != 7 {
 		t.Errorf("Error in envido got %d expected %d", envido, 7)
 	}
 
-	envido = Hand{truco.Card{1, 'e'}, truco.Card{7, 'o'}, truco.Card{6, 'o'}}.Envido()
+	envido = Hand{Card{1, 'e'}, Card{7, 'o'}, Card{6, 'o'}}.Envido()
 	if envido != 33 {
 		t.Errorf("Error in envido got %d expected %d", envido, 33)
 	}
 
-	envido = Hand{truco.Card{1, 'e'}, truco.Card{11, 'o'}, truco.Card{10, 'o'}}.Envido()
+	envido = Hand{Card{1, 'e'}, Card{11, 'o'}, Card{10, 'o'}}.Envido()
 	if envido != 20 {
 		t.Errorf("Error in envido got %d expected %d", envido, 20)
 	}
 
-	envido = Hand{truco.Card{1, 'e'}, truco.Card{11, 'e'}, truco.Card{10, 'o'}}.Envido()
+	envido = Hand{Card{1, 'e'}, Card{11, 'e'}, Card{10, 'o'}}.Envido()
 	if envido != 21 {
 		t.Errorf("Error in envido got %d expected %d", envido, 21)
 	}
 
-	envido = Hand{truco.Card{1, 'e'}, truco.Card{11, 'o'}, truco.Card{10, 'c'}}.Envido()
+	envido = Hand{Card{1, 'e'}, Card{11, 'o'}, Card{10, 'c'}}.Envido()
 	if envido != 1 {
 		t.Errorf("Error in envido got %d expected %d", envido, 1)
 	}
 
-	envido = Hand{truco.Card{12, 'e'}, truco.Card{11, 'o'}, truco.Card{10, 'c'}}.Envido()
+	envido = Hand{Card{12, 'e'}, Card{11, 'o'}, Card{10, 'c'}}.Envido()
 	if envido != 0 {
 		t.Errorf("Error in envido got %d expected %d", envido, 0)
 	}
@@ -121,7 +120,7 @@ func TestEnvidoHands(t *testing.T) {
 	// For each pair, there are 4 suits * 10 cards - 10 cards of same suit = 30 cards of diff suit.
 	// Total hands = 4 * 30 = 120 ?
 	// Actually ALL_CARDS has 40 cards.
-	// Pair has suit S. 3rd truco.Card must be diff suit. There are 30 cards of diff suit.
+	// Pair has suit S. 3rd Card must be diff suit. There are 30 cards of diff suit.
 	// So 4 pairs * 30 cards = 120 hands.
 	hands := EnvidoHands(33)
 	if len(hands) != 120 {
@@ -147,7 +146,7 @@ func TestEnvidoHands(t *testing.T) {
 		}
 	}
 
-	// Test envido 7 (single truco.Card 7, or pair {1,6} no {1,6} is 27. Envido 7 is just 7?)
+	// Test envido 7 (single Card 7, or pair {1,6} no {1,6} is 27. Envido 7 is just 7?)
 	// Actually EnvidoPairs(7) returns {{7}} for each suit? No check data.go
 	// ENVIDOS[7] = {{'7'}}
 	// So 4 single cards: 7e, 7b, 7o, 7c.
@@ -159,7 +158,7 @@ func TestEnvidoHands(t *testing.T) {
 	// So just 3 diff suits.
 	// Suits: e, b, o, c. 7e takes e.
 	// Pairs of suits from {b, o, c} are {b,o}, {b,c}, {o,c} (3 pairs).
-	// For each suit pair, we pick any truco.Card (10 ranks).
+	// For each suit pair, we pick any Card (10 ranks).
 	// So 3 * 10 * 10 = 300 hands for 7e.
 	// Total 4 * 300 = 1200 hands.
 	hands7 := EnvidoHands(7)
@@ -244,6 +243,6 @@ func equalHands(h1, h2 Hand) bool {
 }
 
 var envido33Check = []Hand{
-	{truco.Card{6, 'e'}, truco.Card{7, 'e'}, truco.Card{1, 'b'}},
-	{truco.Card{6, 'e'}, truco.Card{7, 'e'}, truco.Card{10, 'o'}},
+	{Card{6, 'e'}, Card{7, 'e'}, Card{1, 'b'}},
+	{Card{6, 'e'}, Card{7, 'e'}, Card{10, 'o'}},
 }

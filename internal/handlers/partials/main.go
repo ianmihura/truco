@@ -3,7 +3,6 @@ package partials
 import (
 	"html/template"
 	"net/http"
-	"truco/pkg/ar"
 	"truco/pkg/fsm"
 	"truco/pkg/truco"
 )
@@ -46,7 +45,7 @@ type CardUI struct {
 
 // Returns a copy of ALL_CARDS, excluding all cards in
 // filter.MCards and filter.KCards
-func GetAvailableCards(filter ar.FilterHands) []CardUI {
+func GetAvailableCards(filter truco.FilterHands) []CardUI {
 	excluded := make(map[truco.Card]bool, len(filter.KCards)*2)
 	for _, c := range filter.KCards {
 		excluded[c] = true

@@ -1,8 +1,7 @@
-package ar
+package truco
 
 import (
 	"testing"
-	"truco/pkg/truco"
 )
 
 func TestTrucoBeats(t *testing.T) {
@@ -51,9 +50,9 @@ func checkTrucoBeats(t *testing.T, s0, s1, s2, expected int) {
 
 func setupRound(s, i int, mHand, oHand *Hand) {
 	// Use arbitrary card values
-	high := truco.Card{1, 'e'} // Value 14
-	low := truco.Card{4, 'c'}  // Value 1
-	mid := truco.Card{1, 'c'}  // Value 8
+	high := Card{1, 'e'} // Value 14
+	low := Card{4, 'c'}  // Value 1
+	mid := Card{1, 'c'}  // Value 8
 
 	// Adjust values to ensure strict > or < if not 0
 	// Actually we can just trick the TrucoMap or use known values.

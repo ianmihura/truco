@@ -1,7 +1,6 @@
 package fsm
 
 import (
-	"truco/pkg/ar"
 	"truco/pkg/truco"
 )
 
@@ -171,7 +170,7 @@ func (m *Match) ValidEnvidos() [][]ValidAction {
 	}
 }
 
-func (m *Match) GetStatsFilter() ar.FilterHands {
+func (m *Match) GetStatsFilter() truco.FilterHands {
 	kCards := make([]truco.Card, 0, len(m.Cards)*len(m.Cards[0]))
 	for player := range m.Cards {
 		if player != int(m.CPlayer) {
@@ -183,7 +182,7 @@ func (m *Match) GetStatsFilter() ar.FilterHands {
 		}
 	}
 
-	return ar.FilterHands{
+	return truco.FilterHands{
 		KCards:  kCards,
 		MCards:  truco.RealCards(m.Cards[m.CPlayer]),
 		MEnvido: m.Envidos[m.CPlayer],

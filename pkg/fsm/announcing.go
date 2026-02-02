@@ -2,7 +2,6 @@ package fsm
 
 import (
 	"fmt"
-	"truco/pkg/ar"
 	"truco/pkg/truco"
 )
 
@@ -49,7 +48,7 @@ func (a *AnnouncingState) announce(score uint8) error {
 		return nil
 	}
 
-	if score <= 7 || (score >= 20 && score <= ar.MAX_ENVIDO) {
+	if score <= 7 || (score >= 20 && score <= truco.MAX_ENVIDO_AR) {
 		highestE, _ := a.match.winnerE()
 		if highestE < score {
 			a.match.Envidos[a.match.CPlayerE()] = score

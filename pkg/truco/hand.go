@@ -1,14 +1,13 @@
-package ar
+package truco
 
 import (
 	"fmt"
 	"slices"
 	"strings"
-	"truco/pkg/truco"
 )
 
 // Slice of Cards of any length
-type Hand []truco.Card
+type Hand []Card
 
 // Returns a new Hand from a string: Hand{NewCard(c[0]), ...}.
 // Expects cards to be separated by a single space.
@@ -18,16 +17,16 @@ type Hand []truco.Card
 //	"1e 1b 1c" -> Hand{{1, 'e'}, {1, 'b'}, {1, 'c'}}
 func NewHand(handStr string) Hand {
 	cards := strings.Split(handStr, " ")
-	hand := make([]truco.Card, 0, len(cards))
+	hand := make([]Card, 0, len(cards))
 	for c := range cards {
-		hand = append(hand, truco.NewCard(cards[c]))
+		hand = append(hand, NewCard(cards[c]))
 	}
 	return Hand(hand)
 }
 
 // SortForEnvido cmp func to sort Cards in a Hand, highest envido value first:
 // 7-1,10,11,12
-func SortForEnvido(a, b truco.Card) int {
+func SortForEnvido(a, b Card) int {
 	an := a.N
 	if an >= 10 {
 		an = 0
@@ -42,7 +41,7 @@ func SortForEnvido(a, b truco.Card) int {
 
 // SortForTruco cmp func to sort Cards in a Hand, highest truco value first.
 // Uses TRUCO map in data.go
-func SortForTruco(a, b truco.Card) int {
+func SortForTruco(a, b Card) int {
 	return int(b.Truco()) - int(a.Truco())
 }
 

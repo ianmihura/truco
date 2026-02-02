@@ -5,8 +5,8 @@ import (
 	"html/template"
 	"net/http"
 	"truco/internal/handlers/partials"
-	"truco/pkg/ar"
 	"truco/pkg/fsm"
+	"truco/pkg/truco"
 )
 
 type HomeHandler struct {
@@ -19,7 +19,7 @@ func NewHomeHandler(tmpl *template.Template) *HomeHandler {
 
 func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Compute initial stats (default to full matrix mode)
-	stats, err := ar.ComputePairStats(true, ar.FilterHands{})
+	stats, err := truco.ComputePairStats(true, truco.FilterHands{})
 	if err != nil {
 		http.Error(w, "Failed to compute stats: "+err.Error(), http.StatusInternalServerError)
 		return

@@ -1,13 +1,12 @@
-package ar
+package truco
 
 import (
 	"truco/pkg/math"
-	"truco/pkg/truco"
 )
 
 // returns a list of hands given a list of cards
 // each hand consists of one card
-func getListofOneCardHands(cards []truco.Card) []Hand {
+func getListofOneCardHands(cards []Card) []Hand {
 	hands := make([]Hand, len(cards))
 	for i, c := range cards {
 		hands[i] = Hand{c}
@@ -24,13 +23,13 @@ func envidoPairs(score uint8) (comb []Hand) {
 	if score < 20 {
 		// single card
 		if score == 0 {
-			comb = getListofOneCardHands(truco.FIGURES)
+			comb = getListofOneCardHands(FIGURES)
 		} else {
-			comb = getListofOneCardHands(truco.GetSuitCards(cardVal[0][0]))
+			comb = getListofOneCardHands(GetSuitCards(cardVal[0][0]))
 		}
 	} else if score == 20 {
 		// two figures
-		for cards := range math.Combinations(truco.FIGURES, 2) {
+		for cards := range math.Combinations(FIGURES, 2) {
 			if cards[0].S == cards[1].S {
 				comb = append(comb, Hand(cards))
 			}
@@ -38,12 +37,12 @@ func envidoPairs(score uint8) (comb []Hand) {
 	} else {
 		// normal envido
 		for v := range cardVal {
-			var cardsToComb []truco.Card
+			var cardsToComb []Card
 			if cardVal[v][0] == 'f' {
 				// has a figure
-				cardsToComb = append(truco.FIGURES, truco.GetSuitCards(cardVal[v][1])...)
+				cardsToComb = append(FIGURES, GetSuitCards(cardVal[v][1])...)
 			} else {
-				cardsToComb = append(truco.GetSuitCards(cardVal[v][0]), truco.GetSuitCards(cardVal[v][1])...)
+				cardsToComb = append(GetSuitCards(cardVal[v][0]), GetSuitCards(cardVal[v][1])...)
 			}
 
 			for cards := range math.Combinations(cardsToComb, 2) {
@@ -69,7 +68,7 @@ func EnvidoHands(score uint8) (hands []Hand) {
 			// rank does not matter for the 3rd card as it doesn't affect envido score
 			// (envido score is determined by the 2 same-suit cards).
 			suit := p[0].S
-			for _, c := range truco.ALL_CARDS {
+			for _, c := range ALL_CARDS {
 				if c.S != suit {
 					// Create new hand with the pair + this card
 					h := make(Hand, 3)
@@ -92,8 +91,8 @@ func EnvidoHands(score uint8) (hands []Hand) {
 			c1 := p[0]
 
 			// Filter candidates: different suit than c1, and value <= c1.Envido()
-			var candidates []truco.Card
-			for _, c := range truco.ALL_CARDS {
+			var candidates []Card
+			for _, c := range ALL_CARDS {
 				if c.S != c1.S && c.Envido() <= c1.Envido() {
 					candidates = append(candidates, c)
 				}
@@ -121,6 +120,6 @@ func PEnvido(score uint8) float32 {
 }
 
 // Probability a given envido is the highest of the table, given mCards and other kCards
-func PEnvidoHighest(score uint8, mCards, kCards []truco.Card) float32 {
+func PEnvidoHighest(score uint8, mCards, kCards []Card) float32 {
 	return 0.0 // TODO
 }

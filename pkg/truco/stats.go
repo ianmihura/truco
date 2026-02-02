@@ -1,4 +1,4 @@
-package ar
+package truco
 
 import (
 	"encoding/csv"
@@ -13,7 +13,6 @@ import (
 	"strings"
 	"sync"
 	"truco/pkg/math"
-	"truco/pkg/truco"
 )
 
 type PairStat struct {
@@ -42,8 +41,8 @@ type PairData struct {
 }
 
 type FilterHands struct {
-	KCards  []truco.Card
-	MCards  []truco.Card
+	KCards  []Card
+	MCards  []Card
 	KEnvido []uint8 // TODO maybe unnecesary
 	MEnvido uint8
 }
@@ -56,7 +55,7 @@ type FilterHands struct {
 // Hands are sorted by strength.
 // Cards in each hand are sorted by truco strength.
 func CreateHandStatsCSV(outputPath string) error {
-	handsIter := math.Combinations(truco.ALL_CARDS, 3)
+	handsIter := math.Combinations(ALL_CARDS, 3)
 
 	type job struct {
 		hand Hand
@@ -92,7 +91,7 @@ func CreateHandStatsCSV(outputPath string) error {
 
 				strength := (h.TrucoStrength() + 36.0) / 72
 				envido := h.Envido()
-				combined := (float32(envido)/MAX_ENVIDO + strength) / 2.0
+				combined := (float32(envido)/MAX_ENVIDO_AR + strength) / 2.0
 
 				resultsChan <- result{
 					handStr:  handStr.String(),
@@ -290,8 +289,8 @@ func ComputePairStats(withEnvido bool, filter FilterHands) (map[string]PairStat,
 		}
 
 		// Key: first two cards (assumes cards are already sorted for truco)
-		r0 := truco.NewCard(cards[0]).ToRank()
-		r1 := truco.NewCard(cards[1]).ToRank()
+		r0 := NewCard(cards[0]).ToRank()
+		r1 := NewCard(cards[1]).ToRank()
 		pairKey := fmt.Sprintf("%s %s", r0, r1)
 
 		// Full hand for envido
@@ -333,7 +332,7 @@ func ComputePairStats(withEnvido bool, filter FilterHands) (map[string]PairStat,
 		meanE := float64(sumE) / float64(count)
 		medianE := math.Median(d.envidos)
 
-		meanC := (meanT + meanE/MAX_ENVIDO) / 2
+		meanC := (meanT + meanE/MAX_ENVIDO_AR) / 2
 
 		stat := PairStat{
 			Pair:         key.pair,
