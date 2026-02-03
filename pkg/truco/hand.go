@@ -26,8 +26,30 @@ func NewHand(handStr string) Hand {
 
 // Returns true if the hand has all specified cards
 func (hand Hand) HasAll(kCards []Card) bool {
-	for _, kCard := range kCards {
-		if !slices.Contains(hand, kCard) {
+	if len(kCards) > len(hand) {
+		return false
+	}
+
+outer:
+	for _, k := range kCards {
+		for _, h := range hand {
+			if h == k {
+				continue outer
+			}
+		}
+		return false
+	}
+	return true
+}
+
+// Returns true if the hand has all specified cards, in the exact place
+func (hand Hand) HasAllInPlace(kCards []Card) bool {
+	if len(kCards) > len(hand) {
+		return false
+	}
+
+	for i, k := range kCards {
+		if hand[i] != k {
 			return false
 		}
 	}
