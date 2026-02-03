@@ -61,16 +61,20 @@
     - allow me to dig deeper into envido: provide info on mCards
     - chance that your envido is best in table
 
-### TODO backend
-- TrucoStrength (brute force) does not capture the practical stregth, because there are some permutations that will never be reasoanably played. Eg:
-    - Tie the first round, you should play your strongest card right away.
-    - If you lost the first round, you should not tie any other round, unless you're loosing anyway.
-    Meaning, some hands seem stronger, or weaker, than they should. My intuition is that real strength polarizes scores even more: as strong hands would not loose is dumb ways, and viceversa (as score is calculated by averaging agains all possible hands). Mid-range hands would also tend to stay mid-range. I expect there to be no extreme cases where this drastically changes a hand's overall score.
-- TrucoStrength is also 1v1; 2v2 should have a different beatness model
+### Truco analytics
+- TrucoStrength (brute force) does not capture the practical stregth, as some permutations will never be reasoanably played. Basic strategies:
+    - beat with minimum possible
+    - loose with minimum possible
+    - tie in the 1st round, you should play strongest right away
+    - tie (in 2nd or 3rd hand) only if you already won 1st round
+    - if you lost the first round, you should not tie any other round, unless you're loosing anyway
+    - usually you tie in the first round if your remaining cards are "good enough" (not aplicable as a strategy, as we need to test all games to understand what is "good enough")
+- 1v1 problem: TrucoStrength is 1v1; 2v2 should have a different beatness model
+    - the problem is the search space is too big. 
     - mCards, kCards, pCards (partner cards): I may have a value, range or unknown a pCard
     - we can model the match as 6_cards vs 6_cards, each turn of 4 cards, keeping first card of each turn invariant (mCard)
         mkpk|mkpk|mkpk
-- How to play: given your hand (and known cards)
+- Ideal features: How to play: given your hand (and known cards)
     - what's the best card to play
     - what's the chance you win (ask for truco)
 

@@ -133,9 +133,14 @@ func Fact(x, l int) int {
 	}
 }
 
-// From n pick k
-func Pick(n, k int) float32 {
+// From n pick k (nCr, combinations, order does not matter, smaller)
+func PickC(n, k int) float32 {
 	return float32(Fact(n, n-k+1)) / float32(Fact(k, 1))
+}
+
+// From n pick k (nPr, permutations, order matters, bigger)
+func PickP(n, k int) float32 {
+	return float32(Fact(n, n-k+1))
 }
 
 // Type Numeric is limited to types used in this project

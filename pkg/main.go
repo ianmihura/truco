@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"truco/pkg/truco"
 )
 
@@ -19,10 +20,26 @@ func main() {
 
 	// fsm.NewMatch()
 
-	// fmt.Println('a', 'b', 'c', 'd', 'e')
+	// TODO see what happens if you play optimally (as script suggests)
 
-	// fmt.Println(fsm.ValidAction("asdf"))
+	hand := truco.Hand{{7, 'e'}, {12, 'c'}, {4, 'o'}}
+	oHand := []truco.Card{{12, 'o'}}
 
-	hand := truco.Hand{{7, 'e'}, {2, 'c'}, {4, 'c'}}
-	hand.TrucoStrengthStats([]truco.Card{{12, 'o'}}, []truco.Card{}).PPrint()
+	fmt.Println("soy mano, antes de jugar")
+	hand.TrucoStrengthStats([]truco.Card{}, []truco.Card{}, true).PPrint()
+	fmt.Println()
+	fmt.Println("soy pie, antes de jugar")
+	hand.TrucoStrengthStats([]truco.Card{}, []truco.Card{}, false).PPrint()
+
+	fmt.Println()
+	fmt.Println("soy mano")
+	hand.TrucoStrengthStats(oHand, []truco.Card{}, true).PPrint()
+	fmt.Println()
+	fmt.Println("soy pie")
+	hand.TrucoStrengthStats(oHand, []truco.Card{}, false).PPrint()
+
+	// TODO test HasAllInPlace and HasAll
+	// fmt.Println((truco.Hand{{11, 'o'}, {10, 'c'}, {12, 'o'}}).HasAllInPlace(truco.Hand{{12, 'o'}, {10, 'c'}}))
+
+	// fmt.Println(hand.TrucoStrength())
 }

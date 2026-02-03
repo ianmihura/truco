@@ -41,17 +41,12 @@ func isEveryCardIncluded(cards, iCards []Card) bool {
 // - if len(mCards) == 3, then len(hands) == 1
 // - if len(mCards) == 0, then len(hands) == pick(aCards, 3)
 func cardRangeNoEnvido(aCards, mCards []Card) []Hand {
-	hands := make([]Hand, 0, int(math.Pick(len(aCards), 3)))
+	hands := make([]Hand, 0, int(math.PickC(len(aCards), 3)))
 
-	var hand Hand
 	combo := math.Combinations(aCards, 3)
 	for cs := range combo {
 		if isEveryCardIncluded(mCards, cs) {
-			hand = Hand{}
-			for _, c := range cs {
-				hand = append(hand, c)
-			}
-			hands = append(hands, hand)
+			hands = append(hands, Hand(cs))
 		}
 	}
 	return hands

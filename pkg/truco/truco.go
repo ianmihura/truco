@@ -53,6 +53,77 @@ func TrucoBeats(mHand, oHand Hand) int {
 	}
 }
 
+// IsReasonablyPlayed checks if oHand is played with reasonable strategy against mHand.
+// Since mHand plays first each round, only oHand can strategize based on seeing mHand's card.
+// Strategies checked:
+//   - Beat with minimum possible card that still wins
+//   - Lose with minimum possible card when losing
+//   - After a tie in round 0, play strongest card immediately
+//   - Only tie in later rounds if already winning or cannot do better
+//
+// Returns false if oHand's play violates these strategies (unreasonable/wasteful play).
+func IsReasonablyPlayed(mHand, oHand Hand) bool {
+	o0, o1, o2 := oHand[0].Truco(), oHand[1].Truco(), oHand[2].Truco()
+	m0, m1 := mHand[0].Truco(), mHand[1].Truco()
+
+	// Round 0
+	if o0 > m0 {
+		// Won - could a weaker card also win?
+		if (o1 > m0 && o1 < o0) || (o2 > m0 && o2 < o0) {
+			return false
+		}
+	} else if o0 < m0 {
+		// Lost - could a weaker card also lose?
+		if (o1 < m0 && o1 < o0) || (o2 < m0 && o2 < o0) {
+			return false
+		}
+	}
+	// Tie in round 0 is acceptable
+
+	// Round 1: strategy depends on round 0 result
+	if o0 == m0 {
+		// Tie in round 0 - must play strongest remaining card
+		if o2 > o1 {
+			return false
+		}
+	} else if o0 > m0 {
+		// Won round 0
+		if o1 > m1 {
+			// Winning again - check minimum winning card
+			if o2 > m1 && o2 < o1 {
+				return false
+			}
+		} else if o1 < m1 {
+			// Losing round 1 - check minimum losing card
+			if o2 < m1 && o2 < o1 {
+				return false
+			}
+		}
+		// Tie is acceptable when already winning
+	} else {
+		// Lost round 0 - must win round 1 if possible
+		if o1 > m1 {
+			// Winning round 1 - check minimum winning card
+			if o2 > m1 && o2 < o1 {
+				return false
+			}
+		} else {
+			// Losing or tying after losing round 0 (both bad)
+			// Should have won if possible
+			if o2 > m1 {
+				return false
+			}
+			// If losing, check minimum loss -- wont matter, but still exclude to reduce double-counting of matches
+			if o1 < m1 && o2 < m1 && o2 < o1 {
+				return false
+			}
+		}
+	}
+
+	// Round 2: only one card left, no choice to validate
+	return true
+}
+
 // returns count of beats-losses of all permutations of mHand against oHand
 func (mHand Hand) TrucoBeatsAll(oHand Hand) (score int) {
 	mPerms := math.Permutations(mHand, 3)
@@ -80,63 +151,83 @@ func (mHand Hand) TrucoStrength() float32 {
 			score += TrucoBeats(Hand(mH), Hand(oH))
 		}
 	}
-	return float32(score) / math.Pick(37, 3)
+	return float32(score) / math.PickC(37, 3)
 }
 
 type TrucoStats struct {
-	StrengthAll  float32
-	Perms        []Hand
-	StrengthPerm []float32
-	Count        int
+	StrengthAll  float32   // overall hand strength
+	Count        int       // amount of hands simulated
+	Perms        []Hand    // permutations of mHand
+	StrengthPerm []float32 // strength, by permutations of mHand
+	CountPerm    []float32 // amount of hands simulated, by permutations of mHand
 }
 
 func (stats TrucoStats) PPrint() {
-	fmt.Println(stats.StrengthAll)
-	for i, hand := range stats.Perms {
-		hand.Print()
-		fmt.Println(": strength", stats.StrengthPerm[i])
+	if stats.Count == 0 {
+		if len(stats.Perms) == 0 {
+			fmt.Println("Empty stats")
+		} else {
+			for _, hand := range stats.Perms {
+				hand.Println()
+			}
+			fmt.Println("0 permutations simulated")
+			fmt.Println("Hand is already played sub-optimally")
+		}
+	} else {
+		fmt.Println("Overall Strenght=", stats.StrengthAll)
+		for i, hand := range stats.Perms {
+			hand.Print()
+			fmt.Printf(": strength=%.3f, of=%.0f\n", stats.StrengthPerm[i], stats.CountPerm[i])
+		}
+		fmt.Println(stats.Count, "permutations simulated")
 	}
-	fmt.Println("Played", stats.Count, "permutations")
 }
 
 // TrucoStrengthStats calculates detailed strength statistics for a hand by simulating
 // all possible permutations against all possible opponent hands, given known cards.
 //
 // Parameters:
-//   - oCards: Cards held by the opponent (already played by them).
-//   - kCards: Known cards to exclude from the deck (e.g., cards played by other players).
+//   - kCards: Cards held by the opponent (already played by them, in the order played).
+//   - oCards: Known cards to exclude from the deck (e.g., cards played by other players).
 //
 // Returns TrucoStats containing the overall strength and per-permutation breakdown.
-func (mHand Hand) TrucoStrengthStats(oCards, kCards []Card) TrucoStats {
+func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, isMHandFirst bool) TrucoStats {
 	mPerms := math.Permutations(mHand, 3)
-	aCards := CardsExcluding(ALL_CARDS, append(mHand, kCards...))
+	aCards := CardsExcluding(ALL_CARDS, append(mHand, oCards...))
 	oPerms := math.Permutations(aCards, 3)
 
-	var cScore, totScore, count int
-	strengths := make([]float32, 0, 6)
+	var isReasonablyPlayed bool
+	var cScore, totScore, cCount, totCount int
 	perms := make([]Hand, 0, 6)
+	strengths := make([]float32, 0, 6)
+	counts := make([]float32, 0, 6)
 
 	for mH := range mPerms {
-		cScore = 0
-		perms = append(perms, mH)
+		cScore, cCount = 0, 0
 		for oH := range oPerms {
-			if Hand(oH).HasAll(oCards) {
+			if isMHandFirst {
+				isReasonablyPlayed = IsReasonablyPlayed(mH, oH)
+			} else {
+				isReasonablyPlayed = IsReasonablyPlayed(oH, mH)
+			}
+
+			if Hand(oH).HasAllInPlace(kCards) && isReasonablyPlayed {
 				cScore += TrucoBeats(Hand(mH), Hand(oH))
-				count++
+				cCount++
 			}
 		}
-		strengths = append(strengths, float32(cScore))
+		perms = append(perms, mH)
+		strengths = append(strengths, (float32(cScore)/float32(cCount)+1)/2)
+		counts = append(counts, float32(cCount))
 		totScore += cScore
-	}
-
-	for i, s := range strengths {
-		strengths[i] = (s/(float32(count)/6) + 1) / 2
+		totCount += cCount
 	}
 
 	return TrucoStats{
-		StrengthAll:  (float32(totScore)/float32(count) + 1) / 2,
+		StrengthAll:  (float32(totScore)/float32(totCount) + 1) / 2,
+		Count:        totCount,
 		Perms:        perms,
 		StrengthPerm: strengths,
-		Count:        count,
+		CountPerm:    counts,
 	}
 }
