@@ -53,67 +53,74 @@ func TrucoBeats(mHand, oHand Hand) int {
 	}
 }
 
-// IsReasonablyPlayed checks if oHand is played with reasonable strategy against mHand.
-// Since mHand plays first each round, only oHand can strategize based on seeing mHand's card.
-// Strategies checked:
+// IsReasonablyPlayed checks if the match between mHand and oHand is reasonably played.
+//
+// Strategies checked (for the player who plays second):
 //   - Beat with minimum possible card that still wins
 //   - Lose with minimum possible card when losing
 //   - After a tie in round 0, play strongest card immediately
 //   - Only tie in later rounds if already winning or cannot do better
+//   - Must win R1 (with minimum possible) if already lost R0
 //
-// Returns false if oHand's play violates these strategies (unreasonable/wasteful play).
+// Returns false if either player's play violates these strategies (unreasonable/wasteful play).
 func IsReasonablyPlayed(mHand, oHand Hand) bool {
 	o0, o1, o2 := oHand[0].Truco(), oHand[1].Truco(), oHand[2].Truco()
-	m0, m1 := mHand[0].Truco(), mHand[1].Truco()
+	m0, m1, m2 := mHand[0].Truco(), mHand[1].Truco(), mHand[2].Truco()
 
-	// Round 0
+	// Round 0: mHand plays first, oHand plays second (can strategize)
 	if o0 > m0 {
-		// Won - could a weaker card also win?
+		// oHand won - check minimum winning card
 		if (o1 > m0 && o1 < o0) || (o2 > m0 && o2 < o0) {
 			return false
 		}
 	} else if o0 < m0 {
-		// Lost - could a weaker card also lose?
+		// oHand lost - check minimum losing card
 		if (o1 < m0 && o1 < o0) || (o2 < m0 && o2 < o0) {
 			return false
 		}
 	}
 	// Tie in round 0 is acceptable
 
-	// Round 1: strategy depends on round 0 result
-	if o0 == m0 {
-		// Tie in round 0 - must play strongest remaining card
+	// Round 1: winner of R0 plays first
+	if o0 > m0 {
+		// oHand won R0, plays first in R1, mHand can strategize
+		// mHand lost R0, must try to win R1 if possible to stay alive
+		if m1 > o1 {
+			// mHand won R1 - check minimum winning card
+			if m2 > o1 && m2 < m1 {
+				return false
+			}
+		} else {
+			// mHand lost or tied R1 - should have won if possible
+			if m2 > o1 {
+				return false
+			}
+			// Check minimum losing card -- to reduce double-counting
+			if m2 < o1 && m2 < m1 {
+				return false
+			}
+		}
+	} else if o0 == m0 {
+		// Tie in R0, mHand plays first in R1, oHand can strategize
+		// After tie, should play strongest to maximize win chance
 		if o2 > o1 {
 			return false
 		}
-	} else if o0 > m0 {
-		// Won round 0
-		if o1 > m1 {
-			// Winning again - check minimum winning card
-			if o2 > m1 && o2 < o1 {
-				return false
-			}
-		} else if o1 < m1 {
-			// Losing round 1 - check minimum losing card
-			if o2 < m1 && o2 < o1 {
-				return false
-			}
-		}
-		// Tie is acceptable when already winning
 	} else {
-		// Lost round 0 - must win round 1 if possible
+		// mHand won R0, mHand plays first in R1, oHand can strategize
+		// oHand must try to win R1 if possible to stay alive
 		if o1 > m1 {
-			// Winning round 1 - check minimum winning card
+			// Winning R1 - check minimum winning card
 			if o2 > m1 && o2 < o1 {
 				return false
 			}
 		} else {
-			// Losing or tying after losing round 0 (both bad)
+			// Losing or tying R1 after losing R0 (both bad)
 			// Should have won if possible
 			if o2 > m1 {
 				return false
 			}
-			// If losing, check minimum loss -- wont matter, but still exclude to reduce double-counting of matches
+			// If losing, check minimum loss -- to reduce double-counting
 			if o1 < m1 && o2 < m1 && o2 < o1 {
 				return false
 			}
@@ -171,7 +178,7 @@ func (stats TrucoStats) PPrint() {
 				hand.Println()
 			}
 			fmt.Println("0 permutations simulated")
-			fmt.Println("Hand is already played sub-optimally")
+			fmt.Println("Hand is probably played sub-optimally")
 		}
 	} else {
 		fmt.Println("Overall Strenght=", stats.StrengthAll)
@@ -189,6 +196,8 @@ func (stats TrucoStats) PPrint() {
 // Parameters:
 //   - kCards: Cards held by the opponent (already played by them, in the order played).
 //   - oCards: Known cards to exclude from the deck (e.g., cards played by other players).
+//   - isMHandFirst: boolean controling who plays first in round 0
+//   - noStrategy: checks IsReasonablyPlayed, discards permutations that are unreasonably played
 //
 // Returns TrucoStats containing the overall strength and per-permutation breakdown.
 func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, isMHandFirst bool) TrucoStats {

@@ -22,8 +22,8 @@ func main() {
 
 	// TODO see what happens if you play optimally (as script suggests)
 
-	hand := truco.Hand{{7, 'e'}, {12, 'c'}, {4, 'o'}}
-	oHand := []truco.Card{{12, 'o'}}
+	hand := truco.Hand{{N: 7, S: 'e'}, {N: 12, S: 'c'}, {N: 4, S: 'o'}}
+	oHand := []truco.Card{{N: 12, S: 'o'}}
 
 	fmt.Println("soy mano, antes de jugar")
 	hand.TrucoStrengthStats([]truco.Card{}, []truco.Card{}, true).PPrint()
