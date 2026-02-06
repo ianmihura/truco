@@ -195,17 +195,21 @@ func (stats TrucoStats) PPrint() {
 //
 // Parameters:
 //   - kCards: Cards held by the opponent (already played by them, in the order played).
-//   - oCards: Known cards to exclude from the deck (e.g., cards played by other players).
+//   - oCards: Known cards the opponent does not hold (e.g., cards played by other players).
+//   - envido: Known envido of the opponent, helps exclude impossible hands.
 //   - isMHandFirst: boolean controling who plays first in round 0
-//   - noStrategy: checks IsReasonablyPlayed, discards permutations that are unreasonably played
+//   - hasStrategy: if true, checks IsReasonablyPlayed, discards permutations that are unreasonably played
+//
+// Notes:
+//   - envido range as fsm envido (0-33: known, +100: range, 255: unknown)
 //
 // Returns TrucoStats containing the overall strength and per-permutation breakdown.
-func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, isMHandFirst bool) TrucoStats {
+func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, envido uint8, isMHandFirst, hasStrategy bool) TrucoStats {
 	mPerms := math.Permutations(mHand, 3)
 	aCards := CardsExcluding(ALL_CARDS, append(mHand, oCards...))
 	oPerms := math.Permutations(aCards, 3)
 
-	var isReasonablyPlayed bool
+	isReasonablyPlayed := true
 	var cScore, totScore, cCount, totCount int
 	perms := make([]Hand, 0, 6)
 	strengths := make([]float32, 0, 6)
@@ -214,10 +218,21 @@ func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, isMHandFirst bool) T
 	for mH := range mPerms {
 		cScore, cCount = 0, 0
 		for oH := range oPerms {
-			if isMHandFirst {
-				isReasonablyPlayed = IsReasonablyPlayed(mH, oH)
-			} else {
-				isReasonablyPlayed = IsReasonablyPlayed(oH, mH)
+			if envido != 255 {
+				oEnvido := Hand(oH).Envido()
+				if envido > 99 && oEnvido > (envido-100) { // range
+					continue
+				} else if envido < 99 && oEnvido != envido { // concrete
+					continue
+				}
+			}
+
+			if hasStrategy {
+				if isMHandFirst {
+					isReasonablyPlayed = IsReasonablyPlayed(mH, oH)
+				} else {
+					isReasonablyPlayed = IsReasonablyPlayed(oH, mH)
+				}
 			}
 
 			if Hand(oH).HasAllInPlace(kCards) && isReasonablyPlayed {

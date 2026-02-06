@@ -22,21 +22,21 @@ func main() {
 
 	// TODO see what happens if you play optimally (as script suggests)
 
-	hand := truco.Hand{{N: 7, S: 'e'}, {N: 12, S: 'c'}, {N: 4, S: 'o'}}
-	oHand := []truco.Card{{N: 12, S: 'o'}}
+	hand := truco.Hand{{N: 7, S: 'e'}, {N: 12, S: 'c'}, {N: 2, S: 'o'}}
+	oHand := []truco.Card{{N: 3, S: 'o'}}
 
 	fmt.Println("soy mano, antes de jugar")
-	hand.TrucoStrengthStats([]truco.Card{}, []truco.Card{}, true).PPrint()
-	fmt.Println()
-	fmt.Println("soy pie, antes de jugar")
-	hand.TrucoStrengthStats([]truco.Card{}, []truco.Card{}, false).PPrint()
+	hand.TrucoStrengthStats([]truco.Card{}, []truco.Card{}, 255, true, true).PPrint()
+	// fmt.Println()
+	// fmt.Println("soy pie, antes de jugar")
+	// hand.TrucoStrengthStats([]truco.Card{}, []truco.Card{}, false).PPrint()
 
 	fmt.Println()
-	fmt.Println("soy mano")
-	hand.TrucoStrengthStats(oHand, []truco.Card{}, true).PPrint()
-	fmt.Println()
-	fmt.Println("soy pie")
-	hand.TrucoStrengthStats(oHand, []truco.Card{}, false).PPrint()
+	fmt.Println("el otro jugador jugo 3o")
+	hand.TrucoStrengthStats(oHand, []truco.Card{}, 255, true, true).PPrint()
+	// fmt.Println()
+	// fmt.Println("soy pie")
+	// hand.TrucoStrengthStats(oHand, []truco.Card{}, false).PPrint()
 
 	// TODO test HasAllInPlace and HasAll
 	// fmt.Println((truco.Hand{{11, 'o'}, {10, 'c'}, {12, 'o'}}).HasAllInPlace(truco.Hand{{12, 'o'}, {10, 'c'}}))
