@@ -5,37 +5,18 @@ import (
 )
 
 /*
-TODO what to do with uy cards
-We have 3 ideas to encode the muestra and figuras:
-
--NO- bool in the Card struct isFigura
-	pro: self contained
-	pro: keep function ifaces intact
-	con: complex iface for card
-	con: hard to count all cards
-	con: hard to get real prob of getting a card
-
-- Card.S can be 'p'
-	pro: self contained
-	pro: simple iface for card
-	con: looses real suit
-	con: hard to count all cards
-	con: hard to get real prob of getting a card
-
-- keep a context (global or pass around) card
-	pro: keep card intact
-	pro: easy to count all cards
-	pro: real prob of getting a card
-	con: edit all func ifaces
-	con: mid-hard map from card (+card) to identifying string (2m, 4m, ...)
-*/
+ */
 
 // We use uint8 for smallest size
 // knowing that Cards will almost always
 // align (in a Hand) in a single 8-byte block
+//
+// Types of Cards/Hands:
+//   - Flat Cards/Hands are hands in truco argentino, and hands in uruguay without muestra.
+//   - Uruguay Cards/Hands may include 'p' as a suit (pieza).
 type Card struct {
-	N uint8 // Number: 1,2,3,4,5,6,7,10,11,12
-	S uint8 // Suit: e,b,o,c (espada, basto, oro, copa)
+	N uint8 // Number: 1,2,3,4,5,6,7,10,11,12.
+	S uint8 // Suit: e,b,o,c (espada, basto, oro, copa). For uruguay: p=pieza.
 }
 
 // Returns a new Card from a string: Card{c[0], c[1]}.
@@ -52,6 +33,20 @@ func NewCard(c string) Card {
 	}
 }
 
+// Converts in place a flat card to a uruguay card, given a m=muestra Card.
+// Is destructive: will overwrite the value of the suit for 'p' where necesary.
+func (c *Card) UY(m Card) {
+	// we do it this extended way for efficiency
+	if c.S == m.S {
+		if 2 == c.N || 4 == c.N || 5 == c.N || 10 == c.N || 11 == c.N {
+			c.S = 'p'
+		} else if c.N == 12 && (2 == m.N || 4 == m.N || 5 == m.N || 10 == m.N || 11 == m.N) {
+			c.N = m.N
+			c.S = 'p'
+		}
+	}
+}
+
 // Value of card for envido (-20)
 func (c Card) Envido() uint8 {
 	if c.N <= 7 {
@@ -62,7 +57,12 @@ func (c Card) Envido() uint8 {
 }
 
 func (c Card) Truco() uint8 {
-	return TRUCO[c]
+	return GetTruco(c)
+}
+
+func (c Card) TrucoUY(m Card) uint8 {
+	c.UY(m)
+	return GetTruco(c)
 }
 
 // Is a figure (10, 11, 12)

@@ -89,6 +89,68 @@ var TRUCO = map[Card]uint8{
 	{4, 'e'}: 1, {4, 'b'}: 1, {4, 'o'}: 1, {4, 'c'}: 1,
 }
 
+// Slightly more efficient way to get truco value of a card
+func GetTruco(c Card) uint8 {
+	switch c.N {
+	case 1:
+		switch c.S {
+		case 'e':
+			return 14
+		case 'b':
+			return 13
+		default:
+			return 8
+		}
+	case 2:
+		if c.S == 'p' {
+			return 19
+		} else {
+			return 9
+		}
+	case 3:
+		return 10
+	case 4:
+		if c.S == 'p' {
+			return 18
+		} else {
+			return 1
+		}
+	case 5:
+		if c.S == 'p' {
+			return 17
+		} else {
+			return 2
+		}
+	case 6:
+		return 3
+	case 7:
+		switch c.S {
+		case 'e':
+			return 12
+		case 'o':
+			return 11
+		default:
+			return 4
+		}
+	case 10:
+		if c.S == 'p' {
+			return 15
+		} else {
+			return 5
+		}
+	case 11:
+		if c.S == 'p' {
+			return 16
+		} else {
+			return 6
+		}
+	case 12:
+		return 7
+	default:
+		return 0
+	}
+}
+
 const MAX_ENVIDO_AR = 33
 const MAX_ENVIDO_UY = 37
 

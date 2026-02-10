@@ -2,6 +2,7 @@ package truco
 
 import (
 	"fmt"
+	"time"
 	"truco/pkg/math"
 )
 
@@ -25,6 +26,65 @@ func TrucoBeats(mHand, oHand Hand) int {
 	}
 
 	s0, s1, s2 := score[0], score[1], score[2]
+	if s0 == 0 {
+		// tie in the first round is defined inmediately after
+		if s1 == 0 {
+			return s2
+		} else {
+			return s1
+		}
+
+	} else if s1 == 0 {
+		// any other tie is defined by winner of first round
+		return s0
+
+	} else if s0 == s1 {
+		// a player won first two rounds
+		return s0
+
+	} else if s2 == 0 {
+		// after we are sure there's no winner of the first two rounds,
+		// (first two round alternate winners)
+		// tie in last round is defined by winner of first round
+		return s0
+
+	} else {
+		// first two round alternate winners, last round defines
+		return s2
+	}
+}
+
+// Simulates two hands being played in Truco,
+// cards are played in the orther they were given (by index)
+//
+// returns:
+//   - 1 if mHand beats oHand
+//   - -1 if mHand looses against oHand
+//   - 0 if there's a tie
+func TrucoBeatsUY(mHand, oHand Hand, m Card) int {
+	// score := make([]int, 3)
+	var s0, s1, s2 int
+
+	o0, o1, o2 := oHand[0].TrucoUY(m), oHand[1].TrucoUY(m), oHand[2].TrucoUY(m)
+	m0, m1, m2 := mHand[0].TrucoUY(m), mHand[1].TrucoUY(m), mHand[2].TrucoUY(m)
+
+	if m0 > o0 {
+		s0 = 1
+	} else if m0 < o0 {
+		s0 = -1
+	}
+	if m1 > o1 {
+		s1 = 1
+	} else if m1 < o1 {
+		s1 = -1
+	}
+	if m2 > o2 {
+		s2 = 1
+	} else if m2 < o2 {
+		s2 = -1
+	}
+
+	// s0, s1, s2 := score[0], score[1], score[2]
 	if s0 == 0 {
 		// tie in the first round is defined inmediately after
 		if s1 == 0 {
@@ -132,22 +192,22 @@ func IsReasonablyPlayed(mHand, oHand Hand) bool {
 }
 
 // returns count of beats-losses of all permutations of mHand against oHand
-func (mHand Hand) TrucoBeatsAll(oHand Hand) (score int) {
-	mPerms := math.Permutations(mHand, 3)
-	oPerms := math.Permutations(oHand, 3)
-	for mH := range mPerms {
-		for oH := range oPerms {
-			score += TrucoBeats(Hand(mH), Hand(oH))
-		}
-	}
-	return score
-}
+// func (mHand Hand) TrucoBeatsAll(oHand Hand) (score int) {
+// 	mPerms := math.Permutations(mHand, 3)
+// 	oPerms := math.Permutations(oHand, 3)
+// 	for mH := range mPerms {
+// 		for oH := range oPerms {
+// 			score += TrucoBeats(Hand(mH), Hand(oH))
+// 		}
+// 	}
+// 	return score
+// }
 
 // strength of a hand in truco (brute force)
 //
 // plays the hand against all other hands, in all possible permutations.
-// counts times it wins, minus losses. averages the result dividing by 36:
-// range of score = (-36 to 36)
+// counts times it wins, minus losses. Normalizes result to a percent.
+// range of score = (0 to 1)
 func (mHand Hand) TrucoStrength() float32 {
 	mPerms := math.Permutations(mHand, 3)
 	aCards := CardsExcluding(ALL_CARDS, mHand)
@@ -158,7 +218,39 @@ func (mHand Hand) TrucoStrength() float32 {
 			score += TrucoBeats(Hand(mH), Hand(oH))
 		}
 	}
-	return float32(score) / math.PickC(37, 3)
+	return (float32(score)/math.PickC(37, 3) + 36.0) / 72
+}
+
+// strength of a hand in truco uruguay (brute force)
+//
+// plays the hand against all other hands, in all possible permutations, with all possible muestras.
+// counts times it wins, minus losses. Normalizes result to a percent.
+// range of score = (0 to 1)
+//
+// bench = 1700 ms
+func (mHand Hand) TrucoStrengthUY() float32 {
+	var c int
+	mPerms := math.Permutations(mHand, 3)
+	aCards := CardsExcluding(ALL_CARDS, mHand)
+	oPerms := math.Permutations(aCards, 3)
+	pPerms := math.Permutations(aCards, 1)
+
+	var score int
+	start := time.Now()
+	for mH := range mPerms {
+		for oH := range oPerms {
+			for m := range pPerms {
+				if oH[0] == m[0] || oH[1] == m[0] || oH[2] == m[0] {
+					continue // muestra should be unique
+				} else {
+					score += TrucoBeatsUY(Hand(mH), Hand(oH), m[0])
+					c++
+				}
+			}
+		}
+	}
+	fmt.Println(time.Now().UnixMilli() - start.UnixMilli())
+	return ((float32(score) / float32(c)) + 1) / 2
 }
 
 type TrucoStats struct {

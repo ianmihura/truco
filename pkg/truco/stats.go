@@ -89,7 +89,7 @@ func CreateHandStatsCSV(outputPath string) error {
 					}
 				}
 
-				strength := (h.TrucoStrength() + 36.0) / 72
+				strength := h.TrucoStrength()
 				envido := h.Envido()
 				combined := (float32(envido)/MAX_ENVIDO_AR + strength) / 2.0
 

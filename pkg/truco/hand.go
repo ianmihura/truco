@@ -24,6 +24,15 @@ func NewHand(handStr string) Hand {
 	return Hand(hand)
 }
 
+// Converts a flat hand to a uruguay hand, given a m=muestra Card.
+// Is destructive: will overwrite the value of the suit for 'p' where necesary.
+func (hand Hand) UY(m Card) Hand {
+	for i := range hand {
+		hand[i].UY(m)
+	}
+	return hand
+}
+
 // Returns true if the hand has all specified cards
 func (hand Hand) HasAll(kCards []Card) bool {
 	if len(kCards) > len(hand) {

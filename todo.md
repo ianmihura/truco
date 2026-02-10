@@ -62,13 +62,6 @@
     - chance that your envido is best in table
 
 ### Truco analytics
-- TrucoStrength (brute force) does not capture the practical stregth, as some permutations will never be reasoanably played. Basic strategies:
-    - beat with minimum possible
-    - loose with minimum possible
-    - tie in the 1st round, you should play strongest right away
-    - tie (in 2nd or 3rd hand) only if you already won 1st round
-    - if you lost the first round, you should not tie any other round, unless you're loosing anyway
-    - usually you tie in the first round if your remaining cards are "good enough" (not aplicable as a strategy, as we need to test all games to understand what is "good enough")
 - 1v1 problem: TrucoStrength is 1v1; 2v2 should have a different beatness model
     - the problem is the search space is too big. 
     - mCards, kCards, pCards (partner cards): I may have a value, range or unknown a pCard
