@@ -227,7 +227,7 @@ func (mHand Hand) TrucoStrength() float32 {
 // counts times it wins, minus losses. Normalizes result to a percent.
 // range of score = (0 to 1)
 //
-// bench = 1700 ms
+// bench = 1500 ms
 func (mHand Hand) TrucoStrengthUY() float32 {
 	var c int
 	mPerms := math.Permutations(mHand, 3)

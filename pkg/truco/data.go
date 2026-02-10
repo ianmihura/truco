@@ -102,7 +102,49 @@ func GetTruco(c Card) uint8 {
 			return 8
 		}
 	case 2:
-		if c.S == 'p' {
+		return 9
+	case 3:
+		return 10
+	case 4:
+		return 1
+	case 5:
+		return 2
+	case 6:
+		return 3
+	case 7:
+		switch c.S {
+		case 'e':
+			return 12
+		case 'o':
+			return 11
+		default:
+			return 4
+		}
+	case 10:
+		return 5
+	case 11:
+		return 6
+	case 12:
+		return 7
+	default:
+		return 0
+	}
+}
+
+// Slightly more efficient way to get truco value of a card
+func GetTrucoUY(c, m Card) uint8 {
+	switch c.N {
+	case 1:
+		switch c.S {
+		case 'e':
+			return 14
+		case 'b':
+			return 13
+		default:
+			return 8
+		}
+	case 2:
+		if c.S == m.S {
 			return 19
 		} else {
 			return 9
@@ -110,13 +152,13 @@ func GetTruco(c Card) uint8 {
 	case 3:
 		return 10
 	case 4:
-		if c.S == 'p' {
+		if c.S == m.S {
 			return 18
 		} else {
 			return 1
 		}
 	case 5:
-		if c.S == 'p' {
+		if c.S == m.S {
 			return 17
 		} else {
 			return 2
@@ -133,18 +175,34 @@ func GetTruco(c Card) uint8 {
 			return 4
 		}
 	case 10:
-		if c.S == 'p' {
+		if c.S == m.S {
 			return 15
 		} else {
 			return 5
 		}
 	case 11:
-		if c.S == 'p' {
+		if c.S == m.S {
 			return 16
 		} else {
 			return 6
 		}
 	case 12:
+		if c.S == m.S {
+			switch m.N {
+			case 2:
+				return 19
+			case 4:
+				return 18
+			case 5:
+				return 17
+			case 11:
+				return 16
+			case 10:
+				return 15
+			default:
+				return 7
+			}
+		}
 		return 7
 	default:
 		return 0

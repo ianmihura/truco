@@ -61,8 +61,7 @@ func (c Card) Truco() uint8 {
 }
 
 func (c Card) TrucoUY(m Card) uint8 {
-	c.UY(m)
-	return GetTruco(c)
+	return GetTrucoUY(c, m)
 }
 
 // Is a figure (10, 11, 12)
