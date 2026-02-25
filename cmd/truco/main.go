@@ -9,7 +9,6 @@ import (
 
 func main() {
 	// Parse templates
-	// Note: Adjust the path if running from a different directory or use absolute paths in production
 	tmpl, err := template.ParseGlob("web/template/*.html")
 	if err != nil {
 		log.Fatalf("Error parsing templates: %v", err)
