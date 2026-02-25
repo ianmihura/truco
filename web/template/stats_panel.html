@@ -1,6 +1,7 @@
 {{ define "stats_panel" }}
 <div
     class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-xl animate-in fade-in slide-in-from-right-4 duration-300">
+    <!-- TODO show overall averages -->
     <div class="bg-gradient-to-r from-blue-600/20 to-emerald-600/20 p-6 border-b border-slate-700">
         <div class="flex items-center justify-between mb-1">
             <span class="text-slate-400 text-xs font-bold uppercase tracking-wider">Mejor par</span>
@@ -10,14 +11,34 @@
         <h2 class="text-4xl font-black text-white flex items-center gap-3 mb-3">
             <span id="stats-card1"></span><span class="text-slate-500 font-light">&</span><span id="stats-card2"></span>
         </h2>
-        <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
-            <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Resumen (envido y truco)
+        <div class="mb-3 bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
+            <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Fuerza promedio
             </p>
             <p id="stats-combined" class="text-xl font-bold text-slate-200"></p>
         </div>
+        <div class="mb-3 bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
+            <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Truco promedio
+            </p>
+            <p id="stats-truco-mean" class="text-xl font-bold text-slate-200"></p>
+        </div>
+        <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
+            <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Envido promedio
+            </p>
+            <p id="stats-envido-mean" class="text-xl font-bold text-slate-200"></p>
+        </div>
+        <div class="flex items-center justify-between mt-5">
+            <span class="text-slate-400 text-xs font-bold uppercase tracking-wider">Mi mano</span>
+            <!-- <span id="stats-count"
+                class="bg-slate-700 text-slate-300 text-[10px] px-2 py-0.5 rounded-full font-mono"></span> -->
+        </div>
+        <h2 class="text-4xl font-black text-white flex items-center gap-3 mb-3">
+            <span id="my-card1">1e</span>
+            <span id="my-card2">5</span>
+            <span id="my-card3">10</span>
+        </h2>
     </div>
 
-    <div class="p-6 space-y-6">
+    <!-- <div class="p-6 space-y-6">
         <section>
             <h3 class="text-blue-400 text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
                 <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
@@ -28,22 +49,9 @@
                     <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Promedio</p>
                     <p id="stats-truco-mean" class="text-xl font-bold text-slate-200"></p>
                 </div>
-                <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
-                    <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Mediana</p>
-                    <p id="stats-truco-median" class="text-xl font-bold text-slate-200"></p>
-                </div>
-                <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
-                    <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Max</p>
-                    <p id="stats-truco-max" class="text-xl font-bold text-emerald-400"></p>
-                </div>
-                <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
-                    <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Min</p>
-                    <p id="stats-truco-min" class="text-xl font-bold text-red-400"></p>
-                </div>
             </div>
         </section>
 
-        <!-- Divider -->
         <div class="border-t border-slate-700/50"></div>
 
         <section>
@@ -56,20 +64,8 @@
                     <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Promedio</p>
                     <p id="stats-envido-mean" class="text-xl font-bold text-slate-200"></p>
                 </div>
-                <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
-                    <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Mediana</p>
-                    <p id="stats-envido-median" class="text-xl font-bold text-slate-200"></p>
-                </div>
-                <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
-                    <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Max</p>
-                    <p id="stats-envido-max" class="text-xl font-bold text-emerald-400 font-mono"></p>
-                </div>
-                <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
-                    <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Min</p>
-                    <p id="stats-envido-min" class="text-xl font-bold text-red-400 font-mono"></p>
-                </div>
             </div>
         </section>
-    </div>
+    </div> -->
 </div>
 {{ end }}

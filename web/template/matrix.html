@@ -2,7 +2,7 @@
 <div class="flex flex-col items-center w-full max-w-xl">
     <div class="flex justify-between items-center w-full mb-6">
         <div class="flex flex-wrap gap-2 p-1.5 bg-slate-800/80 rounded-xl border border-slate-700/50 backdrop-blur-md">
-            <button onclick="setMetric('combined_mean')" id="btn-combined_score"
+            <button onclick="setMetric('combined_mean')" id="btn-combined_mean"
                 class="metric-btn px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200">
                 Fuerza
             </button>
@@ -142,15 +142,18 @@
 
         // Update Truco section
         document.getElementById('stats-truco-mean').textContent = formatValue(data.truco_mean, 3);
-        document.getElementById('stats-truco-median').textContent = formatValue(data.truco_median, 3);
-        document.getElementById('stats-truco-max').textContent = formatValue(data.truco_max, 3);
-        document.getElementById('stats-truco-min').textContent = formatValue(data.truco_min, 3);
 
         // Update Envido section
         document.getElementById('stats-envido-mean').textContent = formatValue(data.envido_mean, 1);
-        document.getElementById('stats-envido-median').textContent = formatValue(data.envido_median, 0);
-        document.getElementById('stats-envido-max').textContent = data.envido_max || 0;
-        document.getElementById('stats-envido-min').textContent = data.envido_min || 0;
+    }
+
+    function updateMyPanel(data, key) {
+        const [c1, c2] = key.split(' ');
+
+        // Update basic info
+        document.getElementById('my-card1').textContent = c1;
+        document.getElementById('my-card2').textContent = c2;
+        document.getElementById('my-card3').textContent = 'x';
     }
 
     function initMatrix() {
@@ -189,12 +192,46 @@
 
                         cell.innerHTML = data.is_envido ? `${rowRank}<br>${colRank}` : `${colRank}<br>${rowRank}`;
 
-                        cell.onmouseover = () => {
+                        currentSelected = undefined
+                        function updMatrix() {
                             document.querySelectorAll('#matrix > div').forEach(c => {
                                 c.classList.remove('outline', 'outline-2', 'outline-white', 'outline-offset-[-2px]', 'z-20');
                             });
                             cell.classList.add('outline', 'outline-2', 'outline-white', 'outline-offset-[-2px]', 'z-20');
                             updateStatsPanel(data, key);
+                        }
+
+                        isHovering = true
+                        cell.onmouseover = () => {
+                            if (isHovering) {
+                                updMatrix()
+                            }
+                        };
+                        cell.onmousedown = (e) => {
+                            // if (e.button == 2) { // is right click
+                            if (currentSelected == key) {
+                                isHovering = true
+                            } else {
+                                isHovering = false
+                            }
+                            updMatrix()
+                            currentSelected = key
+                        };
+
+                        cell.oncontextmenu = (e) => {
+                            e.preventDefault()
+                            updateMyPanel(data, key)
+                            const [c1, c2] = key.split(' ');
+                            htmx.ajax('GET', `/get-lower-cards?card1=${c1}&card2=${c2}`, {
+                                target: '#modal-container',
+                                swap: 'innerHTML'
+                            }).then(() => {
+                                const dropdown = document.getElementById('cards-lower-dropdown');
+                                if (dropdown) {
+                                    dropdown.style.left = `${e.clientX}px`;
+                                    dropdown.style.top = `${e.clientY}px`;
+                                }
+                            });
                         };
                     } else {
                         cell.classList.add(...emptyCellClass.split(' '));

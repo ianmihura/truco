@@ -5,6 +5,16 @@ import (
 	"truco/pkg/math"
 )
 
+func CardsLowerEqual(min uint8) []string {
+	result := make([]string, 0, len(RANKS))
+	for rank := range RANKS {
+		if RANKS[rank] <= min {
+			result = append(result, rank)
+		}
+	}
+	return result
+}
+
 // Return all cards in `cards` that dont belong to list eCards
 func CardsExcluding(cards, eCards []Card) []Card {
 	if len(eCards) == 0 {

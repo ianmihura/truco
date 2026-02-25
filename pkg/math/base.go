@@ -3,7 +3,12 @@ package math
 import (
 	"iter"
 	"slices"
+	"unsafe"
 )
+
+func BInt(b bool) int {
+	return int(*(*byte)(unsafe.Pointer(&b)))
+}
 
 // Combinations returns an iterator that yields r-length combinations of elements in the items slice.
 // This replicates the behavior of python's itertools.combinations.
