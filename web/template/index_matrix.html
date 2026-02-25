@@ -7,6 +7,7 @@
     <title>Truco Hand Strategies</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+    <link rel="icon" type="image/x-icon" href="/static/espada.png">
     <script>
         tailwind.config = {
             theme: {
@@ -38,19 +39,22 @@
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen py-4 flex justify-center">
     <div class="flex flex-col gap-8 max-w-[1400px] w-full">
         <div class="w-full">
-            {{ template "tracker" .Tracker }}
+            <div id="tracker-grid" class="grid grid-cols-1 md:grid-cols-12 gap-4 w-full mb-8">
+                {{ template "tracker" .Tracker }}
+            </div>
         </div>
 
         <div class="flex flex-col lg:flex-row gap-8 w-full items-start">
-            <!-- <div class="flex-1 flex flex-col items-center">
+            <div class="flex-1 flex flex-col items-center">
                 {{ range .Cards }}
                 {{ $card := .ToString }}
                 {{ $card }}
                 {{ end }}
-            </div> -->
+            </div>
 
             <div class="flex-1 flex flex-col items-center">
-                {{ template "matrix" .Stats }}
+                <!-- TODO not using stats in index.html -->
+                {{ template "matrix" }}
             </div>
 
             <div id="stats-panel-container" class="lg:w-80 w-full shrink-0">
@@ -74,5 +78,14 @@
 
     <div id="modal-container"></div>
 </body>
+
+<style>
+    .action-btn.selected {
+        background-color: rgba(59, 130, 246, 0.4) !important;
+        border-color: rgba(59, 130, 246, 0.6) !important;
+        color: white !important;
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+    }
+</style>
 
 </html>

@@ -44,6 +44,7 @@ func main() {
 
 	hand := truco.Hand{{N: 6, S: 'e'}, {N: 6, S: 'c'}, {N: 6, S: 'o'}}
 	for {
+		// hand.TrucoStrengthStats([]truco.Card{}, []truco.Card{}, 255, true, true).PPrint()
 		hand.TrucoStrengthUY()
 	}
 	// hand.TrucoStrength()

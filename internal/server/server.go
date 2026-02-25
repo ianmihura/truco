@@ -23,6 +23,7 @@ func NewServer(tmpl *template.Template) *Server {
 
 func (s *Server) routes() {
 	// Initialize Handlers
+	matrixHandler := pages.NewMatrixHandler(s.Tmpl)
 	homeHandler := pages.NewHomeHandler(s.Tmpl)
 	handler := partials.NewHandler(s.Tmpl)
 
@@ -30,9 +31,13 @@ func (s *Server) routes() {
 	fs := http.FileServer(http.Dir("web/static"))
 	s.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	// Register Routes
+	// Basic
 	s.Handle("/", homeHandler)
+
+	// Matrix
+	s.Handle("/matrix", matrixHandler)
 	s.HandleFunc("/get-cards", handler.GetCards)
+	s.HandleFunc("/get-lower-cards", handler.GetLowerCards)
 	s.HandleFunc("/track-act", handler.TrackAct)
 	s.HandleFunc("/track-stats", handler.TrackStats)
 }

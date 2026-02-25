@@ -35,8 +35,8 @@ func checkTrucoBeats(t *testing.T, s0, s1, s2, expected int) {
 	// mHand[i] < oHand[i] -> -1
 	// mHand[i] == oHand[i] -> 0
 
-	mHand := make(Hand, 3)
 	oHand := make(Hand, 3)
+	mHand := make(Hand, 3)
 
 	setupRound(s0, 0, &mHand, &oHand)
 	setupRound(s1, 1, &mHand, &oHand)
