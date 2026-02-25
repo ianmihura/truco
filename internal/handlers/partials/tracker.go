@@ -106,7 +106,7 @@ func processActionFSM(action fsm.ValidAction, match *fsm.Match, r *http.Request)
 	}
 
 	// default: next action tracker (next player's turn)
-	return "action", TrackerData{
+	return "tracker", TrackerData{
 		ActionTitle: "Jugador " + string(rune('1'+match.CPlayer)),
 		Actions:     match.ValidActions(),
 		DoneActions: doneActions,
