@@ -31,7 +31,7 @@ func (s *Server) routes() {
 	fs := http.FileServer(http.Dir("web/static"))
 	s.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	// Basic
+	// Main app
 	s.Handle("/", homeHandler)
 
 	// Matrix

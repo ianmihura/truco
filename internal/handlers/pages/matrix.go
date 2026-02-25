@@ -55,38 +55,3 @@ func (h *MatrixHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
-
-type HomeHandler struct {
-	Tmpl *template.Template
-}
-
-func NewHomeHandler(tmpl *template.Template) *HomeHandler {
-	return &HomeHandler{Tmpl: tmpl}
-}
-
-func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// First default action
-	match := fsm.NewMatch()
-	trackerData := partials.TrackerData{
-		ActionTitle: "Jugador 1",
-		Actions:     match.ValidActions(),
-		State:       string(match.Encode()),
-	}
-
-	// Initial load of all cards
-	cards := partials.GetAvailableCards(truco.FilterHands{})
-
-	data := struct {
-		// Stats   template.JS
-		Tracker partials.TrackerData
-		Cards   []partials.CardUI
-	}{
-		// Stats:   template.JS(statsJSON),
-		Tracker: trackerData,
-		Cards:   cards,
-	}
-
-	if err := h.Tmpl.ExecuteTemplate(w, "index.html", data); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}

@@ -8,8 +8,12 @@ import (
 )
 
 func main() {
-	// Parse templates
-	tmpl, err := template.ParseGlob("web/template/*.html")
+	tmpl := template.New("").Funcs(template.FuncMap{
+		"mul": func(a, b float32) float32 {
+			return a * b
+		},
+	})
+	tmpl, err := tmpl.ParseGlob("web/template/*.html")
 	if err != nil {
 		log.Fatalf("Error parsing templates: %v", err)
 	}
