@@ -67,7 +67,6 @@ func (h *HomeHandler) handleCalculate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	stats := truco.Hand(mHand).TrucoStrengthStats(kCards, []truco.Card{}, envido, isMHandFirst, hasStrategy)
-	fmt.Println(stats)
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := h.Tmpl.ExecuteTemplate(w, "results_partial.html", stats); err != nil {

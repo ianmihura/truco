@@ -254,11 +254,12 @@ func (mHand Hand) TrucoStrengthUY() float32 {
 }
 
 type TrucoStats struct {
-	StrengthAll  float32   // overall hand strength
-	Count        int       // amount of hands simulated
-	Perms        []Hand    // permutations of mHand
-	StrengthPerm []float32 // strength, by permutations of mHand
-	CountPerm    []float32 // amount of hands simulated, by permutations of mHand
+	StrengthAll     float32   // overall hand strength: % hands you win
+	Count           int       // amount of hands simulated
+	Perms           []Hand    // permutations of mHand
+	StrengthPerm    []float32 // strength: hands you win / hands played in that permutation
+	StrengthPermAll []float32 // strength: hands you win / hands played it total
+	CountPerm       []float32 // amount of hands simulated, by permutations of mHand
 }
 
 func (stats TrucoStats) PPrint() {
@@ -282,8 +283,9 @@ func (stats TrucoStats) PPrint() {
 	}
 }
 
-// TrucoStrengthStats calculates detailed strength statistics for a hand by simulating
-// all possible permutations against all possible opponent hands, given known cards.
+// TrucoStrengthStats calculates strength statistics for a mHand by simulating
+// all possible permutations against all possible opponent hands, given known info.
+// Helps players identify best permutation to play, and best
 //
 // Parameters:
 //   - kCards: Cards held by the opponent (already played by them, in the order played).
@@ -304,7 +306,8 @@ func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, envido uint8, isMHan
 	isReasonablyPlayed := true
 	var cScore, totScore, cCount, totCount int
 	perms := make([]Hand, 0, 6)
-	strengths := make([]float32, 0, 6)
+	strengthsPerm := make([]float32, 0, 6)
+	strengthsPermAll := make([]float32, 0, 6)
 	counts := make([]float32, 0, 6)
 
 	for mH := range mPerms {
@@ -333,17 +336,32 @@ func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, envido uint8, isMHan
 			}
 		}
 		perms = append(perms, mH)
-		strengths = append(strengths, (float32(cScore)/float32(cCount)+1)/2)
+		if cCount > 0 {
+			strengthsPerm = append(strengthsPerm, (float32(cScore)/float32(cCount)+1)/2)
+		} else {
+			strengthsPerm = append(strengthsPerm, 0.0)
+		}
 		counts = append(counts, float32(cCount))
 		totScore += cScore
 		totCount += cCount
 	}
 
+	var strengthAll float32
+	if totCount > 0 {
+		strengthAll = (float32(totScore)/float32(totCount) + 1) / 2
+		for i := range strengthsPerm {
+			strengthsPermAll = append(strengthsPermAll, strengthsPerm[i]*counts[i]/float32(totCount))
+		}
+	} else {
+		strengthAll = 0
+	}
+
 	return TrucoStats{
-		StrengthAll:  (float32(totScore)/float32(totCount) + 1) / 2,
-		Count:        totCount,
-		Perms:        perms,
-		StrengthPerm: strengths,
-		CountPerm:    counts,
+		StrengthAll:     strengthAll,
+		Count:           totCount,
+		Perms:           perms,
+		StrengthPerm:    strengthsPerm,
+		StrengthPermAll: strengthsPermAll,
+		CountPerm:       counts,
 	}
 }
