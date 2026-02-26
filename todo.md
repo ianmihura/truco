@@ -1,24 +1,31 @@
 # Solver for the game Truco, as played in Argentina and Uruguay
 
 ### Features
-1. Whats the chance of each sub-hand (given two best cards, with or without envido) -- only relevant if we have UI
-2. Given your hand
+1. Given your hand
     - Calc your envido / flor points (easy)
     - Calc 'truco' strength
-        - given sorted cards played against each other, against how many hands do you win
-        - given unsorted, against how many hands do you win
-    So we get:
-    - Whats the chance that your hand is better than one (or more) oponents
-    - Trailing: given we fix some piece of information, how do these probabilites change
-3. Given your envido
+2. Given your envido
     - Whats the chance your envido/flor is best (medium)
     - Whats the range of hands you could have (hard)
     - Bonus: what card reveals less, or contradictory, info (eg. 33 envido with 2m + 3, showing any 7 will bluff)
-    - Trailing: given we fix some piece of information, how do these probabilites change
-4. Guess range of other players given limited info
+3. Guess range of other players given limited info
     - Flor (score)
     - Envido (score or partial score)
     - Individual cards
+
+settings:
+- uy
+- num players (2, 4)
+- hints, explain
+
+test
+11e 7b 11b
+1o 5o (less than 11)
+
+example:
+1e 7c 7b
+kEnvido = 33
+hasStrategy is key to understand the results
 
 ### TODO UI:
 - select past turns:
@@ -31,9 +38,6 @@
     on-request past action: recreate the match with the past actions
     frontend: on click any action in a tracker box, delete all next (if any) and concat incoming
     """
-- settings on top
-    - num players
-    - Separate between arg & uru
 - nicer styles
 - choose mCards and kCards out of a 4x10 matrix
     then also choose an envido
@@ -75,7 +79,7 @@
 - Make sure to reuse generic functions
 
 ### Next steps
-- host in a free tier server (fly.io, gcp, render)
+- host in a free tier server
 - hover on different elements also shows hints in the bottom, explaining UI
     - tutorial?
 - Track progress of a hand
@@ -84,21 +88,21 @@
     - make a nicer card chooser (and reduce the options based on info available)
 
 Envido scores:
-```
-tn| nq  quiero
-1 | 1 - 2
-1 | 1 - 3
-1 | 1 - 255
-
-2 | 2 - 4
-2 | 2 - 5
-2 | 2 - 255
-
-3 | 4 - 7
-3 | 5 - 255
-
-4 | 7 - 255
-```
+turno | no q | quiero | canto
+------|------|--------|------
+1     | 1    | 2      | env
+1     | 1    | 3      | real
+1     | 1    | 255    | falta
+2     | 2    | 4      | env + env
+2     | 2    | 5      | env + real
+2     | 2    | 255    | env + falta
+3     | 4    | 7      | env + env + real
+3     | 5    | 255    | env + env + falta
+4     | 7    | 255    | env + env + real + falta
 
 ### References
 https://quanam.com/todo-lo-que-siempre-quisiste-saber-del-truco-uruguayo/
+
+https://railway.com/pricing
+https://render.com/pricing
+https://www.alwaysdata.com/en/offers/

@@ -26,6 +26,12 @@
             background-color: rgba(59, 130, 246, 0.2) !important;
             box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
         }
+
+        .selected-k-card {
+            border-color: #f63b51 !important;
+            background-color: rgba(246, 59, 59, 0.2) !important;
+            box-shadow: 0 0 15px rgba(246, 59, 59, 0.4);
+        }
     </style>
 </head>
 
@@ -49,8 +55,9 @@
 
                     <div class="grid grid-cols-4 gap-2">
                         {{ range .AllCards }}
-                        <button type="button" onclick="toggleCard(this)" data-card="{{ . }}"
-                            class="card-btn py-3 px-1 rounded-xl bg-slate-900 border border-slate-700 text-sm font-black text-slate-400 hover:text-white hover:border-blue-500/50 transition-all duration-200 uppercase">
+                        <button type="button" onclick="toggleCard(this)" oncontextmenu="toggleKCard(event)"
+                            data-card="{{ . }}"
+                            class="card-btn py-3 px-1 rounded-xl bg-slate-900 border border-slate-700 text-sm font-black text-slate-400 hover:text-white hover:border-blue-500/50 transition-all duration-200">
                             {{ . }}
                         </button>
                         {{ end }}
@@ -60,52 +67,69 @@
                 <!-- Right Column: Parameters -->
                 <div class="space-y-8">
                     <div
+                        class="space-y-4 bg-slate-800/50 rounded-2xl border border-slate-700/50 p-6 backdrop-blur-sm shadow-xl">
+                        <h2 class="text-lg font-bold text-white uppercase tracking-widest">Tus cartas</h2>
+                        <div class="flex gap-4 justify-center" id="hand-preview">
+                            <div
+                                class="w-20 h-28 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center text-slate-700 text-xs font-bold">
+                                1</div>
+                            <div
+                                class="w-20 h-28 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center text-slate-700 text-xs font-bold">
+                                2</div>
+                            <div
+                                class="w-20 h-28 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center text-slate-700 text-xs font-bold">
+                                3</div>
+                        </div>
+
+                        <label
+                            class="flex items-center justify-between p-4 bg-slate-900/50 rounded-xl border border-slate-700/30 text-sm font-bold text-slate-200 cursor-pointer"
+                            for="isMHandFirst">Soy mano
+                            <input type="checkbox" id="isMHandFirst" name="isMHandFirst" value="true"
+                                class="w-5 h-5 accent-blue-500">
+                        </label>
+
+                        <label
+                            class="flex items-center justify-between p-4 bg-slate-900/50 rounded-xl border border-slate-700/30 text-sm font-bold text-slate-200 cursor-pointer"
+                            for="hasStrategy">Con estrategia
+                            <input type="checkbox" id="hasStrategy" name="hasStrategy" value="true"
+                                class="w-5 h-5 accent-blue-500">
+                        </label>
+                    </div>
+
+                    <div
                         class="bg-slate-800/50 rounded-2xl border border-slate-700/50 p-6 backdrop-blur-sm shadow-xl space-y-6">
-                        <h2 class="text-lg font-bold text-white uppercase tracking-widest">Parámetros del Juego</h2>
+                        <h2 class="text-lg font-bold text-white uppercase tracking-widest">cartas del otro</h2>
 
                         <div class="space-y-4">
-                            <div>
-                                <label
-                                    class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Cartas
-                                    jugadas por oponente</label>
-                                <input type="text" name="kCards" placeholder="Ej: 1e,7o"
-                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors uppercase font-mono">
+                            <div class="flex gap-4 justify-center" id="khand-preview">
+                                <div
+                                    class="w-20 h-28 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center text-slate-700 text-xs font-bold">
+                                    1</div>
+                                <div
+                                    class="w-20 h-28 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center text-slate-700 text-xs font-bold">
+                                    2</div>
+                                <div
+                                    class="w-20 h-28 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center text-slate-700 text-xs font-bold">
+                                    3</div>
                             </div>
 
                             <div>
                                 <label
                                     class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Envido
                                     del oponente</label>
-                                <input type="number" name="envido" placeholder="255 (desconocido)" value="255"
+                                <input type="number" name="envido" placeholder="255 (desconocido)" value="" max="33"
                                     class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors">
-                            </div>
-
-                            <div
-                                class="flex items-center justify-between p-4 bg-slate-900/50 rounded-xl border border-slate-700/30">
-                                <span class="text-sm font-bold text-slate-200">Sos mano (jugás primero)</span>
-                                <input type="checkbox" name="isMHandFirst" value="true" class="w-5 h-5 accent-blue-500">
                             </div>
                         </div>
                     </div>
 
-                    <div id="hand-preview" class="flex gap-4 justify-center">
-                        <!-- Preview selected cards here -->
-                        <div
-                            class="w-20 h-28 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center text-slate-700 text-xs font-bold">
-                            1</div>
-                        <div
-                            class="w-20 h-28 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center text-slate-700 text-xs font-bold">
-                            2</div>
-                        <div
-                            class="w-20 h-28 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center text-slate-700 text-xs font-bold">
-                            3</div>
-                    </div>
 
                     <button type="submit" id="submit-btn" disabled
                         class="w-full py-4 rounded-xl bg-slate-700 text-slate-500 font-black uppercase tracking-widest cursor-not-allowed transition-all duration-300">
                         Calcular Fuerza
                     </button>
                     <input type="hidden" name="mHand" id="mHand-input">
+                    <input type="hidden" name="kCards" id="kCards-input">
                 </div>
             </div>
         </form>
@@ -117,6 +141,7 @@
 
     <script>
         let selectedCards = [];
+        let selectedKCards = [];
 
         function toggleCard(btn) {
             const card = btn.dataset.card;
@@ -135,8 +160,27 @@
             updateUI();
         }
 
+        function toggleKCard(e) {
+            e.preventDefault()
+            const card = e.target.dataset.card;
+            const index = selectedKCards.indexOf(card);
+
+            if (index > -1) {
+                selectedKCards.splice(index, 1);
+                e.target.classList.remove('selected-k-card');
+            } else {
+                if (selectedKCards.length < 3) {
+                    selectedKCards.push(card);
+                    e.target.classList.add('selected-k-card');
+                }
+            }
+
+            updateUI();
+        }
+
         function updateUI() {
-            document.getElementById('mHand-input').value = selectedCards.join(',');
+            document.getElementById('mHand-input').value = selectedCards.join(' ');
+            document.getElementById('kCards-input').value = selectedKCards.join(' ');
             document.getElementById('hand-counter').innerText = `${selectedCards.length} / 3 CARTAS`;
 
             const submitBtn = document.getElementById('submit-btn');
@@ -155,11 +199,13 @@
 
         function updatePreview() {
             const preview = document.getElementById('hand-preview');
+            const kpreview = document.getElementById('khand-preview');
             preview.innerHTML = '';
+            kpreview.innerHTML = '';
             for (let i = 0; i < 3; i++) {
                 const card = selectedCards[i];
                 const div = document.createElement('div');
-                div.className = 'w-20 h-28 rounded-xl flex items-center justify-center font-black uppercase shadow-xl transition-all duration-300 animate-in zoom-in-75';
+                div.className = 'w-20 h-28 rounded-xl flex items-center justify-center font-black shadow-xl transition-all duration-300 animate-in zoom-in-75';
                 if (card) {
                     div.classList.add('bg-blue-600', 'text-white', 'text-lg', 'border-2', 'border-white/20');
                     div.innerText = card;
@@ -168,6 +214,18 @@
                     div.innerText = i + 1;
                 }
                 preview.appendChild(div);
+
+                const kcard = selectedKCards[i];
+                const kdiv = document.createElement('div');
+                kdiv.className = 'w-20 h-28 rounded-xl flex items-center justify-center font-black shadow-xl transition-all duration-300 animate-in zoom-in-75';
+                if (kcard) {
+                    kdiv.classList.add('bg-red-600', 'text-white', 'text-lg', 'border-2', 'border-white/20');
+                    kdiv.innerText = kcard;
+                } else {
+                    kdiv.classList.add('border-2', 'border-dashed', 'border-slate-700', 'text-slate-700', 'text-xs');
+                    kdiv.innerText = i + 1;
+                }
+                kpreview.appendChild(kdiv);
             }
         }
     </script>

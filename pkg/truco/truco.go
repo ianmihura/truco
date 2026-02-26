@@ -354,6 +354,7 @@ func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, envido uint8, isMHan
 		}
 	} else {
 		strengthAll = 0
+		strengthsPermAll = []float32{0, 0, 0, 0, 0, 0}
 	}
 
 	return TrucoStats{
