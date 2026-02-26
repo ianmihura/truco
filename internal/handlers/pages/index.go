@@ -1,10 +1,10 @@
 package pages
 
 import (
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 	"truco/pkg/truco"
 )
 
@@ -50,23 +50,27 @@ func (h *HomeHandler) handleCalculate(w http.ResponseWriter, r *http.Request) {
 
 	mHandStr := r.Form.Get("mHand")
 	kCardsStr := r.Form.Get("kCards")
-	envido := uint8(255) // TODO Default to unknown
-	if env := r.Form.Get("envido"); env != "" {
-		fmt.Sscanf(env, "%d", &envido)
-	}
 	isMHandFirst := r.Form.Get("isMHandFirst") == "true"
 	hasStrategy := r.Form.Get("hasStrategy") == "true"
+	sonBuenas := r.Form.Get("sonBuenas") == "true"
+	kEnvido, err := strconv.Atoi(r.Form.Get("envido"))
+	if err != nil {
+		kEnvido = 255
+	}
 
 	mHand := truco.NewHand(mHandStr)
-	mEnvido := mHand.Envido()
 	kCards := []truco.Card(truco.NewHand(kCardsStr))
+	mEnvido := mHand.Envido()
+	if sonBuenas {
+		kEnvido = 100 + int(mEnvido)
+	}
 
 	if len(mHand) != 3 {
 		http.Error(w, "Select exactly 3 cards for your hand", http.StatusBadRequest)
 		return
 	}
 
-	stats := mHand.TrucoStrengthStats(kCards, []truco.Card{}, envido, isMHandFirst, hasStrategy)
+	stats := mHand.TrucoStrengthStats(kCards, []truco.Card{}, uint8(kEnvido), isMHandFirst, hasStrategy)
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := h.Tmpl.ExecuteTemplate(w, "results_partial.html", struct {

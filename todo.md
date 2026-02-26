@@ -2,8 +2,8 @@
 
 ### Features
 1. Given your hand
-    - Calc your envido / flor points (easy)
-    - Calc 'truco' strength
+    - Calc your envido / flor points
+    - Calc 'truco' strength (show correctly)
 2. Given your envido
     - Whats the chance your envido/flor is best (medium)
     - Whats the range of hands you could have (hard)
@@ -12,20 +12,25 @@
     - Flor (score)
     - Envido (score or partial score)
     - Individual cards
-
-settings:
-- uy
-- num players (2, 4)
-- hints, explain
-
-test
-11e 7b 11b
-1o 5o (less than 11)
-
-example:
-1e 7c 7b
-kEnvido = 33
-hasStrategy is key to understand the results
+4. Advances:
+    - UY
+    - Num players (add posibility of 4)
+    - Hints, explain
+        - soy mano: only relevant is strategy=true
+    - Command palette
+    - Hotkeys to choose cards
+5. Cases:
+    - 11e 7b 11b
+        1o 5o (less than 11)
+    - 1e 7c 7b
+        kEnvido = 33
+        hasStrategy is key to understand the results
+6. Host:
+    - https://railway.com/pricing
+    - https://render.com/pricing
+    - https://www.alwaysdata.com/en/offers/
+7. Nice to haves
+    - color of strengths % (in results)
 
 ### TODO UI:
 - select past turns:
@@ -102,7 +107,3 @@ turno | no q | quiero | canto
 
 ### References
 https://quanam.com/todo-lo-que-siempre-quisiste-saber-del-truco-uruguayo/
-
-https://railway.com/pricing
-https://render.com/pricing
-https://www.alwaysdata.com/en/offers/

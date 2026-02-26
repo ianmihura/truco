@@ -16,6 +16,9 @@ type Hand []Card
 //
 //	"1e 1b 1c" -> Hand{{1, 'e'}, {1, 'b'}, {1, 'c'}}
 func NewHand(handStr string) Hand {
+	if handStr == "" {
+		return []Card{}
+	}
 	cards := strings.Split(handStr, " ")
 	hand := make([]Card, 0, len(cards))
 	for c := range cards {
