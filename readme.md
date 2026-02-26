@@ -10,6 +10,7 @@ The webapp is still being built. We'll have a working version, hosted live, this
 
 # Representation
 
+![image](./screenshot-2026-02-26.png)
 ![image](./screenshot.png)
 
 ### Matrix
