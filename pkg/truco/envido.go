@@ -114,12 +114,21 @@ func EnvidoHands(score uint8) (hands []Hand) {
 	return hands
 }
 
-// Raw probability of having a certain envido score
-func PEnvido(score uint8) float32 {
+// Probability a given envido is the highest of the table, given mCards and other kCards
+func PEnvidoHighest(mHand Hand, kCards []Card) float32 {
+	// mEnvido := mHand.Envido()
+	// aCards := CardsExcluding(ALL_CARDS, mHand)
 	return 0.0 // TODO
 }
 
-// Probability a given envido is the highest of the table, given mCards and other kCards
-func PEnvidoHighest(score uint8, mCards, kCards []Card) float32 {
-	return 0.0 // TODO
+func EnvidoBeats(mEnvido, oEnvido uint8, isMHandFirst bool) int {
+	// return math.BtoI(((mEnvido == oEnvido) && isMHandFirst) || (mEnvido > oEnvido))
+
+	if mEnvido > oEnvido {
+		return 1
+	} else if mEnvido < oEnvido {
+		return 0
+	} else {
+		return math.BtoI(isMHandFirst)
+	}
 }

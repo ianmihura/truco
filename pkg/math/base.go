@@ -6,7 +6,7 @@ import (
 	"unsafe"
 )
 
-func BInt(b bool) int {
+func BtoI(b bool) int {
 	return int(*(*byte)(unsafe.Pointer(&b)))
 }
 

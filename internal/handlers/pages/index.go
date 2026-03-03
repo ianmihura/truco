@@ -60,9 +60,8 @@ func (h *HomeHandler) handleCalculate(w http.ResponseWriter, r *http.Request) {
 
 	mHand := truco.NewHand(mHandStr)
 	kCards := []truco.Card(truco.NewHand(kCardsStr))
-	mEnvido := mHand.Envido()
 	if sonBuenas {
-		kEnvido = 100 + int(mEnvido)
+		kEnvido = 100 + int(mHand.Envido())
 	}
 
 	if len(mHand) != 3 {
@@ -73,13 +72,7 @@ func (h *HomeHandler) handleCalculate(w http.ResponseWriter, r *http.Request) {
 	stats := mHand.TrucoStrengthStats(kCards, []truco.Card{}, uint8(kEnvido), isMHandFirst, hasStrategy)
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if err := h.Tmpl.ExecuteTemplate(w, "results_partial.html", struct {
-		truco.TrucoStats
-		MEnvido uint8
-	}{
-		stats,
-		mEnvido,
-	}); err != nil {
+	if err := h.Tmpl.ExecuteTemplate(w, "results_partial.html", stats); err != nil {
 		log.Printf("Template execution error: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

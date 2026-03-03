@@ -34,7 +34,7 @@
     - color of strengths % (in results)
     - icons or emojis: https://www.flaticon.es/iconos-gratis/baraja-espanola
 8. Bugs
-    - select same card for both playes
+    - 
 
 ### TODO UI:
 - select past turns:

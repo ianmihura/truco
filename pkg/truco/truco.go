@@ -258,8 +258,10 @@ type TrucoStats struct {
 	Count           int       // amount of hands simulated
 	Perms           []Hand    // permutations of mHand
 	StrengthPerm    []float32 // strength: hands you win / hands played in that permutation
-	StrengthPermAll []float32 // strength: hands you win / hands played it total
+	StrengthPermAll []float32 // strength: hands you win / hands played in total
 	CountPerm       []float32 // amount of hands simulated, by permutations of mHand
+	MEnvido         uint8     // my envido
+	MEnvidoScore    float32   // my envido strength: hands you win / hands played in total
 }
 
 func (stats TrucoStats) PPrint() {
@@ -302,9 +304,10 @@ func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, envido uint8, isMHan
 	mPerms := math.Permutations(mHand, 3)
 	aCards := CardsExcluding(ALL_CARDS, append(mHand, oCards...))
 	oPerms := math.Permutations(aCards, 3)
+	mEnvido := mHand.Envido()
 
 	isReasonablyPlayed := true
-	var cScore, totScore, cCount, totCount int
+	var eScore, eCount, cScore, totScore, cCount, totCount int
 	perms := make([]Hand, 0, 6)
 	strengthsPerm := make([]float32, 0, 6)
 	strengthsPermAll := make([]float32, 0, 6)
@@ -330,9 +333,13 @@ func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, envido uint8, isMHan
 				}
 			}
 
-			if Hand(oH).HasAllInPlace(kCards) && isReasonablyPlayed {
-				cScore += TrucoBeats(Hand(mH), Hand(oH))
-				cCount++
+			if Hand(oH).HasAllInPlace(kCards) {
+				if isReasonablyPlayed {
+					cScore += TrucoBeats(Hand(mH), Hand(oH))
+					cCount++
+				}
+				eScore += EnvidoBeats(mEnvido, Hand(oH).Envido(), isMHandFirst)
+				eCount++
 			}
 		}
 		perms = append(perms, mH)
@@ -364,5 +371,7 @@ func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, envido uint8, isMHan
 		StrengthPerm:    strengthsPerm,
 		StrengthPermAll: strengthsPermAll,
 		CountPerm:       counts,
+		MEnvido:         mEnvido,
+		MEnvidoScore:    float32(eScore) / float32(eCount),
 	}
 }

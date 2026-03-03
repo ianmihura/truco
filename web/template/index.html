@@ -53,9 +53,9 @@
 
                     <div class="grid grid-cols-4 gap-2">
                         {{ range .AllCards }}
-                        <button type="button" onclick="toggleCard(this)" oncontextmenu="toggleKCard(event)"
+                        <button type="button" onclick="toggleCard(event)" oncontextmenu="toggleKCard(event)"
                             data-card="{{ . }}"
-                            class="card-btn py-3 px-1 rounded-xl bg-slate-900 border border-slate-700 text-sm font-black text-slate-400 hover:text-white hover:border-blue-500/50 transition-all duration-200">
+                            class="card-btn py-3 px-1 rounded-xl bg-slate-900 border border-slate-700 text-sm font-black text-slate-400 hover:text-white hover:border-blue-500/50 transition-all duration-200 cursor-pointer">
                             {{ . }}
                         </button>
                         {{ if or (eq . "1b") (eq . "7o") (eq . "1c") (eq . "7c") }}
@@ -82,14 +82,6 @@
                                 class="w-20 h-28 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center text-slate-700 text-xs font-bold">
                                 3</div>
                         </div>
-
-                        <label onmousedown="toggleSoyMano()"
-                            data-tip="Sólo juega permutaciones razonables (ej. si empata la primera, intenta ganar la segunda)."
-                            class="tooltip flex items-center justify-between p-4 bg-slate-900/50 rounded-xl border border-slate-700/30 text-sm font-bold text-slate-200 cursor-pointer"
-                            for="hasStrategy">Con estrategia
-                            <input type="checkbox" id="hasStrategy" name="hasStrategy" value="true"
-                                class="w-5 h-5 accent-blue-500">
-                        </label>
 
                         <label id="isMHandFirstLabel"
                             class="hidden flex items-center justify-between p-4 bg-slate-900/50 rounded-xl border border-slate-700/30 text-sm font-bold text-slate-200 cursor-pointer"
@@ -144,6 +136,14 @@
                         </div>
                     </div>
 
+                    <label
+                        data-tip="Sólo juega permutaciones razonables (ej. si empata la primera, intenta ganar la segunda)."
+                        class="tooltip flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border border-slate-700/30 text-sm font-bold text-slate-200 cursor-pointer"
+                        for="hasStrategy">Con estrategia
+                        <input type="checkbox" id="hasStrategy" name="hasStrategy" value="true"
+                            class="w-5 h-5 accent-blue-500">
+                    </label>
+
                     <button type="submit" id="submit-btn" disabled
                         class="w-full py-4 rounded-xl bg-slate-700 text-slate-500 font-black tracking-widest cursor-not-allowed transition-all duration-300">
                         Calcular fuerza
@@ -163,23 +163,27 @@
         let selectedCards = [];
         let selectedKCards = [];
 
-        function toggleCard(btn) {
-            const card = btn.dataset.card;
+        // my hand cards
+        function toggleCard(e) {
+            const card = e.target.dataset.card;
             const index = selectedCards.indexOf(card);
 
             if (index > -1) {
                 selectedCards.splice(index, 1);
-                btn.classList.remove('selected-card');
+                e.target.classList.remove('selected-card');
+            } else if (selectedKCards.indexOf(card) > -1) {
+                return // already in other's hand
             } else {
                 if (selectedCards.length < 3) {
                     selectedCards.push(card);
-                    btn.classList.add('selected-card');
+                    e.target.classList.add('selected-card');
                 }
             }
 
             updateUI();
         }
 
+        // other's hand cards
         function toggleKCard(e) {
             e.preventDefault()
             const card = e.target.dataset.card;
@@ -188,6 +192,8 @@
             if (index > -1) {
                 selectedKCards.splice(index, 1);
                 e.target.classList.remove('selected-k-card');
+            } else if (selectedCards.indexOf(card) > -1) {
+                return // already in my hand
             } else {
                 if (selectedKCards.length < 3) {
                     selectedKCards.push(card);
@@ -261,10 +267,6 @@
             } else {
                 envidoEl.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-slate-800');
             }
-        }
-
-        function toggleSoyMano() {
-            document.getElementById('isMHandFirstLabel').classList.toggle('hidden');
         }
     </script>
 </body>

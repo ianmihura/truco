@@ -9,19 +9,28 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div
-            class="p-6 bg-slate-900/50 rounded-xl border border-slate-700/30 flex flex-col items-center justify-center text-center">
-            <span class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Fuerza total de la mano</span>
-            <span class="text-5xl font-black text-white">{{ printf "%.1f%%" (mul .StrengthAll 100.0) }}</span>
-            <div class="w-full bg-slate-800 h-2 rounded-full mt-4 overflow-hidden">
+        <div class="p-6 bg-slate-900/50 rounded-xl border border-slate-700/30 flex flex-col space-y-4">
+            <span class="text-slate-400 text-xs font-bold tracking-widest mb-1">Truco</span>
+            <span class="text-4xl font-black text-white">{{ printf "%.1f%%" (mul .StrengthAll 100.0) }}</span>
+            <div class="w-full bg-slate-800 h-2 rounded-full mt-2 overflow-hidden">
                 <div class="bg-gradient-to-r from-blue-500 to-emerald-500 h-full"
                     style='width: {{ printf "%.1f%%" (mul .StrengthAll 100.0) }}'></div>
             </div>
-            <!-- {{ $.MEnvido }} : my envido -->
+            <span class="text-slate-400 text-xs font-bold tracking-widest mb-1 mt-5">Envido</span>
+            <div>
+                <span class="text-4xl font-black text-white">{{ printf "%.1f%%" (mul $.MEnvidoScore 100.0) }}</span>
+                <span class="text-slate-400 text-xs font-bold tracking-widest mb-1">con envido de {{ $.MEnvido
+                    }}</span>
+            </div>
+            <div class="w-full bg-slate-800 h-2 rounded-full mt-2 overflow-hidden">
+                <div class="bg-gradient-to-r from-blue-500 to-emerald-500 h-full"
+                    style='width: {{ printf "%.1f%%" (mul .MEnvidoScore 100.0) }}'>
+                </div>
+            </div>
         </div>
 
         <div class="space-y-3">
-            <span class="text-slate-400 text-xs font-bold uppercase tracking-widest block mb-2">Permutaciones</span>
+            <span class="text-slate-400 text-xs font-bold tracking-widest block mb-2">Permutaciones</span>
             {{ range $i, $h := .Perms }}
             <div class="flex items-center justify-between p-3 bg-slate-900/30 rounded-lg border border-slate-700/20">
                 <span class="font-mono text-slate-200 font-bold">{{ range $h }}{{ .ToString }} {{ end }}</span>
