@@ -1,24 +1,20 @@
 # Solver for the game Truco, as played in Argentina and Uruguay
 
 ### Features
-1. Given your hand
-    - Calc your envido / flor points
-    - Calc 'truco' strength (show correctly)
-2. Given your envido
-    - Whats the chance your envido/flor is best (medium)
-    - Whats the range of hands you could have (hard)
-    - Bonus: what card reveals less, or contradictory, info (eg. 33 envido with 2m + 3, showing any 7 will bluff)
-3. Guess range of other players given limited info
-    - Flor (score)
+1. Show stats correctly
+    - Truco strength
+    - Overall strength
+    - Flor (envido optional)
+3. Show range of other players' card given limited info
+    - Individual cards (matrix)
     - Envido (score or partial score)
-    - Individual cards
 4. Advances:
     - UY
     - Num players (add posibility of 4)
-    - Hints, explain
-        - soy mano: only relevant is strategy=true
     - Command palette
     - Hotkeys to choose cards
+    - Given your envido, whats the range of hands you could have
+    - what card reveals less, or contradictory, info (eg. 33 envido with 2m + 3, showing any 7 will bluff)
 5. Cases:
     - 11e 7b 11b
         1o 5o (less than 11)
@@ -31,8 +27,9 @@
     - https://railway.com/pricing
     - https://www.alwaysdata.com/en/offers/
 7. Nice to haves
+    - nicer ui for results
     - color of strengths % (in results)
-    - icons or emojis: https://www.flaticon.es/iconos-gratis/baraja-espanola
+    - emojis in preview
 8. Bugs
     - 
 
@@ -88,9 +85,6 @@
 - Make sure to reuse generic functions
 
 ### Next steps
-- host in a free tier server
-- hover on different elements also shows hints in the bottom, explaining UI
-    - tutorial?
 - Track progress of a hand
     - scrollable action tracker
     - The matrix will constantly be updated every time some player makes an action

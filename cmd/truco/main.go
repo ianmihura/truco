@@ -5,12 +5,16 @@ import (
 	"log"
 	"net/http"
 	"truco/internal/server"
+	"truco/pkg/truco"
 )
 
 func main() {
 	tmpl := template.New("").Funcs(template.FuncMap{
 		"mul": func(a, b float32) float32 {
 			return a * b
+		},
+		"mapCardEmoji": func(card string) string {
+			return truco.NewCard(card).ToEmoji()
 		},
 	})
 	tmpl, err := tmpl.ParseGlob("web/template/*.html")

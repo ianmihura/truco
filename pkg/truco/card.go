@@ -69,6 +69,22 @@ func (c Card) IsF() bool {
 	return c.N >= 10
 }
 
+// Returns card string with suit as a UI friendly emoji
+func (c Card) ToEmoji() string {
+	switch c.S {
+	case 'e':
+		return fmt.Sprintf("%d", c.N) + " 🗡"
+	case 'b':
+		return fmt.Sprintf("%d", c.N) + " 🪵"
+	case 'c':
+		return fmt.Sprintf("%d", c.N) + " 🏆"
+	case 'o':
+		return fmt.Sprintf("%d", c.N) + " 🪙"
+	default:
+		return c.ToString()
+	}
+}
+
 // string representation of card
 func (c Card) ToString() string {
 	return fmt.Sprintf("%d%c", c.N, c.S)

@@ -56,7 +56,7 @@
                         <button type="button" onclick="toggleCard(event)" oncontextmenu="toggleKCard(event)"
                             data-card="{{ . }}"
                             class="card-btn py-3 px-1 rounded-xl bg-slate-900 border border-slate-700 text-sm font-black text-slate-400 hover:text-white hover:border-blue-500/50 transition-all duration-200 cursor-pointer">
-                            {{ . }}
+                            {{ mapCardEmoji . }}
                         </button>
                         {{ if or (eq . "1b") (eq . "7o") (eq . "1c") (eq . "7c") }}
                         <div></div>
