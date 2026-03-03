@@ -26,11 +26,15 @@
         kEnvido = 33
         hasStrategy is key to understand the results
 6. Host:
+    - (deployed) https://render.com/
+        - https://truco-kv5e.onrender.com/
     - https://railway.com/pricing
-    - https://render.com/pricing
     - https://www.alwaysdata.com/en/offers/
 7. Nice to haves
     - color of strengths % (in results)
+    - icons or emojis: https://www.flaticon.es/iconos-gratis/baraja-espanola
+8. Bugs
+    - select same card for both playes
 
 ### TODO UI:
 - select past turns:

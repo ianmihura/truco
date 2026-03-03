@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Truco - Fuerza de Mano</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+    <script src="/static/browser@4.js"></script>
+    <link href="static/daisyui@5.css" rel="stylesheet" type="text/css" />
     <link rel="icon" type="image/x-icon" href="/static/espada.png">
     <script>
         tailwind.config = {
@@ -47,8 +47,8 @@
                 <!-- Left Column: Card Selection -->
                 <div
                     class="bg-slate-800/50 rounded-2xl border border-slate-700/50 p-6 backdrop-blur-sm shadow-xl space-y-6">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-lg font-bold text-white uppercase tracking-widest">Seleccioná tu mano</h2>
+                    <div class="items-center justify-between">
+                        <h2 class="text-lg font-bold text-white tracking-widest">Seleccioná tu mano</h2>
                     </div>
 
                     <div class="grid grid-cols-4 gap-2">
@@ -70,7 +70,7 @@
                 <div class="space-y-8">
                     <div
                         class="space-y-4 bg-slate-800/50 rounded-2xl border border-slate-700/50 p-6 backdrop-blur-sm shadow-xl">
-                        <h2 class="text-lg font-bold text-white uppercase tracking-widest">Tus cartas</h2>
+                        <h2 class="text-lg font-bold text-white tracking-widest">Tus cartas</h2>
                         <div class="flex gap-4 justify-center" id="hand-preview">
                             <div
                                 class="w-20 h-28 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center text-slate-700 text-xs font-bold">
@@ -83,8 +83,16 @@
                                 3</div>
                         </div>
 
-                        <label
-                            class="flex items-center justify-between p-4 bg-slate-900/50 rounded-xl border border-slate-700/30 text-sm font-bold text-slate-200 cursor-pointer"
+                        <label onmousedown="toggleSoyMano()"
+                            data-tip="Sólo juega permutaciones razonables (ej. si empata la primera, intenta ganar la segunda)."
+                            class="tooltip flex items-center justify-between p-4 bg-slate-900/50 rounded-xl border border-slate-700/30 text-sm font-bold text-slate-200 cursor-pointer"
+                            for="hasStrategy">Con estrategia
+                            <input type="checkbox" id="hasStrategy" name="hasStrategy" value="true"
+                                class="w-5 h-5 accent-blue-500">
+                        </label>
+
+                        <label id="isMHandFirstLabel"
+                            class="hidden flex items-center justify-between p-4 bg-slate-900/50 rounded-xl border border-slate-700/30 text-sm font-bold text-slate-200 cursor-pointer"
                             for="isMHandFirst">Soy mano
                             <input type="checkbox" id="isMHandFirst" name="isMHandFirst" value="true"
                                 class="w-5 h-5 accent-blue-500">
@@ -93,7 +101,12 @@
 
                     <div
                         class="bg-slate-800/50 rounded-2xl border border-slate-700/50 p-6 backdrop-blur-sm shadow-xl space-y-6">
-                        <h2 class="text-lg font-bold text-white uppercase tracking-widest">cartas del otro</h2>
+                        <div class="space-y-2">
+                            <h2 class="text-lg font-bold text-white tracking-widest">Cartas del otro</h2>
+                            <p class="block text-xs font-bold text-slate-400 tracking-widest">
+                                Seleccionalas con click derecho
+                            </p>
+                        </div>
 
                         <div class="space-y-4">
                             <div class="flex gap-4 justify-center" id="khand-preview">
@@ -109,9 +122,9 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
+                                <p class="block text-xs font-bold text-slate-400 tracking-widest mb-2">
                                     Envido del oponente
-                                </label>
+                                </p>
                                 <div class="flex gap-4 justify-between">
                                     <input id="envido" type="number" name="envido" placeholder="0-33" value="" max="33"
                                         min="0"
@@ -124,19 +137,16 @@
                                     </label>
                                 </div>
                             </div>
+
+                            <p class="block text-xs font-bold text-slate-400 tracking-widest">
+                                * Las cartas del oponente se juegan en el orden que aparecen.
+                            </p>
                         </div>
                     </div>
 
-                    <label
-                        class="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border border-slate-700/30 text-sm font-bold text-slate-200 cursor-pointer"
-                        for="hasStrategy">Con estrategia
-                        <input type="checkbox" id="hasStrategy" name="hasStrategy" value="true"
-                            class="w-5 h-5 accent-blue-500">
-                    </label>
-
                     <button type="submit" id="submit-btn" disabled
-                        class="w-full py-4 rounded-xl bg-slate-700 text-slate-500 font-black uppercase tracking-widest cursor-not-allowed transition-all duration-300">
-                        Calcular Fuerza
+                        class="w-full py-4 rounded-xl bg-slate-700 text-slate-500 font-black tracking-widest cursor-not-allowed transition-all duration-300">
+                        Calcular fuerza
                     </button>
                     <input type="hidden" name="mHand" id="mHand-input">
                     <input type="hidden" name="kCards" id="kCards-input">
@@ -252,7 +262,13 @@
                 envidoEl.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-slate-800');
             }
         }
+
+        function toggleSoyMano() {
+            document.getElementById('isMHandFirstLabel').classList.toggle('hidden');
+        }
     </script>
 </body>
+
+<script src="/static/htmx.min.js"></script>
 
 </html>
