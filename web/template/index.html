@@ -55,7 +55,7 @@
                         {{ range .AllCards }}
                         <button type="button" onclick="toggleCard(event)" oncontextmenu="toggleKCard(event)"
                             data-card="{{ . }}"
-                            class="card-btn py-3 px-1 rounded-xl bg-slate-900 border border-slate-700 text-sm font-black text-slate-400 hover:text-white hover:border-blue-500/50 transition-all duration-200 cursor-pointer">
+                            class="card-btn py-3 px-1 rounded-xl bg-slate-900 border border-slate-700 text-md font-mono font-black text-slate-200 hover:text-white hover:border-blue-500/50 transition-all duration-200 cursor-pointer">
                             {{ mapCardEmoji . }}
                         </button>
                         {{ if or (eq . "7o") (eq . "7b") (eq . "7e") (eq . "10c") }}
@@ -149,7 +149,7 @@
                         class="tooltip flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border border-slate-700/30 text-sm font-bold text-slate-200 cursor-pointer"
                         for="hasStrategy">Con estrategia
                         <input type="checkbox" id="hasStrategy" name="hasStrategy" value="true"
-                            class="w-5 h-5 accent-blue-500">
+                            class="w-5 h-5 accent-blue-500" checked>
                     </label>
 
                     <button type="submit" id="submit-btn" disabled

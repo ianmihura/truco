@@ -73,13 +73,13 @@ func (c Card) IsF() bool {
 func (c Card) ToEmoji() string {
 	switch c.S {
 	case 'e':
-		return fmt.Sprintf("%d", c.N) + " 🗡"
+		return fmt.Sprintf("%d", c.N) + "🗡"
 	case 'b':
-		return fmt.Sprintf("%d", c.N) + " 🪵"
+		return fmt.Sprintf("%d", c.N) + "🪵"
 	case 'c':
-		return fmt.Sprintf("%d", c.N) + " 🏆"
+		return fmt.Sprintf("%d", c.N) + "🏆"
 	case 'o':
-		return fmt.Sprintf("%d", c.N) + " 🪙"
+		return fmt.Sprintf("%d", c.N) + "🪙"
 	default:
 		return c.ToString()
 	}

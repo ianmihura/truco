@@ -11,20 +11,21 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="p-6 bg-slate-900/50 rounded-xl border border-slate-700/30 flex flex-col space-y-4">
             <span class="text-slate-400 text-xs font-bold tracking-widest mb-1">Truco</span>
-            <span class="text-4xl font-black text-white">{{ printf "%.1f%%" (mul .StrengthAll 100.0) }}</span>
+            <span class="text-4xl font-mono font-black text-white">{{ printf "%.1f%%" (mul .StrengthAll 100.0) }}</span>
             <div class="w-full bg-slate-800 h-2 rounded-full mt-2 overflow-hidden">
-                <div class="bg-gradient-to-r from-blue-500 to-emerald-500 h-full"
-                    style='width: {{ printf "%.1f%%" (mul .StrengthAll 100.0) }}'></div>
+                <div class="bg-blue-400/75 h-full" style='width: {{ printf "%.1f%%" (mul .StrengthAll 100.0) }}'></div>
             </div>
+            <span class="text-slate-400 text-xs font-bold tracking-widest mb-6">* Agregado de todas las manos
+                jugadas</span>
             <span class="text-slate-400 text-xs font-bold tracking-widest mb-1 mt-5">Envido</span>
             <div>
-                <span class="text-4xl font-black text-white">{{ printf "%.1f%%" (mul $.MEnvidoScore 100.0) }}</span>
+                <span class="text-4xl font-mono font-black text-white">{{ printf "%.1f%%" (mul $.MEnvidoScore 100.0)
+                    }}</span>
                 <span class="text-slate-400 text-xs font-bold tracking-widest mb-1">con envido de {{ $.MEnvido
                     }}</span>
             </div>
             <div class="w-full bg-slate-800 h-2 rounded-full mt-2 overflow-hidden">
-                <div class="bg-gradient-to-r from-blue-500 to-emerald-500 h-full"
-                    style='width: {{ printf "%.1f%%" (mul .MEnvidoScore 100.0) }}'>
+                <div class="bg-blue-400/75 h-full" style='width: {{ printf "%.1f%%" (mul .MEnvidoScore 100.0) }}'>
                 </div>
             </div>
         </div>
@@ -32,15 +33,19 @@
         <div class="space-y-3">
             <span class="text-slate-400 text-xs font-bold tracking-widest block mb-2">Cómo jugar</span>
             {{ range $i, $h := .Perms }}
-            <div class="flex items-center justify-between p-3 bg-slate-900/30 rounded-lg border border-slate-700/20">
-                <span class="font-mono text-slate-200 font-bold">{{ range $h }}{{ mapCardEmoji .ToString }} {{ end
-                    }}</span>
-                <!-- <span class="text-emerald-400 font-bold">{{ printf "%.1f%%" (mul (index $.StrengthPerm $i) 100.0)
-                    }}</span> -->
-                <span class="text-slate-400">ganás {{( index $.WinsPerm $i )}} de {{ index $.CountPerm $i }}</span>
+            <div class="relative p-3 bg-slate-900/30 rounded-lg border border-slate-700/20 tooltip transition-all hover:bg-slate-900/50 w-full"
+                data-tip="ganás {{( index $.WinsPerm $i )}} de {{ index $.CountPerm $i }} válidos para este orden">
+                <div class="absolute right-0 top-0 h-full bg-blue-400/25 transition-all duration-500"
+                    style='width: {{ printf "%.1f%%" (mul (index $.StrengthPerm $i) 100.0) }}'></div>
+                <div class="relative flex items-center justify-between">
+                    <span class="font-mono text-slate-200 whitespace-nowrap">{{ range $h }}{{ mapCardEmoji
+                        .ToString }} {{ end }}</span>
+                    <span class="text-slate-200 font-mono text-s">
+                        {{ printf "%.1f%%" (mul (index $.StrengthPerm $i) 100.0) }}
+                    </span>
+                </div>
             </div>
             {{ end }}
-
         </div>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="hand-result">
@@ -54,11 +59,11 @@
                 {{ range $i, $strength := $arr }}
                 <div class="flex flex-col">
                     <div class="flex items-center justify-between mb-1">
-                        <span class="text-xl font-bold">{{ index $.MHand $i }}</span>
-                        <span class="text-xl font-black text-white">{{ printf "%.1f%%" (mul $strength 100.0) }}</span>
+                        <span class="text-xl font-mono">{{ index $.MHand $i }}</span>
+                        <span class="text-xl font-mono text-white">{{ printf "%.1f%%" (mul $strength 100.0) }}</span>
                     </div>
                     <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                        <div class="bg-gradient-to-r from-blue-500 to-emerald-500 h-full transition-all duration-500"
+                        <div class="bg-blue-400/75 h-full transition-all duration-500"
                             style='width: {{ printf "%.1f%%" (mul $strength 100.0) }}'></div>
                     </div>
                 </div>
@@ -70,5 +75,8 @@
     <p class="block text-xs font-bold text-slate-400 tracking-widest">
         Calculamos los resultados simulando todas los partidos jugados de todas las maneras posibles, y contando
         partidos ganados contra perdidos.
+    </p>
+    <p class="block text-xs font-bold text-slate-400 tracking-widest">
+        Si hay muy pocas manos jugadas, probá "Sin estrategia" (botón al lado de "Calcular fuerza").
     </p>
 </div>
