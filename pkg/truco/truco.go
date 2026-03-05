@@ -357,7 +357,7 @@ func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, envido uint8, isMHan
 
 	var strengthAll float32
 	if totCount > 0 {
-		strengthAll = (float32(totScore)/float32(totCount) + 1) / 2
+		strengthAll = float32(totScore) / float32(totCount)
 		for i := range winsPerm {
 			strengthsPerm = append(strengthsPerm, winsPerm[i]/float32(totCount))
 		}
