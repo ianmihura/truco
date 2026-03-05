@@ -15,13 +15,13 @@
             <div class="w-full bg-slate-800 h-2 rounded-full mt-2 overflow-hidden">
                 <div class="bg-blue-400/75 h-full" style='width: {{ printf "%.1f%%" (mul .StrengthAll 100.0) }}'></div>
             </div>
-            <span class="text-slate-400 text-xs font-bold tracking-widest mb-6">* Agregado de todas las manos
+            <span class="text-slate-400 text-xs tracking-widest mb-6">* Agregado de todas las manos
                 jugadas</span>
             <span class="text-slate-400 text-xs font-bold tracking-widest mb-1 mt-5">Envido</span>
             <div>
                 <span class="text-4xl font-mono font-black text-white">{{ printf "%.1f%%" (mul $.MEnvidoScore 100.0)
                     }}</span>
-                <span class="text-slate-400 text-xs font-bold tracking-widest mb-1">con envido de {{ $.MEnvido
+                <span class="text-slate-400 text-xs tracking-widest mb-1 ml-2">con envido de {{ $.MEnvido
                     }}</span>
             </div>
             <div class="w-full bg-slate-800 h-2 rounded-full mt-2 overflow-hidden">
@@ -72,11 +72,11 @@
         </div>
         {{ end }}
     </div>
-    <p class="block text-xs font-bold text-slate-400 tracking-widest">
+    <p class="block text-xs text-slate-400 tracking-widest">
         Calculamos los resultados simulando todas los partidos jugados de todas las maneras posibles, y contando
         partidos ganados contra perdidos.
     </p>
-    <p class="block text-xs font-bold text-slate-400 tracking-widest">
+    <p class="block text-xs text-slate-400 tracking-widest">
         Si hay muy pocas manos jugadas, probá "Sin estrategia" (botón al lado de "Calcular fuerza").
     </p>
 </div>

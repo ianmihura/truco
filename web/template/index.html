@@ -104,7 +104,9 @@
                         <div class="space-y-2">
                             <h2 class="text-lg font-bold text-white tracking-widest">Cartas del otro</h2>
                             <p class="block text-xs font-bold text-slate-400 tracking-widest">
-                                En el orden que son jugadas
+                                <span class="hidden md:inline">Seleccionalas con click derecho,</span>
+                                <span class="inline md:hidden">Mantené presionado para seleccionar,</span>
+                                en el orden que son jugadas
                             </p>
                         </div>
 
@@ -129,18 +131,14 @@
                                     <input id="envido" type="number" name="envido" placeholder="0-33" value="" max="33"
                                         min="0"
                                         class="basis-64 bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors">
-                                    <label
-                                        class="basis-64 flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border border-slate-700/30 text-sm font-bold text-slate-200 cursor-pointer"
-                                        for="sonBuenas" onclick="sonBuenas()">Son buenas
+                                    <label data-tip="Ganaste el envido y el oponente sólo dijo 'son buenas'"
+                                        class="basis-64 flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border border-slate-700/30 text-sm font-bold text-slate-200 cursor-pointer tooltip"
+                                        for="sonBuenas" onclick="sonBuenas()">"Son buenas"
                                         <input type="checkbox" id="sonBuenas" name="sonBuenas" value="true"
                                             class="w-5 h-5 accent-blue-500">
                                     </label>
                                 </div>
                             </div>
-
-                            <p class="block text-xs font-bold text-slate-400 tracking-widest">
-                                * Seleccionalas con click derecho.
-                            </p>
                         </div>
                     </div>
 
