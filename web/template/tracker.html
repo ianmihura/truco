@@ -65,8 +65,6 @@
         card.querySelectorAll('.action-btn').forEach(b => b.classList.remove('selected'));
         // Add selected class to the clicked button
         btn.classList.add('selected');
-
-        console.log(`Player card selected action: ${btn.dataset.action}`);
     });
 
     window.currentTrucoState = "{{ .State }}";

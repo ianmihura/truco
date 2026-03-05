@@ -1,7 +1,6 @@
 package partials
 
 import (
-	"fmt"
 	"net/http"
 	"truco/pkg/fsm"
 	"truco/pkg/truco"
@@ -37,8 +36,6 @@ func (h *Handler) GetLowerCards(w http.ResponseWriter, r *http.Request) {
 	}{
 		Ranks: truco.CardsLowerEqual(min(t1, t2)),
 	}
-
-	fmt.Println(truco.CardsLowerEqual(min(t1, t2)))
 
 	err := h.tmpl.ExecuteTemplate(w, "cards_lower", data)
 	if err != nil {

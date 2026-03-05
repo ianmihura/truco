@@ -58,7 +58,10 @@
                             class="card-btn py-3 px-1 rounded-xl bg-slate-900 border border-slate-700 text-sm font-black text-slate-400 hover:text-white hover:border-blue-500/50 transition-all duration-200 cursor-pointer">
                             {{ mapCardEmoji . }}
                         </button>
-                        {{ if or (eq . "1b") (eq . "7o") (eq . "1c") (eq . "7c") }}
+                        {{ if or (eq . "7o") (eq . "7b") (eq . "7e") (eq . "10c") }}
+                        <div></div>
+                        {{ end }}
+                        {{ if or (eq . "1b") (eq . "2c") }}
                         <div></div>
                         <div></div>
                         {{ end }}
@@ -69,8 +72,13 @@
                 <!-- Right Column: Parameters -->
                 <div class="space-y-8">
                     <div
-                        class="space-y-4 bg-slate-800/50 rounded-2xl border border-slate-700/50 p-6 backdrop-blur-sm shadow-xl">
-                        <h2 class="text-lg font-bold text-white tracking-widest">Tus cartas</h2>
+                        class="space-y-6 bg-slate-800/50 rounded-2xl border border-slate-700/50 p-6 backdrop-blur-sm shadow-xl">
+                        <div class="space-y-2">
+                            <h2 class="text-lg font-bold text-white tracking-widest">Tus cartas</h2>
+                            <p class="block text-xs font-bold text-slate-400 tracking-widest">
+                                En cualquier orden
+                            </p>
+                        </div>
                         <div class="flex gap-4 justify-center" id="hand-preview">
                             <div
                                 class="w-20 h-28 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center text-slate-700 text-xs font-bold">
@@ -83,8 +91,8 @@
                                 3</div>
                         </div>
 
-                        <label id="isMHandFirstLabel"
-                            class="hidden flex items-center justify-between p-4 bg-slate-900/50 rounded-xl border border-slate-700/30 text-sm font-bold text-slate-200 cursor-pointer"
+                        <label
+                            class="flex items-center justify-between p-4 bg-slate-900/50 rounded-xl border border-slate-700/30 text-sm font-bold text-slate-200 cursor-pointer"
                             for="isMHandFirst">Soy mano
                             <input type="checkbox" id="isMHandFirst" name="isMHandFirst" value="true"
                                 class="w-5 h-5 accent-blue-500">
@@ -96,7 +104,7 @@
                         <div class="space-y-2">
                             <h2 class="text-lg font-bold text-white tracking-widest">Cartas del otro</h2>
                             <p class="block text-xs font-bold text-slate-400 tracking-widest">
-                                Seleccionalas con click derecho
+                                En el orden que son jugadas
                             </p>
                         </div>
 
@@ -131,7 +139,7 @@
                             </div>
 
                             <p class="block text-xs font-bold text-slate-400 tracking-widest">
-                                * Las cartas del oponente se juegan en el orden que aparecen.
+                                * Seleccionalas con click derecho.
                             </p>
                         </div>
                     </div>
@@ -145,7 +153,7 @@
                     </label>
 
                     <button type="submit" id="submit-btn" disabled
-                        class="w-full py-4 rounded-xl bg-slate-700 text-slate-500 font-black tracking-widest cursor-not-allowed transition-all duration-300">
+                        class="w-full py-4 rounded-xl bg-slate-700 text-slate-500 font-black tracking-widest transition-all duration-300 cursor-pointer">
                         Calcular fuerza
                     </button>
                     <input type="hidden" name="mHand" id="mHand-input">
@@ -268,6 +276,19 @@
                 envidoEl.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-slate-800');
             }
         }
+
+        // FOR TESTING
+        async function getData() {
+            const response = await fetch("http://localhost:8080/", { "headers": { "accept": "*/*", "accept-language": "en-US,en;q=0.9", "content-type": "application/x-www-form-urlencoded", "hx-current-url": "http://localhost:8080/", "hx-request": "true", "hx-target": "results-container", "hx-trigger": "calc-form", "sec-ch-ua": "\"Chromium\";v=\"145\", \"Not:A-Brand\";v=\"99\"", "sec-ch-ua-mobile": "?0", "sec-ch-ua-platform": "\"Linux\"", "sec-fetch-dest": "empty", "sec-fetch-mode": "cors", "sec-fetch-site": "same-origin" }, "referrer": "http://localhost:8080/", "body": "envido=&hasStrategy=true&mHand=11b%2012o%203e&kCards=", "method": "POST", "mode": "cors", "credentials": "omit" })
+            const html = await response.text()
+            const parser = new DOMParser()
+            const doc = parser.parseFromString(html, "text/html")
+            document.getElementById("results-container").innerHTML = doc.body.innerHTML
+        }
+        if (window.location.href.includes("localhost")) {
+            getData()
+        }
+
     </script>
 </body>
 

@@ -254,14 +254,16 @@ func (mHand Hand) TrucoStrengthUY() float32 {
 }
 
 type TrucoStats struct {
-	StrengthAll     float32   // overall hand strength: % hands you win
-	Count           int       // amount of hands simulated
-	Perms           []Hand    // permutations of mHand
-	StrengthPerm    []float32 // strength: hands you win / hands played in that permutation
-	StrengthPermAll []float32 // strength: hands you win / hands played in total
-	CountPerm       []float32 // amount of hands simulated, by permutations of mHand
-	MEnvido         uint8     // my envido
-	MEnvidoScore    float32   // my envido strength: hands you win / hands played in total
+	MHand            []string    // my hand: input parameter
+	StrengthAll      float32     // overall hand strength: % hands you win
+	Count            int         // amount of hands simulated
+	Perms            []Hand      // permutations of mHand
+	WinsPerm         []float32   // hands you win
+	StrengthPerm     []float32   // strength: hands you win / hands played in total
+	StrengthPosition [][]float32 //
+	CountPerm        []float32   // amount of hands simulated, by permutations of mHand
+	MEnvido          uint8       // my envido
+	MEnvidoScore     float32     // my envido strength: hands you win / hands played in total
 }
 
 func (stats TrucoStats) PPrint() {
@@ -279,7 +281,7 @@ func (stats TrucoStats) PPrint() {
 		fmt.Println("Overall Strenght=", stats.StrengthAll)
 		for i, hand := range stats.Perms {
 			hand.Print()
-			fmt.Printf(": strength=%.3f, of=%.0f\n", stats.StrengthPerm[i], stats.CountPerm[i])
+			fmt.Printf(": strength=%.3f, of=%.0f\n", stats.WinsPerm[i], stats.CountPerm[i])
 		}
 		fmt.Println(stats.Count, "permutations simulated")
 	}
@@ -309,9 +311,10 @@ func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, envido uint8, isMHan
 	isReasonablyPlayed := true
 	var eScore, eCount, cScore, totScore, cCount, totCount int
 	perms := make([]Hand, 0, 6)
+	winsPerm := make([]float32, 0, 6)
 	strengthsPerm := make([]float32, 0, 6)
-	strengthsPermAll := make([]float32, 0, 6)
 	counts := make([]float32, 0, 6)
+	strengthsPosition := make([][]float32, 0, 3)
 
 	for mH := range mPerms {
 		cScore, cCount = 0, 0
@@ -335,7 +338,10 @@ func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, envido uint8, isMHan
 
 			if Hand(oH).HasAllInPlace(kCards) {
 				if isReasonablyPlayed {
-					cScore += TrucoBeats(Hand(mH), Hand(oH))
+					if TrucoBeats(Hand(mH), Hand(oH)) == 1 {
+						cScore++
+					}
+					// cScore += TrucoBeats(Hand(mH), Hand(oH))
 					cCount++
 				}
 				eScore += EnvidoBeats(mEnvido, Hand(oH).Envido(), isMHandFirst)
@@ -343,11 +349,7 @@ func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, envido uint8, isMHan
 			}
 		}
 		perms = append(perms, mH)
-		if cCount > 0 {
-			strengthsPerm = append(strengthsPerm, (float32(cScore)/float32(cCount)+1)/2)
-		} else {
-			strengthsPerm = append(strengthsPerm, 0.0)
-		}
+		winsPerm = append(winsPerm, float32(cScore))
 		counts = append(counts, float32(cCount))
 		totScore += cScore
 		totCount += cCount
@@ -356,22 +358,44 @@ func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, envido uint8, isMHan
 	var strengthAll float32
 	if totCount > 0 {
 		strengthAll = (float32(totScore)/float32(totCount) + 1) / 2
-		for i := range strengthsPerm {
-			strengthsPermAll = append(strengthsPermAll, strengthsPerm[i]*counts[i]/float32(totCount))
+		for i := range winsPerm {
+			strengthsPerm = append(strengthsPerm, winsPerm[i]/float32(totCount))
 		}
 	} else {
 		strengthAll = 0
-		strengthsPermAll = []float32{0, 0, 0, 0, 0, 0}
+		strengthsPerm = []float32{0, 0, 0, 0, 0, 0}
+	}
+
+	var pScore float32
+	for pos := range 3 {
+		posScoreArr := make([]float32, 0, 3)
+		for _, mCard := range mHand {
+			pScore = 0
+			for iPerm, perm := range perms {
+				if mCard == perm[pos] {
+					pScore += strengthsPerm[iPerm]
+				}
+			}
+			posScoreArr = append(posScoreArr, pScore)
+		}
+		strengthsPosition = append(strengthsPosition, posScoreArr)
+	}
+
+	sMHand := make([]string, 0, 3)
+	for c := range mHand {
+		sMHand = append(sMHand, mHand[c].ToEmoji())
 	}
 
 	return TrucoStats{
-		StrengthAll:     strengthAll,
-		Count:           totCount,
-		Perms:           perms,
-		StrengthPerm:    strengthsPerm,
-		StrengthPermAll: strengthsPermAll,
-		CountPerm:       counts,
-		MEnvido:         mEnvido,
-		MEnvidoScore:    float32(eScore) / float32(eCount),
+		MHand:            sMHand,
+		StrengthAll:      strengthAll,
+		Count:            totCount,
+		Perms:            perms,
+		WinsPerm:         winsPerm,
+		StrengthPerm:     strengthsPerm,
+		StrengthPosition: strengthsPosition,
+		CountPerm:        counts,
+		MEnvido:          mEnvido,
+		MEnvidoScore:     float32(eScore) / float32(eCount),
 	}
 }

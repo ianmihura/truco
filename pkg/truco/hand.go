@@ -134,3 +134,19 @@ func (h Hand) Println() {
 	h.Print()
 	fmt.Println()
 }
+
+func (h Hand) ToString() string {
+	var result strings.Builder
+	for c := range h {
+		result.WriteString(" " + h[c].ToString())
+	}
+	return result.String()
+}
+
+func (h Hand) ToEmoji() string {
+	var result strings.Builder
+	for c := range h {
+		result.WriteString(" " + h[c].ToEmoji())
+	}
+	return result.String()
+}
