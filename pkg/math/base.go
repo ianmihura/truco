@@ -127,6 +127,63 @@ func Permutations[T any](items []T, r int) iter.Seq[[]T] {
 	}
 }
 
+// PermutationsRaw returns a slice of all r-length permutations of elements in the items slice.
+// This replicates the behavior of python's itertools.permutations.
+//
+// Elements are treated as unique based on their position, not on their value.
+// The permutations are emitted in lexicographic sorting order (based on input order).
+//
+// Order matters in permutations, meaning (a, b) is different from (b, a).
+func PermutationsRaw[T any](items []T, r int) [][]T {
+	n := len(items)
+	if r > n {
+		return nil
+	}
+
+	indices := make([]int, n)
+	for i := range indices {
+		indices[i] = i
+	}
+
+	cycles := make([]int, r)
+	for i := range cycles {
+		cycles[i] = n - i
+	}
+
+	result := make([]T, r)
+	for i := range r {
+		result[i] = items[indices[i]]
+	}
+	
+	var allPerms [][]T
+	allPerms = append(allPerms, slices.Clone(result))
+
+	for {
+		i := r - 1
+		for ; i >= 0; i-- {
+			cycles[i]--
+			if cycles[i] == 0 {
+				tmp := indices[i]
+				copy(indices[i:], indices[i+1:])
+				indices[n-1] = tmp
+				cycles[i] = n - i
+			} else {
+				j := cycles[i]
+				indices[i], indices[n-j] = indices[n-j], indices[i]
+
+				for k := range r {
+					result[k] = items[indices[k]]
+				}
+				allPerms = append(allPerms, slices.Clone(result))
+				break
+			}
+		}
+		if i < 0 {
+			return allPerms
+		}
+	}
+}
+
 // Hany factorial that multiplies x*...*x-l.
 // Same as doing x!/l!. Note that Fact(x, 1) == x!
 // Handy for a faster Pick function

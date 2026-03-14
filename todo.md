@@ -1,18 +1,12 @@
 # Solver for the game Truco, as played in Argentina and Uruguay
 
 ### Features
-1. Show stats correctly
-    - Truco strength
-    - Overall strength
-    - Flor (envido optional)
 3. Show range of other players' card given limited info
     - Individual cards (matrix)
-    - Envido (score or partial score)
 4. Advances:
     - UY
-    - Num players (add posibility of 4)
-    - Command palette
-    - Hotkeys to choose cards
+    - Num players (4 players, 6 players)
+        - Envido (score or partial score)
     - Given your envido, whats the range of hands you could have
     - what card reveals less, or contradictory, info (eg. 33 envido with 2m + 3, showing any 7 will bluff)
 5. Cases:
@@ -23,15 +17,15 @@
         hasStrategy is key to understand the results
 6. Host:
     - (deployed) https://render.com/
-        - https://truco-kv5e.onrender.com/
     - https://railway.com/pricing
     - https://www.alwaysdata.com/en/offers/
 7. Nice to haves
-    - nicer ui for results
-    - color of strengths % (in results)
-    - emojis in preview
-8. Bugs
-    - 
+    - emojis in preview (fix issues)
+    - click preview will remove it
+    - Flor
+    - Command palette
+    - Hotkeys to choose cards
+    - explain
 
 ### TODO UI:
 - select past turns:

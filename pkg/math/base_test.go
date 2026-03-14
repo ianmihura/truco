@@ -118,3 +118,57 @@ func TestPermutationsEmpty(t *testing.T) {
 		t.Errorf("Expected 0 permutations when r > len(items), got %d", count)
 	}
 }
+
+func TestPermutationsRaw(t *testing.T) {
+	items := []string{"A", "B", "C"}
+	r := 2
+	expected := [][]string{
+		{"A", "B"}, {"A", "C"},
+		{"B", "A"}, {"B", "C"},
+		{"C", "A"}, {"C", "B"},
+	}
+
+	got := PermutationsRaw(items, r)
+
+	if len(got) != len(expected) {
+		t.Fatalf("Expected %d permutations, got %d", len(expected), len(got))
+	}
+
+	for i, p := range got {
+		if !slices.Equal(p, expected[i]) {
+			t.Errorf("Index %d: expected %v, got %v", i, expected[i], p)
+		}
+	}
+}
+
+func TestPermutationsRawOrderMatters(t *testing.T) {
+	items := []int{1, 2}
+	r := 2
+	expected := [][]int{
+		{1, 2},
+		{2, 1},
+	}
+
+	got := PermutationsRaw(items, r)
+
+	if len(got) != len(expected) {
+		t.Fatalf("Expected %d permutations, got %d", len(expected), len(got))
+	}
+
+	for i, p := range got {
+		if !slices.Equal(p, expected[i]) {
+			t.Errorf("Index %d: expected %v, got %v", i, expected[i], p)
+		}
+	}
+}
+
+func TestPermutationsRawEmpty(t *testing.T) {
+	items := []int{1, 2, 3}
+	r := 4
+
+	got := PermutationsRaw(items, r)
+
+	if len(got) != 0 {
+		t.Errorf("Expected 0 permutations when r > len(items), got %d", len(got))
+	}
+}

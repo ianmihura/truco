@@ -241,6 +241,7 @@ func (mHand Hand) TrucoStrengthUY() float32 {
 		for oH := range oPerms {
 			for m := range pPerms {
 				if oH[0] == m[0] || oH[1] == m[0] || oH[2] == m[0] {
+					// assuming muestra is not in mHand, but may be in oHand
 					continue // muestra should be unique
 				} else {
 					score += TrucoBeatsUY(Hand(mH), Hand(oH), m[0])

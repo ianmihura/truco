@@ -51,7 +51,7 @@
                         <h2 class="text-lg font-bold text-white tracking-widest">Seleccioná tu mano</h2>
                     </div>
 
-                    <div class="grid grid-cols-4 gap-2">
+                    <div id="card-grid" class="grid grid-cols-4 gap-2">
                         {{ range .AllCards }}
                         <button type="button" onclick="toggleCard(event)" oncontextmenu="toggleKCard(event)"
                             data-card="{{ . }}"
@@ -95,7 +95,7 @@
                             class="flex items-center justify-between p-4 bg-slate-900/50 rounded-xl border border-slate-700/30 text-sm font-bold text-slate-200 cursor-pointer"
                             for="isMHandFirst">Soy mano
                             <input type="checkbox" id="isMHandFirst" name="isMHandFirst" value="true"
-                                class="w-5 h-5 accent-blue-500">
+                                class="w-5 h-5 accent-blue-500" checked>
                         </label>
                     </div>
 
@@ -166,9 +166,9 @@
 
         <footer class="pt-12 text-center text-xs text-slate-500 font-mono tracking-widest pb-4">
             <p>
-                Hecho por <a href="https://ianmihura.github.io"
+                Hecho por <a href="https://ianmihura.github.io" target="_blank"
                     class="hover:text-blue-400 transition-colors duration-200">Ian Mihura</a>
-                — <a href="https://github.com/ianmihura"
+                — <a href="https://github.com/ianmihura" target="_blank"
                     class="hover:text-blue-400 transition-colors duration-200 underline decoration-slate-700 underline-offset-4">GitHub</a>
             </p>
         </footer>
@@ -296,6 +296,38 @@
             getData()
         }
 
+        /**
+         * mapToEmoji replaces suit emojis in the card grid with corresponding SVG icons.
+         * Expected side effect: Modifies the DOM by replacing text emojis with <img> tags
+         * inside the .card-btn elements within #card-grid.
+         */
+        function mapToEmoji() {
+            // TODO ISSUE: click on span should work
+            // TODO ISSUE: "> appears after results hit the browser
+            return false;
+
+            const emojiMap = {
+                '🗡': { path: '/static/espada.svg', color: 'bg-blue-500' },
+                '🪵': { path: '/static/basto.svg', color: 'bg-green-700' },
+                '🏆': { path: '/static/copa.svg', color: 'bg-red-600' },
+                '🪙': { path: '/static/oro.svg', color: 'bg-yellow-500' }
+            };
+
+            const elements = document.querySelectorAll('.card-btn, .emoji-text');
+            elements.forEach(el => {
+                let html = el.innerHTML;
+                for (const [emoji, config] of Object.entries(emojiMap)) {
+                    if (html.includes(emoji)) {
+                        const iconHtml = `<span class="inline-block w-4 h-4 -mt-1 ml-1 ${config.color}" style="-webkit-mask-image: url('${config.path}'); mask-image: url('${config.path}'); -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center;" role="img" aria-label="${emoji}"></span>`;
+                        html = html.replaceAll(emoji, iconHtml);
+                    }
+                }
+                el.innerHTML = html;
+            });
+        }
+
+        // Run on load
+        mapToEmoji();
     </script>
 </body>
 

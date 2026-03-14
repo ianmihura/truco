@@ -1,7 +1,7 @@
 <div
     class="mt-8 p-6 bg-slate-800/80 rounded-2xl border border-slate-700/50 backdrop-blur-md animate-in fade-in slide-in-from-bottom-4 duration-300 space-y-4">
     <div class="flex items-center justify-between mb-6">
-        <h3 class="text-xl font-bold text-white">Resultados</h3>
+        <h2 class="text-lg font-bold text-white tracking-widest">Resultados</h2>
         <div
             class="px-3 py-1 bg-blue-600/20 rounded-full border border-blue-500/30 text-blue-400 text-xs font-bold font-mono">
             {{ .Count }} Partidos jugados
@@ -38,7 +38,7 @@
                 <div class="absolute right-0 top-0 h-full bg-blue-400/25 transition-all duration-500"
                     style='width: {{ printf "%.1f%%" (mul (index $.StrengthPerm $i) 100.0) }}'></div>
                 <div class="relative flex items-center justify-between">
-                    <span class="font-mono text-slate-200 whitespace-nowrap">{{ range $h }}{{ mapCardEmoji
+                    <span class="font-mono text-slate-200 whitespace-nowrap emoji-text">{{ range $h }}{{ mapCardEmoji
                         .ToString }} {{ end }}</span>
                     <span class="text-slate-200 font-mono text-s">
                         {{ printf "%.1f%%" (mul (index $.StrengthPerm $i) 100.0) }}
@@ -59,7 +59,7 @@
                 {{ range $i, $strength := $arr }}
                 <div class="flex flex-col">
                     <div class="flex items-center justify-between mb-1">
-                        <span class="text-xl font-mono">{{ index $.MHand $i }}</span>
+                        <span class="text-xl font-mono emoji-text">{{ index $.MHand $i }}</span>
                         <span class="text-xl font-mono text-white">{{ printf "%.1f%%" (mul $strength 100.0) }}</span>
                     </div>
                     <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
@@ -79,4 +79,9 @@
     <p class="block text-xs text-slate-400 tracking-widest">
         Si hay muy pocas manos jugadas, probá "Sin estrategia" (botón al lado de "Calcular fuerza").
     </p>
+    <script>
+        if (typeof mapToEmoji === 'function') {
+            mapToEmoji();
+        }
+    </script>
 </div>
