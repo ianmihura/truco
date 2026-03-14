@@ -2,7 +2,6 @@ package truco
 
 import (
 	"fmt"
-	"time"
 	"truco/pkg/math"
 )
 
@@ -209,13 +208,13 @@ func IsReasonablyPlayed(mHand, oHand Hand) bool {
 // counts times it wins, minus losses. Normalizes result to a percent.
 // range of score = (0 to 1)
 func (mHand Hand) TrucoStrength() float32 {
-	mPerms := math.Permutations(mHand, 3)
+	mPerms := math.PermutationsRaw(mHand, 3)
 	aCards := CardsExcluding(ALL_CARDS, mHand)
-	oPerms := math.Permutations(aCards, 3)
+	oPerms := math.PermutationsRaw(aCards, 3)
 	var score int
 	for mH := range mPerms {
 		for oH := range oPerms {
-			score += TrucoBeats(Hand(mH), Hand(oH))
+			score += TrucoBeats(Hand(mPerms[mH]), Hand(oPerms[oH]))
 		}
 	}
 	return (float32(score)/math.PickC(37, 3) + 36.0) / 72
@@ -227,30 +226,28 @@ func (mHand Hand) TrucoStrength() float32 {
 // counts times it wins, minus losses. Normalizes result to a percent.
 // range of score = (0 to 1)
 //
-// bench = 1500 ms
+// bench = 330 ms
 func (mHand Hand) TrucoStrengthUY() float32 {
 	var c int
-	mPerms := math.Permutations(mHand, 3)
+	mPerms := math.PermutationsRaw(mHand, 3)
 	aCards := CardsExcluding(ALL_CARDS, mHand)
-	oPerms := math.Permutations(aCards, 3)
-	pPerms := math.Permutations(aCards, 1)
+	oPerms := math.PermutationsRaw(aCards, 3)
+	pPerms := math.PermutationsRaw(aCards, 1)
 
 	var score int
-	start := time.Now()
 	for mH := range mPerms {
 		for oH := range oPerms {
 			for m := range pPerms {
-				if oH[0] == m[0] || oH[1] == m[0] || oH[2] == m[0] {
+				if oPerms[oH][0] == pPerms[m][0] || oPerms[oH][1] == pPerms[m][0] || oPerms[oH][2] == pPerms[m][0] {
 					// assuming muestra is not in mHand, but may be in oHand
 					continue // muestra should be unique
 				} else {
-					score += TrucoBeatsUY(Hand(mH), Hand(oH), m[0])
+					score += TrucoBeatsUY(Hand(mPerms[mH]), Hand(oPerms[oH]), pPerms[m][0])
 					c++
 				}
 			}
 		}
 	}
-	fmt.Println(time.Now().UnixMilli() - start.UnixMilli())
 	return ((float32(score) / float32(c)) + 1) / 2
 }
 
