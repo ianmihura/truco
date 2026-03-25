@@ -422,10 +422,6 @@
          * inside the .card-btn elements within #card-grid.
          */
         function mapToEmoji() {
-            // TODO ISSUE: click on span should work
-            // TODO ISSUE: "> appears after results hit the browser
-            return false;
-
             const emojiMap = {
                 '🗡': { path: '/static/espada.svg', color: 'bg-blue-500' },
                 '🪵': { path: '/static/basto.svg', color: 'bg-green-700' },
@@ -433,16 +429,21 @@
                 '🪙': { path: '/static/oro.svg', color: 'bg-yellow-500' }
             };
 
-            const elements = document.querySelectorAll('.card-btn, .emoji-text');
+            const elements = document.querySelectorAll('.card-btn:not(.is-mapped), .emoji-text:not(.is-mapped)');
             elements.forEach(el => {
                 let html = el.innerHTML;
+                let mapped = false;
                 for (const [emoji, config] of Object.entries(emojiMap)) {
                     if (html.includes(emoji)) {
                         const iconHtml = `<span class="inline-block w-4 h-4 -mt-1 ml-1 ${config.color}" style="-webkit-mask-image: url('${config.path}'); mask-image: url('${config.path}'); -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center;" role="img" aria-label="${emoji}"></span>`;
                         html = html.replaceAll(emoji, iconHtml);
+                        mapped = true;
                     }
                 }
-                el.innerHTML = html;
+                if (mapped) {
+                    el.innerHTML = html;
+                    el.classList.add('is-mapped');
+                }
             });
         }
 
