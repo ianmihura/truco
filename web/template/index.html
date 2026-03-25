@@ -75,7 +75,7 @@
                             {{ range .AllCards }}
                             <button type="button" onclick="toggleCard(event)" oncontextmenu="handleCardClick(event)"
                                 data-card="{{ . }}"
-                                class="card-btn py-3 px-1 rounded-xl bg-slate-900 border border-slate-700 text-md font-mono font-black text-slate-200 hover:text-white hover:border-blue-500/50 transition-all duration-200 cursor-pointer">
+                                class="card-btn py-3 px-1 rounded-xl bg-slate-900 border border-slate-700 text-lg font-mono font-black text-slate-200 hover:text-white hover:border-blue-500/50 transition-all duration-200 cursor-pointer">
                                 {{ mapCardEmoji . }}
                             </button>
                             {{ if or (eq . "7o") (eq . "7b") (eq . "7e") (eq . "10c") }}
@@ -449,7 +449,7 @@
                 let mapped = false;
                 for (const [emoji, config] of Object.entries(emojiMap)) {
                     if (html.includes(emoji)) {
-                        const iconHtml = `<span class="inline-block w-4 h-4 -mt-1 ml-1 ${config.color}" style="-webkit-mask-image: url('${config.path}'); mask-image: url('${config.path}'); -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center;" role="img" aria-label="${emoji}"></span>`;
+                        const iconHtml = `<span class="inline-block w-6 h-6 ml-1 ${config.color}" style="-webkit-mask-image: url('${config.path}'); mask-image: url('${config.path}'); -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center;" role="img" aria-label="${emoji}"></span>`;
                         html = html.replaceAll(emoji, iconHtml);
                         mapped = true;
                     }
