@@ -30,9 +30,9 @@ func NewHand(handStr string) Hand {
 // Converts a flat hand to a uruguay hand, given a m=muestra Card.
 // Is destructive: will overwrite the value of the suit for 'p' where necesary.
 func (hand Hand) UY(m Card) Hand {
-	for i := range hand {
-		hand[i].UY(m)
-	}
+	hand[0].UY(m)
+	hand[1].UY(m)
+	hand[2].UY(m)
 	return hand
 }
 
@@ -89,38 +89,95 @@ func SortForTruco(a, b Card) int {
 	return int(b.Truco()) - int(a.Truco())
 }
 
-// Returns a sub-hand of the given hand
-// of the cards that count for envido (2 or 1 card)
-func (h Hand) EnvidoCards() *Hand {
+// Full value of hand, 0-33
+func (h Hand) Envido() uint8 {
 	slices.SortFunc(h, SortForEnvido)
 
-	s0 := h[0].S
-	s1 := h[1].S
-	s2 := h[2].S
+	s0, s1, s2 := h[0].S, h[1].S, h[2].S
 
 	if s0 == s1 && s1 == s2 {
 		// flor, highest envido for now
-		return &Hand{h[0], h[1]}
+		return h[0].Envido() + h[1].Envido() + 20
 	} else if s0 == s1 {
-		return &Hand{h[0], h[1]}
+		return h[0].Envido() + h[1].Envido() + 20
 	} else if s0 == s2 {
-		return &Hand{h[0], h[2]}
+		return h[0].Envido() + h[2].Envido() + 20
 	} else if s1 == s2 {
-		return &Hand{h[1], h[2]}
+		return h[1].Envido() + h[2].Envido() + 20
 	} else {
-		return &Hand{h[0]}
+		return h[0].Envido()
 	}
 }
 
-// Full value of hand
-func (h Hand) Envido() uint8 {
-	cards := h.EnvidoCards()
+// Full value of hand, including flor.
+//
+//   - 0-37 envido
+//   - 220-247 flor
+func (h Hand) EnvidoUY() uint8 {
+	var pCards []Card
+	var normalCards []Card
 
-	if len(*cards) == 1 {
-		return (*cards)[0].Envido()
-	} else {
-		return (*cards)[0].Envido() + (*cards)[1].Envido() + 20
+	// count piezas
+	for i := range 3 {
+		c := h[i]
+		if c.S == 'p' {
+			pCards = append(pCards, c)
+		} else {
+			normalCards = append(normalCards, c)
+		}
 	}
+
+	if len(pCards) == 0 {
+		// No piezas, get envido score
+		slices.SortFunc(h, SortForEnvido)
+
+		s0, s1, s2 := h[0].S, h[1].S, h[2].S
+
+		if s0 == s1 && s1 == s2 {
+			// flor all same suit
+			return h[0].Envido() + h[1].Envido() + h[2].Envido() + 220
+		} else if s0 == s1 {
+			return h[0].Envido() + h[1].Envido() + 20
+		} else if s0 == s2 {
+			return h[0].Envido() + h[2].Envido() + 20
+		} else if s1 == s2 {
+			return h[1].Envido() + h[2].Envido() + 20
+		} else {
+			return h[0].Envido()
+		}
+	}
+
+	if len(pCards) == 1 {
+		if normalCards[0].S == normalCards[1].S {
+			// flor: 1 pieza + envido
+			return ENVIDO_PIEZA[pCards[0].N] + normalCards[0].Envido() + normalCards[1].Envido() + 220
+
+		} else {
+			// envido: 1 pieza + carta alta
+			slices.SortFunc(normalCards, SortForEnvido)
+			return ENVIDO_PIEZA[pCards[0].N] + normalCards[0].Envido() + 20
+		}
+	}
+
+	if len(pCards) == 2 {
+		// flor: 2 piezas
+		sum := uint8(0)
+		sum += ENVIDO_PIEZA[pCards[0].N]
+		sum += ENVIDO_PIEZA[pCards[1].N]
+		sum += normalCards[0].Envido()
+		return sum + 220
+	}
+
+	if len(pCards) == 3 {
+		// flor: 3 piezas
+		sum := uint8(0)
+		sum += ENVIDO_PIEZA[pCards[0].N]
+		sum += ENVIDO_PIEZA[pCards[1].N]
+		sum += ENVIDO_PIEZA[pCards[2].N]
+		return sum + 220
+	}
+
+	return 255 // should never get here
 }
 
 func (h Hand) Print() {

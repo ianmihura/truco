@@ -44,14 +44,17 @@ func main() {
 
 	// // fmt.Println(hand.TrucoStrength())
 
-	hand := truco.Hand{{N: 6, S: 'e'}, {N: 6, S: 'c'}, {N: 6, S: 'o'}}
+	hand := truco.Hand{{N: 4, S: 'e'}, {N: 1, S: 'o'}, {N: 3, S: 'e'}}
 	for {
 		// hand.TrucoStrengthStats([]truco.Card{}, []truco.Card{}, 255, true, true).PPrint()
 		start := time.Now()
-		hand.TrucoStrengthUY()
+		// hand.TrucoStrengthUY()
 		// hand.TrucoStrength()
-		// hand.TrucoStrengthStats([]truco.Card{}, []truco.Card{}, 255, true, true)
+		// hand.TrucoStrengthStats([]truco.Card{}, []truco.Card{}, 255, false, true).PPrint()
+		hand.TrucoStrengthStatsUY([]truco.Card{}, []truco.Card{{3, 'c'}}, 200, false, true).PPrint()
 		fmt.Println(time.Now().UnixMilli() - start.UnixMilli())
+
+		break
 	}
 	// hand.TrucoStrength()
 }

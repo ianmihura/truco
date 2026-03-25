@@ -232,14 +232,14 @@ func (mHand Hand) TrucoStrengthUY() float32 {
 	mPerms := math.PermutationsRaw(mHand, 3)
 	aCards := CardsExcluding(ALL_CARDS, mHand)
 	oPerms := math.PermutationsRaw(aCards, 3)
-	pPerms := math.PermutationsRaw(aCards, 1)
+	pPerms := math.PermutationsRaw(aCards, 1) // muestra
 
 	var score int
 	for mH := range mPerms {
 		for oH := range oPerms {
 			for m := range pPerms {
 				if oPerms[oH][0] == pPerms[m][0] || oPerms[oH][1] == pPerms[m][0] || oPerms[oH][2] == pPerms[m][0] {
-					// assuming muestra is not in mHand, but may be in oHand
+					// muestra may be in oHand
 					continue // muestra should be unique
 				} else {
 					score += TrucoBeatsUY(Hand(mPerms[mH]), Hand(oPerms[oH]), pPerms[m][0])
@@ -287,7 +287,9 @@ func (stats TrucoStats) PPrint() {
 
 // TrucoStrengthStats calculates strength statistics for a mHand by simulating
 // all possible permutations against all possible opponent hands, given known info.
-// Helps players identify best permutation to play, and best
+// Helps players identify best permutation to play
+//
+// For Argentinian Truco.
 //
 // Parameters:
 //   - kCards: Cards held by the opponent (already played by them, in the order played).
@@ -297,7 +299,7 @@ func (stats TrucoStats) PPrint() {
 //   - hasStrategy: if true, checks IsReasonablyPlayed, discards permutations that are unreasonably played
 //
 // Notes:
-//   - envido range as fsm envido (0-33: known, +100: range, 255: unknown)
+//   - envido range as fsm envido (0-33: known, 100-199: envido range, 200: unknown flor, 201-254: flor, 255: unknown)
 //
 // Returns TrucoStats containing the overall strength and per-permutation breakdown.
 func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, envido uint8, isMHandFirst, hasStrategy bool) TrucoStats {
@@ -394,6 +396,146 @@ func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, envido uint8, isMHan
 		StrengthPosition: strengthsPosition,
 		CountPerm:        counts,
 		MEnvido:          mEnvido,
+		MEnvidoScore:     float32(eScore) / float32(eCount),
+	}
+}
+
+// TrucoStrengthStatsUY calculates strength statistics for a mHand by simulating
+// all possible permutations against all possible opponent hands, given known info.
+// Helps players identify best permutation to play.
+//
+// For Uruguayan Truco.
+//
+// Parameters:
+//   - kCards: Cards held by the opponent (already played by them, in the order played).
+//   - oCards: Known cards the opponent does not hold (e.g., cards played by other players). First card is 'muestra'.
+//   - envido: Known envido of the opponent, helps exclude impossible hands.
+//   - isMHandFirst: boolean controling who plays first in round 0
+//   - hasStrategy: if true, checks IsReasonablyPlayed, discards permutations that are unreasonably played
+//
+// Notes:
+//   - envido range as fsm envido (0-33: known, 100-199: envido range, 200: unknown flor, 201-254: flor, 255: unknown)
+//
+// Returns TrucoStats containing the overall strength and per-permutation breakdown.
+func (mHand Hand) TrucoStrengthStatsUY(kCards, oCards []Card, envido uint8, isMHandFirst, hasStrategy bool) TrucoStats {
+	mPerms := math.PermutationsRaw(mHand, 3)
+	aCards := CardsExcluding(ALL_CARDS, append(mHand, oCards...))
+	oPerms := math.PermutationsRaw(aCards, 3)
+	if len(oCards) != 0 {
+		// we know the 'muestra': only allow one card permutation
+		aCards = []Card{oCards[len(oCards)-1]}
+	}
+	pPerms := math.PermutationsRaw(aCards, 1) // muestra
+
+	isReasonablyPlayed := true
+	var eScore, eCount, cScore, totScore, cCount, totCount int
+	perms := make([]Hand, 0, 6)
+	winsPerm := make([]float32, 0, 6)
+	strengthsPerm := make([]float32, 0, 6)
+	counts := make([]float32, 0, 6)
+	strengthsPosition := make([][]float32, 0, 3)
+
+	for mH := range mPerms {
+		cScore, cCount = 0, 0
+		for oH := range oPerms {
+			for m := range pPerms {
+				muestra := pPerms[m][0]
+				if oPerms[oH][0] == muestra || oPerms[oH][1] == muestra || oPerms[oH][2] == muestra {
+					continue // muestra should be unique
+				}
+
+				oEnvido := Hand(oPerms[oH]).UY(muestra).EnvidoUY()
+				if envido == 255 { // didnt declare anything
+					if oEnvido > 200 { // only filter out flor
+						continue
+					}
+				} else if envido == 200 { // declare unknown flor
+					if oEnvido < 200 || oEnvido == 255 { // filter out non-flor
+						continue
+					}
+				} else if envido < 99 { // declare concrete envido
+					if oEnvido != envido {
+						continue
+					}
+				} else if envido < 199 { // declare range envido 'son buenas'
+					if oEnvido > (envido - 100) { // range
+						continue
+					}
+				} else { // known flor
+					if oEnvido != envido {
+						continue
+					}
+				}
+
+				if hasStrategy {
+					if isMHandFirst {
+						isReasonablyPlayed = IsReasonablyPlayed(mPerms[mH], oPerms[oH])
+					} else {
+						isReasonablyPlayed = IsReasonablyPlayed(oPerms[oH], mPerms[mH])
+					}
+				}
+
+				if Hand(oPerms[oH]).HasAllInPlace(kCards) {
+					if isReasonablyPlayed {
+						if TrucoBeatsUY(Hand(mPerms[mH]), Hand(oPerms[oH]), muestra) == 1 {
+							cScore++
+						}
+						// cScore += TrucoBeats(Hand(mH), Hand(oH))
+						cCount++
+					}
+					eScore += EnvidoBeats(mHand.EnvidoUY(), oEnvido, isMHandFirst)
+					eCount++
+				}
+			}
+		}
+		perms = append(perms, mPerms[mH])
+		winsPerm = append(winsPerm, float32(cScore))
+		counts = append(counts, float32(cCount))
+		totScore += cScore
+		totCount += cCount
+	}
+
+	var strengthAll float32
+	if totCount > 0 {
+		strengthAll = float32(totScore) / float32(totCount)
+		for i := range winsPerm {
+			strengthsPerm = append(strengthsPerm, winsPerm[i]/float32(totCount))
+		}
+	} else {
+		strengthAll = 0
+		strengthsPerm = []float32{0, 0, 0, 0, 0, 0}
+	}
+
+	var pScore float32
+	for pos := range 3 {
+		posScoreArr := make([]float32, 0, 3)
+		for _, mCard := range mHand {
+			pScore = 0
+			for iPerm, perm := range perms {
+				if mCard == perm[pos] {
+					pScore += strengthsPerm[iPerm]
+				}
+			}
+			posScoreArr = append(posScoreArr, pScore)
+		}
+		strengthsPosition = append(strengthsPosition, posScoreArr)
+	}
+
+	sMHand := make([]string, 0, 3)
+	for c := range mHand {
+		sMHand = append(sMHand, mHand[c].ToEmoji())
+	}
+
+	return TrucoStats{
+		MHand:            sMHand,
+		StrengthAll:      strengthAll,
+		Count:            totCount,
+		Perms:            perms,
+		WinsPerm:         winsPerm,
+		StrengthPerm:     strengthsPerm,
+		StrengthPosition: strengthsPosition,
+		CountPerm:        counts,
+		MEnvido:          255, // TODO make this a range or force a muestra
 		MEnvidoScore:     float32(eScore) / float32(eCount),
 	}
 }

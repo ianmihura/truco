@@ -268,10 +268,10 @@ var ENVIDOS_UY = map[uint8][][]uint8{
 }
 
 // envido each pieza card brings
-var ENVIDO_PIEZA = map[Card]uint8{
-	{2, 'p'}:  10,
-	{4, 'p'}:  9,
-	{5, 'p'}:  8,
-	{11, 'p'}: 7,
-	{10, 'p'}: 7,
+var ENVIDO_PIEZA = map[uint8]uint8{
+	2:  10,
+	4:  9,
+	5:  8,
+	11: 7,
+	10: 7,
 }

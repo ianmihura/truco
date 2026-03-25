@@ -70,30 +70,56 @@ func setupRound(s, i int, mHand, oHand *Hand) {
 	}
 }
 
-// func TestTrucoBeatsAll(t *testing.T) {
-// 	mHand := Hand{{1, 'e'}, {1, 'b'}, {7, 'e'}}
-// 	oHand := Hand{{10, 'e'}, {10, 'c'}, {4, 'e'}}
-// 	score := mHand.TrucoBeatsAll(oHand)
-// 	if score != 36 {
-// 		t.Errorf("{1, 'e'}, {1, 'b'}, {7, 'e'} should always beat any other hand, instead got %d", score)
-// 	}
+func TestTrucoBeatsUY(t *testing.T) {
+	muestra := Card{1, 'b'} // None of {1e, 4c, 1c} are piezas with 1b
 
-// 	mHand = Hand{{10, 'b'}, {10, 'o'}, {4, 'b'}}
-// 	score = mHand.TrucoBeatsAll(oHand)
-// 	if score != 0 {
-// 		t.Errorf("equal hands should have score=0, instead got %d", score)
-// 	}
+	// Standard cases (no piezas)
+	checkTrucoBeatsUY(t, muestra, 1, 1, 2, 1)
+	checkTrucoBeatsUY(t, muestra, 1, 0, 2, 1)
+	checkTrucoBeatsUY(t, muestra, 1, -1, 1, 1)
+	checkTrucoBeatsUY(t, muestra, 1, -1, -1, -1)
+	checkTrucoBeatsUY(t, muestra, 1, -1, 0, 1)
 
-// 	// only one card is better than the other hand
-// 	// for every order i can play, there's only 2 orders that i beat the oponent:
-// 	//  - we must play our different card in the same turn (eg. first card played is 4 and 5 respectively)
-// 	//    + 3 positions x2 permutations of my other two cards
-// 	//  - the oponent can permute the other two cards
-// 	//    + 3 positions x2 permutations
-// 	// total = 3x2 + 3x2 = 12
-// 	mHand = Hand{{10, 'b'}, {10, 'o'}, {5, 'b'}}
-// 	score = mHand.TrucoBeatsAll(oHand)
-// 	if score != 12 {
-// 		t.Errorf("only one card different should beat 12 hands, instead got %d", score)
-// 	}
-// }
+	checkTrucoBeatsUY(t, muestra, -1, -1, 2, -1)
+	checkTrucoBeatsUY(t, muestra, -1, 0, 2, -1)
+	checkTrucoBeatsUY(t, muestra, -1, 1, -1, -1)
+	checkTrucoBeatsUY(t, muestra, -1, 1, 1, 1)
+	checkTrucoBeatsUY(t, muestra, -1, 1, 0, -1)
+
+	checkTrucoBeatsUY(t, muestra, 0, 1, 2, 1)
+	checkTrucoBeatsUY(t, muestra, 0, -1, 2, -1)
+	checkTrucoBeatsUY(t, muestra, 0, 0, 1, 1)
+	checkTrucoBeatsUY(t, muestra, 0, 0, -1, -1)
+	checkTrucoBeatsUY(t, muestra, 0, 0, 0, 0)
+
+	// Pieza cases
+	// muestra 1e -> 2e is pieza(19), 1e is 14
+	muestraPiece := Card{1, 'e'}
+	p2 := Card{2, 'e'} // 19
+	c1 := Card{1, 'e'} // 14
+	c4 := Card{4, 'c'} // 1
+
+	// mHand wins with piece
+	if res := TrucoBeatsUY(Hand{p2, c4, c4}, Hand{c1, c4, c4}, muestraPiece); res != 1 {
+		t.Errorf("Piece 2e(19) should beat 1e(14), got %d", res)
+	}
+
+	// oHand wins with piece
+	if res := TrucoBeatsUY(Hand{c1, c4, c4}, Hand{p2, c4, c4}, muestraPiece); res != -1 {
+		t.Errorf("1e(14) should lose to 2e(19), got %d", res)
+	}
+}
+
+func checkTrucoBeatsUY(t *testing.T, m Card, s0, s1, s2, expected int) {
+	oHand := make(Hand, 3)
+	mHand := make(Hand, 3)
+
+	setupRound(s0, 0, &mHand, &oHand)
+	setupRound(s1, 1, &mHand, &oHand)
+	setupRound(s2, 2, &mHand, &oHand)
+
+	result := TrucoBeatsUY(mHand, oHand, m)
+	if result != expected {
+		t.Errorf("UY: For scores [%d, %d, %d], expected %d, got %d", s0, s1, s2, expected, result)
+	}
+}

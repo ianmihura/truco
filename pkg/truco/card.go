@@ -35,6 +35,7 @@ func NewCard(c string) Card {
 
 // Converts in place a flat card to a uruguay card, given a m=muestra Card.
 // Is destructive: will overwrite the value of the suit for 'p' where necesary.
+// It will also overwrite the value of 12p to the actual value (according to the muestra)
 func (c *Card) UY(m Card) {
 	// we do it this extended way for efficiency
 	if c.S == m.S {
