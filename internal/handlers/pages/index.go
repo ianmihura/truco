@@ -1,6 +1,7 @@
 package pages
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -50,26 +51,51 @@ func (h *HomeHandler) handleCalculate(w http.ResponseWriter, r *http.Request) {
 
 	mHandStr := r.Form.Get("mHand")
 	kCardsStr := r.Form.Get("kCards")
+	mode := r.Form.Get("mode")
+	muestraStr := r.Form.Get("muestra")
 	isMHandFirst := r.Form.Get("isMHandFirst") == "true"
 	hasStrategy := r.Form.Get("hasStrategy") == "true"
 	sonBuenas := r.Form.Get("sonBuenas") == "true"
+	flor := r.Form.Get("flor") == "true"
 	kEnvido, err := strconv.Atoi(r.Form.Get("envido"))
 	if err != nil {
 		kEnvido = 255
 	}
 
 	mHand := truco.NewHand(mHandStr)
-	kCards := []truco.Card(truco.NewHand(kCardsStr))
-	if sonBuenas {
-		kEnvido = 100 + int(mHand.Envido())
-	}
-
 	if len(mHand) != 3 {
 		http.Error(w, "Select exactly 3 cards for your hand", http.StatusBadRequest)
 		return
 	}
+	kCards := []truco.Card(truco.NewHand(kCardsStr))
 
-	stats := mHand.TrucoStrengthStats(kCards, []truco.Card{}, uint8(kEnvido), isMHandFirst, hasStrategy)
+	var muestra truco.Card
+	if mode == "UY" {
+		if muestraStr == "" {
+			http.Error(w, "Select a muestra", http.StatusBadRequest)
+			return
+		}
+		muestra = truco.NewHand(muestraStr)[0]
+	}
+
+	if sonBuenas {
+		if mode == "UY" {
+			kEnvido = 100 + int(mHand.EnvidoUY(muestra))
+		} else {
+			kEnvido = 100 + int(mHand.Envido())
+		}
+	} else if flor {
+		kEnvido = 200
+	}
+
+	var stats truco.TrucoStats
+	if mode == "UY" {
+		mHand.Println()
+		fmt.Println(kCards, muestra, kEnvido)
+		stats = mHand.TrucoStrengthStatsUY(kCards, []truco.Card{muestra}, uint8(kEnvido), isMHandFirst, hasStrategy)
+	} else {
+		stats = mHand.TrucoStrengthStats(kCards, []truco.Card{}, uint8(kEnvido), isMHandFirst, hasStrategy)
+	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := h.Tmpl.ExecuteTemplate(w, "results_partial.html", stats); err != nil {

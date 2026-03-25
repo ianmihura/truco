@@ -32,40 +32,76 @@
             background-color: rgba(246, 59, 59, 0.2) !important;
             box-shadow: 0 0 15px rgba(246, 59, 59, 0.4);
         }
+
+        .selected-m-card {
+            border-color: #f6ea3b !important;
+            background-color: rgba(246, 212, 59, 0.2) !important;
+            box-shadow: 0 0 15px rgba(246, 218, 59, 0.4);
+        }
     </style>
 </head>
 
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen py-8 px-4 flex justify-center">
     <div class="max-w-4xl w-full space-y-8">
-        <header class="text-center space-y-2">
-            <h1 class="text-5xl font-black text-white tracking-tighter italic uppercase">Mano de truco</h1>
+        <header class="text-center space-y-4 relative">
+            <div class="flex justify-center mb-2">
+                <div
+                    class="bg-slate-800/80 p-1 rounded-xl border border-slate-700/50 backdrop-blur-md flex shadow-inner">
+                    <button type="button" id="btn-ar" onclick="setMode('AR')"
+                        class="px-6 py-1.5 rounded-lg text-xs font-black tracking-widest transition-all duration-300 bg-blue-600 text-white shadow-lg">
+                        ARGENTINA
+                    </button>
+                    <button type="button" id="btn-uy" onclick="setMode('UY')"
+                        class="px-6 py-1.5 rounded-lg text-xs font-black tracking-widest transition-all duration-300 text-slate-400 hover:text-slate-200">
+                        URUGUAY
+                    </button>
+                </div>
+            </div>
+            <h1 class="text-5xl font-black text-white tracking-tighter">Truco x 2mangos</h1>
             <p class="text-slate-400 font-medium italic">Dominá el Truco con estadísticas</p>
         </header>
 
         <form id="calc-form" hx-post="/" hx-target="#results-container" hx-swap="innerHTML" class="space-y-8">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Left Column: Card Selection -->
-                <div
-                    class="bg-slate-800/50 rounded-2xl border border-slate-700/50 p-6 backdrop-blur-sm shadow-xl space-y-6">
-                    <div class="items-center justify-between">
-                        <h2 class="text-lg font-bold text-white tracking-widest">Seleccioná tu mano</h2>
+                <div class="space-y-8">
+                    <div
+                        class="bg-slate-800/50 rounded-2xl border border-slate-700/50 p-6 backdrop-blur-sm shadow-xl space-y-6">
+                        <div class="items-center justify-between">
+                            <h2 class="text-lg font-bold text-white tracking-widest">Seleccioná tu mano</h2>
+                        </div>
+
+                        <div id="card-grid" class="grid grid-cols-4 gap-2">
+                            {{ range .AllCards }}
+                            <button type="button" onclick="toggleCard(event)" oncontextmenu="handleCardClick(event)"
+                                data-card="{{ . }}"
+                                class="card-btn py-3 px-1 rounded-xl bg-slate-900 border border-slate-700 text-md font-mono font-black text-slate-200 hover:text-white hover:border-blue-500/50 transition-all duration-200 cursor-pointer">
+                                {{ mapCardEmoji . }}
+                            </button>
+                            {{ if or (eq . "7o") (eq . "7b") (eq . "7e") (eq . "10c") }}
+                            <div></div>
+                            {{ end }}
+                            {{ if or (eq . "1b") (eq . "2c") }}
+                            <div></div>
+                            <div></div>
+                            {{ end }}
+                            {{ end }}
+                        </div>
                     </div>
 
-                    <div id="card-grid" class="grid grid-cols-4 gap-2">
-                        {{ range .AllCards }}
-                        <button type="button" onclick="toggleCard(event)" oncontextmenu="toggleKCard(event)"
-                            data-card="{{ . }}"
-                            class="card-btn py-3 px-1 rounded-xl bg-slate-900 border border-slate-700 text-md font-mono font-black text-slate-200 hover:text-white hover:border-blue-500/50 transition-all duration-200 cursor-pointer">
-                            {{ mapCardEmoji . }}
-                        </button>
-                        {{ if or (eq . "7o") (eq . "7b") (eq . "7e") (eq . "10c") }}
-                        <div></div>
-                        {{ end }}
-                        {{ if or (eq . "1b") (eq . "2c") }}
-                        <div></div>
-                        <div></div>
-                        {{ end }}
-                        {{ end }}
+                    <div id="muestra-container"
+                        class="flex items-center justify-between hidden space-y-6 bg-slate-800/50 rounded-2xl border border-slate-700/50 p-6 backdrop-blur-sm shadow-xl">
+                        <div class="space-y-2">
+                            <h2 class="text-lg font-bold text-white tracking-widest">Muestra</h2>
+                            <p class="block text-xs font-bold text-slate-400 tracking-widest">
+                                Seleccionala con click derecho
+                            </p>
+                        </div>
+                        <div class="flex gap-4 justify-center" id="muestra-preview" onclick="clearMuestra()">
+                            <div
+                                class="w-20 h-28 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center text-slate-700 text-xs font-bold">
+                                ?</div>
+                        </div>
                     </div>
                 </div>
 
@@ -138,6 +174,12 @@
                                             class="w-5 h-5 accent-blue-500">
                                     </label>
                                 </div>
+                                <label data-tip="El oponente canta flor"
+                                    class="basis-64 flex items-center justify-between mt-4 p-4 bg-slate-800/50 rounded-xl border border-slate-700/30 text-sm font-bold text-slate-200 cursor-pointer tooltip"
+                                    for="flor" onclick="flor()">Flor
+                                    <input type="checkbox" id="flor" name="flor" value="true"
+                                        class="w-5 h-5 accent-blue-500">
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -156,6 +198,8 @@
                     </button>
                     <input type="hidden" name="mHand" id="mHand-input">
                     <input type="hidden" name="kCards" id="kCards-input">
+                    <input type="hidden" name="muestra" id="muestra-input">
+                    <input type="hidden" name="mode" id="mode-input" value="AR">
                 </div>
             </div>
         </form>
@@ -177,21 +221,59 @@
     <script>
         let selectedCards = [];
         let selectedKCards = [];
+        let muestraCard = null;
+        let mode = 'AR';
+
+        function setMode(newMode) {
+            mode = newMode;
+            document.getElementById('mode-input').value = mode;
+
+            const btnAr = document.getElementById('btn-ar');
+            const btnUy = document.getElementById('btn-uy');
+            const muestraContainer = document.getElementById('muestra-container');
+
+            if (mode === 'UY') {
+                btnUy.className = "px-6 py-1.5 rounded-lg text-xs font-black tracking-widest transition-all duration-300 bg-blue-600 text-white shadow-lg";
+                btnAr.className = "px-6 py-1.5 rounded-lg text-xs font-black tracking-widest transition-all duration-300 text-slate-400 hover:text-slate-200";
+                muestraContainer.classList.remove('hidden');
+            } else {
+                btnAr.className = "px-6 py-1.5 rounded-lg text-xs font-black tracking-widest transition-all duration-300 bg-blue-600 text-white shadow-lg";
+                btnUy.className = "px-6 py-1.5 rounded-lg text-xs font-black tracking-widest transition-all duration-300 text-slate-400 hover:text-slate-200";
+                muestraContainer.classList.add('hidden');
+                clearMuestra();
+            }
+            updateUI();
+        }
+
+        function handleCardClick(e) {
+            e.preventDefault()
+            const card = e.currentTarget.dataset.card;
+
+            if (mode === 'UY' && !muestraCard && selectedCards.indexOf(card) === -1 && selectedKCards.indexOf(card) === -1) {
+                muestraCard = card;
+                e.currentTarget.classList.add('selected-m-card');
+                updateUI();
+            } else if (muestraCard === card) {
+                clearMuestra()
+            } else {
+                toggleKCard(e);
+            }
+        }
 
         // my hand cards
         function toggleCard(e) {
-            const card = e.target.dataset.card;
+            const card = e.currentTarget.dataset.card;
             const index = selectedCards.indexOf(card);
 
             if (index > -1) {
                 selectedCards.splice(index, 1);
-                e.target.classList.remove('selected-card');
-            } else if (selectedKCards.indexOf(card) > -1) {
-                return // already in other's hand
+                e.currentTarget.classList.remove('selected-card');
+            } else if (selectedKCards.indexOf(card) > -1 || card === muestraCard) {
+                return // already in other's hand or is muestra
             } else {
                 if (selectedCards.length < 3) {
                     selectedCards.push(card);
-                    e.target.classList.add('selected-card');
+                    e.currentTarget.classList.add('selected-card');
                 }
             }
 
@@ -200,31 +282,42 @@
 
         // other's hand cards
         function toggleKCard(e) {
-            e.preventDefault()
-            const card = e.target.dataset.card;
+            const card = e.currentTarget.dataset.card;
             const index = selectedKCards.indexOf(card);
 
             if (index > -1) {
                 selectedKCards.splice(index, 1);
-                e.target.classList.remove('selected-k-card');
-            } else if (selectedCards.indexOf(card) > -1) {
-                return // already in my hand
+                e.currentTarget.classList.remove('selected-k-card');
+            } else if (selectedCards.indexOf(card) > -1 || card === muestraCard) {
+                return // already in my hand or is muestra
             } else {
                 if (selectedKCards.length < 3) {
                     selectedKCards.push(card);
-                    e.target.classList.add('selected-k-card');
+                    e.currentTarget.classList.add('selected-k-card');
                 }
             }
 
             updateUI();
         }
 
+        function clearMuestra() {
+            if (muestraCard) {
+                const btn = document.querySelector(`.card-btn[data-card="${muestraCard}"]`);
+                if (btn) btn.classList.remove('selected-m-card');
+                muestraCard = null;
+                updateUI();
+            }
+        }
+
         function updateUI() {
             document.getElementById('mHand-input').value = selectedCards.join(' ');
             document.getElementById('kCards-input').value = selectedKCards.join(' ');
+            document.getElementById('muestra-input').value = muestraCard || '';
 
             const submitBtn = document.getElementById('submit-btn');
-            if (selectedCards.length === 3) {
+            const isReady = selectedCards.length === 3 && (mode === 'AR' || muestraCard);
+
+            if (isReady) {
                 submitBtn.disabled = false;
                 submitBtn.classList.remove('bg-slate-700', 'text-slate-500', 'cursor-not-allowed');
                 submitBtn.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-500', 'shadow-lg', 'shadow-blue-900/40');
@@ -240,8 +333,24 @@
         function updatePreview() {
             const preview = document.getElementById('hand-preview');
             const kpreview = document.getElementById('khand-preview');
+            const mpreview = document.getElementById('muestra-preview');
+
             preview.innerHTML = '';
             kpreview.innerHTML = '';
+
+            if (mpreview) {
+                mpreview.innerHTML = '';
+                const mdiv = document.createElement('div');
+                mdiv.className = 'w-16 h-24 rounded-xl flex items-center justify-center font-black shadow-xl transition-all duration-300 animate-in zoom-in-75';
+                if (muestraCard) {
+                    mdiv.classList.add('bg-yellow-500', 'text-white', 'text-sm', 'border-2', 'border-white/20');
+                    mdiv.innerText = muestraCard;
+                } else {
+                    mdiv.classList.add('border-2', 'border-dashed', 'border-slate-700', 'text-slate-700', 'text-[10px]');
+                    mdiv.innerText = '?';
+                }
+                mpreview.appendChild(mdiv);
+            }
             for (let i = 0; i < 3; i++) {
                 const card = selectedCards[i];
                 const div = document.createElement('div');
@@ -279,8 +388,19 @@
             if (isSonBuenas) {
                 envidoEl.value = '';
                 envidoEl.classList.add('opacity-50', 'cursor-not-allowed', 'bg-slate-800');
+                document.getElementById("flor").checked = false;
             } else {
                 envidoEl.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-slate-800');
+            }
+        }
+
+        function flor() {
+            const florEl = document.getElementById("flor");
+            const sonBuenasEl = document.getElementById("sonBuenas");
+
+            if (florEl.checked) {
+                sonBuenasEl.checked = false;
+                sonBuenas();
             }
         }
 

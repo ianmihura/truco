@@ -13,6 +13,9 @@ func main() {
 		"mul": func(a, b float32) float32 {
 			return a * b
 		},
+		"sub": func(a uint8, b int) int {
+			return int(a) - b
+		},
 		"mapCardEmoji": func(card string) string {
 			return truco.NewCard(card).ToEmoji()
 		},

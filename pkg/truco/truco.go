@@ -421,11 +421,8 @@ func (mHand Hand) TrucoStrengthStatsUY(kCards, oCards []Card, envido uint8, isMH
 	mPerms := math.PermutationsRaw(mHand, 3)
 	aCards := CardsExcluding(ALL_CARDS, append(mHand, oCards...))
 	oPerms := math.PermutationsRaw(aCards, 3)
-	if len(oCards) != 0 {
-		// we know the 'muestra': only allow one card permutation
-		aCards = []Card{oCards[len(oCards)-1]}
-	}
-	pPerms := math.PermutationsRaw(aCards, 1) // muestra
+	muestra := oCards[0]
+	mEnvido := mHand.EnvidoUY(muestra)
 
 	isReasonablyPlayed := true
 	var eScore, eCount, cScore, totScore, cCount, totCount int
@@ -438,54 +435,51 @@ func (mHand Hand) TrucoStrengthStatsUY(kCards, oCards []Card, envido uint8, isMH
 	for mH := range mPerms {
 		cScore, cCount = 0, 0
 		for oH := range oPerms {
-			for m := range pPerms {
-				muestra := pPerms[m][0]
-				if oPerms[oH][0] == muestra || oPerms[oH][1] == muestra || oPerms[oH][2] == muestra {
-					continue // muestra should be unique
-				}
+			if oPerms[oH][0] == muestra || oPerms[oH][1] == muestra || oPerms[oH][2] == muestra {
+				continue // muestra should be unique
+			}
 
-				oEnvido := Hand(oPerms[oH]).UY(muestra).EnvidoUY()
-				if envido == 255 { // didnt declare anything
-					if oEnvido > 200 { // only filter out flor
-						continue
-					}
-				} else if envido == 200 { // declare unknown flor
-					if oEnvido < 200 || oEnvido == 255 { // filter out non-flor
-						continue
-					}
-				} else if envido < 99 { // declare concrete envido
-					if oEnvido != envido {
-						continue
-					}
-				} else if envido < 199 { // declare range envido 'son buenas'
-					if oEnvido > (envido - 100) { // range
-						continue
-					}
-				} else { // known flor
-					if oEnvido != envido {
-						continue
-					}
+			oEnvido := Hand(oPerms[oH]).EnvidoUY(muestra)
+			if envido == 255 { // didnt declare anything
+				if oEnvido > 200 { // only filter out flor
+					continue
 				}
+			} else if envido == 200 { // declare unknown flor
+				if oEnvido < 200 || oEnvido == 255 { // filter out non-flor
+					continue
+				}
+			} else if envido < 99 { // declare concrete envido
+				if oEnvido != envido {
+					continue
+				}
+			} else if envido < 199 { // declare range envido 'son buenas'
+				if oEnvido > (envido - 100) { // range
+					continue
+				}
+			} else { // known flor
+				if oEnvido != envido {
+					continue
+				}
+			}
 
-				if hasStrategy {
-					if isMHandFirst {
-						isReasonablyPlayed = IsReasonablyPlayed(mPerms[mH], oPerms[oH])
-					} else {
-						isReasonablyPlayed = IsReasonablyPlayed(oPerms[oH], mPerms[mH])
-					}
+			if hasStrategy {
+				if isMHandFirst {
+					isReasonablyPlayed = IsReasonablyPlayed(mPerms[mH], oPerms[oH])
+				} else {
+					isReasonablyPlayed = IsReasonablyPlayed(oPerms[oH], mPerms[mH])
 				}
+			}
 
-				if Hand(oPerms[oH]).HasAllInPlace(kCards) {
-					if isReasonablyPlayed {
-						if TrucoBeatsUY(Hand(mPerms[mH]), Hand(oPerms[oH]), muestra) == 1 {
-							cScore++
-						}
-						// cScore += TrucoBeats(Hand(mH), Hand(oH))
-						cCount++
+			if Hand(oPerms[oH]).HasAllInPlace(kCards) {
+				if isReasonablyPlayed {
+					if TrucoBeatsUY(Hand(mPerms[mH]), Hand(oPerms[oH]), muestra) == 1 {
+						cScore++
 					}
-					eScore += EnvidoBeats(mHand.EnvidoUY(), oEnvido, isMHandFirst)
-					eCount++
+					// cScore += TrucoBeats(Hand(mH), Hand(oH))
+					cCount++
 				}
+				eScore += EnvidoBeats(mEnvido, oEnvido, isMHandFirst)
+				eCount++
 			}
 		}
 		perms = append(perms, mPerms[mH])
@@ -535,7 +529,7 @@ func (mHand Hand) TrucoStrengthStatsUY(kCards, oCards []Card, envido uint8, isMH
 		StrengthPerm:     strengthsPerm,
 		StrengthPosition: strengthsPosition,
 		CountPerm:        counts,
-		MEnvido:          255, // TODO make this a range or force a muestra
+		MEnvido:          mEnvido,
 		MEnvidoScore:     float32(eScore) / float32(eCount),
 	}
 }

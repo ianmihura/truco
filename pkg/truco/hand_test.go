@@ -40,10 +40,9 @@ func TestFlorUY(t *testing.T) {
 		t.Run(tt.handStr+"_m_"+tt.muestra, func(t *testing.T) {
 			h := NewHand(tt.handStr)
 			m := NewCard(tt.muestra)
-			h.UY(m)
-			got := h.EnvidoUY()
+			got := h.EnvidoUY(m)
 			if got != tt.want {
-				t.Errorf("Hand(%s).UY(%s).EnvidoUY() = %d, want %d", tt.handStr, tt.muestra, got, tt.want)
+				t.Errorf("Hand(%s).EnvidoUY(%s) = %d, want %d", tt.handStr, tt.muestra, got, tt.want)
 			}
 		})
 	}

@@ -28,12 +28,14 @@ func NewHand(handStr string) Hand {
 }
 
 // Converts a flat hand to a uruguay hand, given a m=muestra Card.
-// Is destructive: will overwrite the value of the suit for 'p' where necesary.
+// Returns a new hand, does not overwrite the old one.
 func (hand Hand) UY(m Card) Hand {
-	hand[0].UY(m)
-	hand[1].UY(m)
-	hand[2].UY(m)
-	return hand
+	newHand := make(Hand, 3)
+	copy(newHand, hand)
+	newHand[0].UY(m)
+	newHand[1].UY(m)
+	newHand[2].UY(m)
+	return newHand
 }
 
 // Returns true if the hand has all specified cards
@@ -113,9 +115,11 @@ func (h Hand) Envido() uint8 {
 //
 //   - 0-37 envido
 //   - 220-247 flor
-func (h Hand) EnvidoUY() uint8 {
+func (hand Hand) EnvidoUY(m Card) uint8 {
 	var pCards []Card
 	var normalCards []Card
+
+	h := hand.UY(m)
 
 	// count piezas
 	for i := range 3 {
