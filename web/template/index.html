@@ -75,7 +75,7 @@
                             {{ range .AllCards }}
                             <button type="button" onclick="toggleCard(event)" oncontextmenu="handleCardClick(event)"
                                 data-card="{{ . }}"
-                                class="card-btn py-3 px-1 rounded-xl bg-slate-900 border border-slate-700 text-lg font-mono font-black text-slate-200 hover:text-white hover:border-blue-500/50 transition-all duration-200 cursor-pointer">
+                                class="card-btn py-3 px-1 rounded-xl bg-slate-900 border border-slate-700 text-lg font-mono text-slate-200 hover:text-white hover:border-blue-500/50 transition-all duration-200 cursor-pointer">
                                 {{ mapCardEmoji . }}
                             </button>
                             {{ if or (eq . "7o") (eq . "7b") (eq . "7e") (eq . "10c") }}
@@ -99,7 +99,7 @@
                         </div>
                         <div class="flex gap-4 justify-center" id="muestra-preview" onclick="clearMuestra()">
                             <div
-                                class="w-20 h-28 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center text-slate-700 text-xs font-bold">
+                                class="w-20 h-28 border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center text-slate-700 text-xs ">
                                 ?</div>
                         </div>
                     </div>
@@ -341,7 +341,7 @@
             if (mpreview) {
                 mpreview.innerHTML = '';
                 const mdiv = document.createElement('div');
-                mdiv.className = 'w-16 h-24 rounded-xl flex items-center justify-center font-black shadow-xl transition-all duration-300 animate-in zoom-in-75';
+                mdiv.className = 'w-16 h-24 rounded-xl flex items-center justify-center shadow-xl transition-all duration-300 animate-in zoom-in-75';
                 if (muestraCard) {
                     mdiv.classList.add('bg-slate-800', 'text-white', 'text-sm', 'border-2', 'border-white/20', 'emoji-text');
                     mdiv.innerText = codeToEmoji(muestraCard);
@@ -354,7 +354,7 @@
             for (let i = 0; i < 3; i++) {
                 const card = selectedCards[i];
                 const div = document.createElement('div');
-                div.className = 'w-20 h-28 rounded-xl flex items-center justify-center font-black shadow-xl transition-all duration-300 animate-in zoom-in-75';
+                div.className = 'w-20 h-28 rounded-xl flex items-center justify-center shadow-xl transition-all duration-300 animate-in zoom-in-75';
                 if (card) {
                     div.classList.add('bg-slate-800', 'text-white', 'text-lg', 'border-2', 'border-white/20', 'emoji-text');
                     div.innerText = codeToEmoji(card);
@@ -366,7 +366,7 @@
 
                 const kcard = selectedKCards[i];
                 const kdiv = document.createElement('div');
-                kdiv.className = 'w-20 h-28 rounded-xl flex items-center justify-center font-black shadow-xl transition-all duration-300 animate-in zoom-in-75';
+                kdiv.className = 'w-20 h-28 rounded-xl flex items-center justify-center shadow-xl transition-all duration-300 animate-in zoom-in-75';
                 if (kcard) {
                     kdiv.classList.add('bg-slate-800', 'text-white', 'text-lg', 'border-2', 'border-white/20', 'emoji-text');
                     kdiv.innerText = codeToEmoji(kcard);
