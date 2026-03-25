@@ -343,8 +343,8 @@
                 const mdiv = document.createElement('div');
                 mdiv.className = 'w-16 h-24 rounded-xl flex items-center justify-center font-black shadow-xl transition-all duration-300 animate-in zoom-in-75';
                 if (muestraCard) {
-                    mdiv.classList.add('bg-yellow-500', 'text-white', 'text-sm', 'border-2', 'border-white/20');
-                    mdiv.innerText = muestraCard;
+                    mdiv.classList.add('bg-slate-800', 'text-white', 'text-sm', 'border-2', 'border-white/20', 'emoji-text');
+                    mdiv.innerText = codeToEmoji(muestraCard);
                 } else {
                     mdiv.classList.add('border-2', 'border-dashed', 'border-slate-700', 'text-slate-700', 'text-[10px]');
                     mdiv.innerText = '?';
@@ -356,8 +356,8 @@
                 const div = document.createElement('div');
                 div.className = 'w-20 h-28 rounded-xl flex items-center justify-center font-black shadow-xl transition-all duration-300 animate-in zoom-in-75';
                 if (card) {
-                    div.classList.add('bg-blue-600', 'text-white', 'text-lg', 'border-2', 'border-white/20');
-                    div.innerText = card;
+                    div.classList.add('bg-slate-800', 'text-white', 'text-lg', 'border-2', 'border-white/20', 'emoji-text');
+                    div.innerText = codeToEmoji(card);
                 } else {
                     div.classList.add('border-2', 'border-dashed', 'border-slate-700', 'text-slate-700', 'text-xs');
                     div.innerText = i + 1;
@@ -368,14 +368,28 @@
                 const kdiv = document.createElement('div');
                 kdiv.className = 'w-20 h-28 rounded-xl flex items-center justify-center font-black shadow-xl transition-all duration-300 animate-in zoom-in-75';
                 if (kcard) {
-                    kdiv.classList.add('bg-red-600', 'text-white', 'text-lg', 'border-2', 'border-white/20');
-                    kdiv.innerText = kcard;
+                    kdiv.classList.add('bg-slate-800', 'text-white', 'text-lg', 'border-2', 'border-white/20', 'emoji-text');
+                    kdiv.innerText = codeToEmoji(kcard);
                 } else {
                     kdiv.classList.add('border-2', 'border-dashed', 'border-slate-700', 'text-slate-700', 'text-xs');
                     kdiv.innerText = i + 1;
                 }
                 kpreview.appendChild(kdiv);
             }
+            mapToEmoji();
+        }
+
+        function codeToEmoji(code) {
+            if (!code) return '';
+            const suit = code.slice(-1);
+            const num = code.slice(0, -1);
+            const suitMap = {
+                'e': '🗡',
+                'b': '🪵',
+                'c': '🏆',
+                'o': '🪙'
+            };
+            return num + (suitMap[suit] || suit);
         }
 
         function sonBuenas() {
