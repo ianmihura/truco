@@ -9,23 +9,22 @@
         - Envido (score or partial score)
     - Given your envido, whats the range of hands you could have
     - what card reveals less, or contradictory, info (eg. 33 envido with 2m + 3, showing any 7 will bluff)
-5. Cases:
-    - 11e 7b 11b
-        1o 5o (less than 11)
-    - 1e 7c 7b
-        kEnvido = 33
-        hasStrategy is key to understand the results
 6. Host:
     - (deployed) https://render.com/
     - https://railway.com/pricing
     - https://www.alwaysdata.com/en/offers/
 7. Nice to haves
-    - emojis in preview (fix issues)
+    - piezas replace emoji
     - click preview will remove it
-    - Flor
+    - hold-click text for mobile devices  (muestra)
     - Command palette
     - Hotkeys to choose cards
     - explain
+        - 11e 7b 11b
+            1o 5o (less than 11)
+        - 1e 7c 7b
+            kEnvido = 33
+            hasStrategy is key to understand the results
 
 ### TODO UI:
 - select past turns:
