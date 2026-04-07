@@ -1,5 +1,7 @@
 package truco
 
+var NO_CARD = Card{}
+
 // list of all cards
 var ALL_CARDS = []Card{
 	{1, 'e'}, {1, 'b'},

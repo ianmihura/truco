@@ -13,18 +13,27 @@ import (
 //   - -1 if mHand looses against oHand
 //   - 0 if there's a tie
 func TrucoBeats(mHand, oHand Hand) int {
-	score := make([]int, 3)
-	for i := range 3 {
-		if mHand[i].Truco() > oHand[i].Truco() {
-			score[i] = 1
-		} else if mHand[i].Truco() < oHand[i].Truco() {
-			score[i] = -1
-		} else {
-			score[i] = 0
-		}
+	var s0, s1, s2 int
+
+	o0, o1, o2 := oHand[0].Truco(), oHand[1].Truco(), oHand[2].Truco()
+	m0, m1, m2 := mHand[0].Truco(), mHand[1].Truco(), mHand[2].Truco()
+
+	if m0 > o0 {
+		s0 = 1
+	} else if m0 < o0 {
+		s0 = -1
+	}
+	if m1 > o1 {
+		s1 = 1
+	} else if m1 < o1 {
+		s1 = -1
+	}
+	if m2 > o2 {
+		s2 = 1
+	} else if m2 < o2 {
+		s2 = -1
 	}
 
-	s0, s1, s2 := score[0], score[1], score[2]
 	if s0 == 0 {
 		// tie in the first round is defined inmediately after
 		if s1 == 0 {
@@ -61,7 +70,6 @@ func TrucoBeats(mHand, oHand Hand) int {
 //   - -1 if mHand looses against oHand
 //   - 0 if there's a tie
 func TrucoBeatsUY(mHand, oHand Hand, m Card) int {
-	// score := make([]int, 3)
 	var s0, s1, s2 int
 
 	o0, o1, o2 := oHand[0].TrucoUY(m), oHand[1].TrucoUY(m), oHand[2].TrucoUY(m)
@@ -83,7 +91,6 @@ func TrucoBeatsUY(mHand, oHand Hand, m Card) int {
 		s2 = -1
 	}
 
-	// s0, s1, s2 := score[0], score[1], score[2]
 	if s0 == 0 {
 		// tie in the first round is defined inmediately after
 		if s1 == 0 {
@@ -122,9 +129,16 @@ func TrucoBeatsUY(mHand, oHand Hand, m Card) int {
 //   - Must win R1 (with minimum possible) if already lost R0
 //
 // Returns false if either player's play violates these strategies (unreasonable/wasteful play).
-func IsReasonablyPlayed(mHand, oHand Hand) bool {
-	o0, o1, o2 := oHand[0].Truco(), oHand[1].Truco(), oHand[2].Truco()
-	m0, m1, m2 := mHand[0].Truco(), mHand[1].Truco(), mHand[2].Truco()
+func IsReasonablyPlayed(mHand, oHand Hand, m Card) bool {
+	o0, o1, o2, m0, m1, m2 := uint8(0), uint8(0), uint8(0), uint8(0), uint8(0), uint8(0)
+
+	if m == NO_CARD {
+		o0, o1, o2 = oHand[0].Truco(), oHand[1].Truco(), oHand[2].Truco()
+		m0, m1, m2 = mHand[0].Truco(), mHand[1].Truco(), mHand[2].Truco()
+	} else {
+		o0, o1, o2 = oHand[0].TrucoUY(m), oHand[1].TrucoUY(m), oHand[2].TrucoUY(m)
+		m0, m1, m2 = mHand[0].TrucoUY(m), mHand[1].TrucoUY(m), mHand[2].TrucoUY(m)
+	}
 
 	// Round 0: mHand plays first, oHand plays second (can strategize)
 	if o0 > m0 {
@@ -330,9 +344,9 @@ func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, envido uint8, isMHan
 
 			if hasStrategy {
 				if isMHandFirst {
-					isReasonablyPlayed = IsReasonablyPlayed(mH, oH)
+					isReasonablyPlayed = IsReasonablyPlayed(mH, oH, NO_CARD)
 				} else {
-					isReasonablyPlayed = IsReasonablyPlayed(oH, mH)
+					isReasonablyPlayed = IsReasonablyPlayed(oH, mH, NO_CARD)
 				}
 			}
 
@@ -464,9 +478,9 @@ func (mHand Hand) TrucoStrengthStatsUY(kCards, oCards []Card, envido uint8, isMH
 
 			if hasStrategy {
 				if isMHandFirst {
-					isReasonablyPlayed = IsReasonablyPlayed(mPerms[mH], oPerms[oH])
+					isReasonablyPlayed = IsReasonablyPlayed(mPerms[mH], oPerms[oH], muestra)
 				} else {
-					isReasonablyPlayed = IsReasonablyPlayed(oPerms[oH], mPerms[mH])
+					isReasonablyPlayed = IsReasonablyPlayed(oPerms[oH], mPerms[mH], muestra)
 				}
 			}
 
