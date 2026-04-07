@@ -47,9 +47,14 @@
                 data-tip="ganás {{( index $.WinsPerm $i )}} de {{ index $.CountPerm $i }} válidos para este orden">
                 <div class="absolute right-0 top-0 h-full bg-blue-400/25 transition-all duration-500"
                     style='width: {{ printf "%.1f%%" (mul (index $.StrengthPerm $i) 100.0) }}'></div>
+                <div class="absolute right-0 bottom-0 h-1 bg-green-400/25 transition-all duration-500"
+                    style='width: {{ printf "%.1f%%" (mul (index $.StrengthPermRel $i) 100.0) }}'></div>
                 <div class="relative flex items-center justify-between">
                     <span class="font-mono text-slate-200 whitespace-nowrap emoji-text">{{ range $h }}{{ mapCardEmoji
                         .ToString }} {{ end }}</span>
+                    <span class="text-slate-400 font-mono text-xs">
+                        {{ printf "%.1f%%" (mul (index $.StrengthPermRel $i) 100.0) }}
+                    </span>
                     <span class="text-slate-200 font-mono text-s">
                         {{ printf "%.1f%%" (mul (index $.StrengthPerm $i) 100.0) }}
                     </span>
@@ -58,6 +63,9 @@
             {{ end }}
         </div>
     </div>
+
+    <h2 class="text-lg font-bold text-white tracking-widest">Por carta</h2>
+
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="hand-result">
         {{ range $pos, $arr := .StrengthPosition }}
         <div class="p-6 bg-slate-900/50 rounded-xl border border-slate-700/30 flex flex-col space-y-6">
@@ -80,43 +88,9 @@
                 {{ end }}
             </div>
         </div>
+
         {{ end }}
     </div>
-    <p class="block text-sm text-slate-400 tracking-widest">
-        Resultados
-    </p>
-    <p class="block text-xs text-slate-400 tracking-widest">
-        Simulamos todos los partidos posibles, y contamos partidos ganados contra perdidos.
-    </p>
-    <ul class="ml-4 block text-xs text-slate-400 tracking-widest">
-        <li>✓ De todas las maneras de jugar las cartas, cuáles son las mejores.</li>
-        <li>✓ Estas probabilidades están relacionadas a la cantidad de manos jugadas: una buena estrategia
-            puede tener bajo porcentaje por tener pocas chance de ser jugada (ver Estrategia abajo).</li>
-    </ul>
-    <p class="block text-xs text-slate-400 tracking-widest">
-        A veces los resultados son contra-intuitivos.
-    </p>
-    <p class="block text-sm text-slate-400 tracking-widest">
-        Estrategia
-    </p>
-    <p class="block text-xs text-slate-400 tracking-widest">
-        Si hay muy pocas manos jugadas, probá sin "Estrategia" (botón al lado de "Calcular fuerza"). Para mentir a veces
-        connviene no jugar razonablemente. Qué es la "Estrategia" (sólo juega permutaciones razonables):
-    </p>
-    <ul class="ml-4 block text-xs text-slate-400 tracking-widest">
-        <li>✓ Se guarda las mejores cartas: si puede usar una carta más baja para conseguir el mismo resultado (sea
-            ganar o perder), usa esa carta.</li>
-        <li>✓ Si está "obligado" a ganar esta mano, intenta ganarla (ej: después de empatar, o después de perder la
-            primera).</li>
-        <li>✓ Sólo busca empatar (la segunda o tercera mano) si ganó la primera.</li>
-    </ul>
-    <p class="block text-sm text-slate-400 tracking-widest">
-        Limites
-    </p>
-    <p class="block text-xs text-slate-400 tracking-widest">
-        No modelamos los cantos de truco, el apure (amenazas), la mentira, los paquetes (mazo mal mezclado),
-        o ninguna de las vivezas que hacen al truco.
-    </p>
     <script>
         if (typeof mapToEmoji === 'function') {
             mapToEmoji();

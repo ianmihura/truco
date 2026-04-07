@@ -1,0 +1,80 @@
+{{ define "explain" }}
+<div class="bg-slate-800/50 rounded-2xl border border-slate-700/50 p-6 backdrop-blur-sm shadow-xl space-y-6">
+    <div class="space-y-6">
+        <div class="space-y-2">
+            <p class="block text-lg font-bold text-slate-200 tracking-widest">Cómo jugar 💡</p>
+            <p class="block text-sm text-slate-400 tracking-widest">
+                Simulá muchos partidos, para ver cómo cambian las probabilidades cuando cambian otros factores:
+            </p>
+            <ul class="ml-4 block text-sm text-slate-400 tracking-widest space-y-1">
+                <li>✓ Envido del otro.</li>
+                <li>✓ Si soy mano.</li>
+                <li>✓ Qué cartas juega el otro.</li>
+                <li>✓ Con o sin "Estrategia" (ver abajo).</li>
+            </ul>
+            <p class="block text-sm text-slate-400 tracking-widest">
+                "Es buena esta mano si el otro me cantó tal envido?", etc
+            </p>
+        </div>
+
+        <div class="space-y-2">
+            <p class="block text-lg font-bold text-slate-200 tracking-widest">Cómo calculamos los resultados</p>
+            <p class="block text-sm text-slate-400 tracking-widest">
+                Simulamos todos los partidos posibles, y contamos partidos ganados contra perdidos. Es decir, de todas
+                las maneras de jugar las cartas, cuáles son las mejores.
+            </p>
+            <p class="block text-sm text-slate-400 tracking-widest">
+                No modelamos los cantos de truco, el apure (amenazas), la mentira, los paquetes (mazo mal mezclado),
+                o ninguna de las vivezas que hacen al truco.
+            </p>
+        </div>
+
+        <div class="space-y-2">
+            <p class="block text-lg font-bold text-slate-200 tracking-widest">Cómo leer los resultados</p>
+            <p class="block text-sm text-slate-200 tracking-widest">Fuerza principal absoluta (azul):</p>
+            <ul class="ml-4 block text-sm text-slate-400 tracking-widest space-y-1">
+                <li class="font-mono">manos ganadas / todas las manos jugadas</li>
+                <li>✓ Una buena estrategia puede tener bajo porcentaje por tener pocas chance de ser jugada, y
+                    vice-versa.
+                </li>
+                <li>✓ Más relevante si estás usando "Estrategia" (ver abajo)</li>
+            </ul>
+            <p class="block text-sm text-slate-200 tracking-widest">Fuerza secundaria relativa (verde):</p>
+            <ul class="ml-4 block text-sm text-slate-400 tracking-widest space-y-1">
+                <li class="font-mono">manos ganadas / manos jugadas para esta permutación</li>
+                <li>✓ 100% suele indicar una manera perfecta de jugar.</li>
+            </ul>
+            <p class="block text-sm text-slate-400 tracking-widest">
+                Los resultados pueden ser contra-intuitivos.
+            </p>
+        </div>
+
+        <div class="space-y-2">
+            <p class="block text-lg font-bold text-slate-200 tracking-widest">Botón "Estrategia"</p>
+            <p class="block text-sm text-slate-400 tracking-widest">
+                En vez de jugar todas las manos posibles, descartamos las que son ineficientes. Es decir:
+            </p>
+            <ul class="ml-4 block text-sm text-slate-400 tracking-widest space-y-1">
+                <li>✓ Se guarda las mejores cartas: si puede usar una carta más baja para conseguir el mismo resultado
+                    (sea ganar o perder), usa esa carta.</li>
+                <li>✓ Si está "obligado" a ganar esta mano, intenta ganarla (ej: después de empatar, o después de perder
+                    la primera).</li>
+                <li>✓ Busca empatar la segunda o tercera mano sólo si ganó la primera.</li>
+            </ul>
+            <p class="block text-sm text-slate-400 tracking-widest">
+                Si hay muy pocas manos jugadas en los resultados, probá sin "Estrategia". Para mentir a veces conviene
+                no jugar razonablemente.
+            </p>
+        </div>
+
+        <div class="space-y-2">
+            <p class="block text-lg font-bold text-slate-200 tracking-widest">Variantes</p>
+            <p class="block text-sm text-slate-400 tracking-widest">
+                Expandí tu manera de jugar al Truco con estas variantes y reglas alternativas.
+            </p>
+            <a href="https://ianmihura.github.io/truco/" target="_blank" class="block text-sm tracking-widest">Lista de
+                variantes ↗</a>
+        </div>
+    </div>
+</div>
+{{ end }}

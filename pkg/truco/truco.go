@@ -271,6 +271,7 @@ type TrucoStats struct {
 	Count            int         // amount of hands simulated
 	Perms            []Hand      // permutations of mHand
 	WinsPerm         []float32   // hands you win
+	StrengthPermRel  []float32   // strength: hands you win / hands played with this perm
 	StrengthPerm     []float32   // strength: hands you win / hands played in total
 	StrengthPosition [][]float32 //
 	CountPerm        []float32   // amount of hands simulated, by permutations of mHand
@@ -326,6 +327,7 @@ func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, envido uint8, isMHan
 	var eScore, eCount, cScore, totScore, cCount, totCount int
 	perms := make([]Hand, 0, 6)
 	winsPerm := make([]float32, 0, 6)
+	strengthsPermRel := make([]float32, 0, 6)
 	strengthsPerm := make([]float32, 0, 6)
 	counts := make([]float32, 0, 6)
 	strengthsPosition := make([][]float32, 0, 3)
@@ -374,9 +376,11 @@ func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, envido uint8, isMHan
 		strengthAll = float32(totScore) / float32(totCount)
 		for i := range winsPerm {
 			strengthsPerm = append(strengthsPerm, winsPerm[i]/float32(totCount))
+			strengthsPermRel = append(strengthsPermRel, winsPerm[i]/float32(counts[i]))
 		}
 	} else {
 		strengthAll = 0
+		strengthsPermRel = []float32{0, 0, 0, 0, 0, 0}
 		strengthsPerm = []float32{0, 0, 0, 0, 0, 0}
 	}
 
@@ -406,6 +410,7 @@ func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, envido uint8, isMHan
 		Count:            totCount,
 		Perms:            perms,
 		WinsPerm:         winsPerm,
+		StrengthPermRel:  strengthsPermRel,
 		StrengthPerm:     strengthsPerm,
 		StrengthPosition: strengthsPosition,
 		CountPerm:        counts,
@@ -443,6 +448,7 @@ func (mHand Hand) TrucoStrengthStatsUY(kCards, oCards []Card, envido uint8, isMH
 	perms := make([]Hand, 0, 6)
 	winsPerm := make([]float32, 0, 6)
 	strengthsPerm := make([]float32, 0, 6)
+	strengthsPermRel := make([]float32, 0, 6)
 	counts := make([]float32, 0, 6)
 	strengthsPosition := make([][]float32, 0, 3)
 
@@ -508,10 +514,12 @@ func (mHand Hand) TrucoStrengthStatsUY(kCards, oCards []Card, envido uint8, isMH
 		strengthAll = float32(totScore) / float32(totCount)
 		for i := range winsPerm {
 			strengthsPerm = append(strengthsPerm, winsPerm[i]/float32(totCount))
+			strengthsPermRel = append(strengthsPermRel, winsPerm[i]/float32(counts[i]))
 		}
 	} else {
 		strengthAll = 0
 		strengthsPerm = []float32{0, 0, 0, 0, 0, 0}
+		strengthsPermRel = []float32{0, 0, 0, 0, 0, 0}
 	}
 
 	var pScore float32
@@ -540,6 +548,7 @@ func (mHand Hand) TrucoStrengthStatsUY(kCards, oCards []Card, envido uint8, isMH
 		Count:            totCount,
 		Perms:            perms,
 		WinsPerm:         winsPerm,
+		StrengthPermRel:  strengthsPermRel,
 		StrengthPerm:     strengthsPerm,
 		StrengthPosition: strengthsPosition,
 		CountPerm:        counts,

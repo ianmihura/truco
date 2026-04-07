@@ -57,8 +57,6 @@
                     </button>
                 </div>
             </div>
-            <h1 class="text-5xl font-black text-white tracking-tighter">Truco x 2mangos</h1>
-            <p class="text-slate-400 font-medium italic">Dominá el Truco con estadísticas</p>
         </header>
 
         <form id="calc-form" hx-post="/" hx-target="#results-container" hx-swap="innerHTML" class="space-y-8">
@@ -207,6 +205,8 @@
         <div id="results-container">
             <!-- Results will be loaded here -->
         </div>
+
+        {{ template "explain" }}
 
         <footer class="pt-12 text-center text-xs text-slate-500 font-mono tracking-widest pb-4">
             <p>
