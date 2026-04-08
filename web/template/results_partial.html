@@ -1,24 +1,23 @@
 <div
     class="mt-8 p-6 bg-slate-800/80 rounded-2xl border border-slate-700/50 backdrop-blur-md animate-in fade-in slide-in-from-bottom-4 duration-300 space-y-4">
     <div class="flex items-center justify-between mb-6">
-        <h2 class="text-lg font-bold text-white tracking-widest">Resultados</h2>
-        <div data-tip="Si hay muy pocas manos jugadas, probá sin 'Estrategia' (botón al lado de 'Calcular fuerza')."
+        <!-- <div data-tip="Si hay muy pocas manos jugadas, probá sin 'Estrategia' (botón al lado de 'Calcular fuerza')."
             class="tooltip px-3 py-1 bg-blue-600/20 rounded-full border border-blue-500/30 text-blue-400 text-xs font-bold font-mono">
             {{ .Count }} Partidos jugados
-        </div>
+        </div> -->
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="p-6 bg-slate-900/50 rounded-xl border border-slate-700/30 flex flex-col space-y-4">
-            <span class="text-slate-400 text-xs font-bold tracking-widest mb-1">Truco</span>
+            <span class="text-slate-400 text-s font-bold tracking-widest mb-1">Truco</span>
             <span class="text-4xl font-mono font-black text-white">{{ printf "%.1f%%" (mul .StrengthAll 100.0) }}</span>
             <div class="w-full bg-slate-800 h-2 rounded-full mt-2 overflow-hidden">
                 <div class="bg-blue-400/75 h-full" style='width: {{ printf "%.1f%%" (mul .StrengthAll 100.0) }}'></div>
             </div>
-            <span class="text-slate-400 text-xs tracking-widest mb-6">* Agregado de todas las manos
-                jugadas</span>
+            <span class="text-slate-400 text-xs tracking-widest mb-6"> de {{ .Count }} partidos
+                jugados</span>
             {{ if lt $.MEnvido 200 }}
-            <span class="text-slate-400 text-xs font-bold tracking-widest mb-1 mt-5">Envido</span>
+            <span class="text-slate-400 text-s font-bold tracking-widest mb-1 mt-5">Envido</span>
             <div>
                 <span class="text-4xl font-mono font-black text-white">{{ printf "%.1f%%" (mul $.MEnvidoScore 100.0)
                     }}</span>
@@ -29,7 +28,7 @@
                 </div>
             </div>
             {{ else }}
-            <span class="text-slate-400 text-xs font-bold tracking-widest mb-1 mt-5">Flor de</span>
+            <span class="text-slate-400 text-s font-bold tracking-widest mb-1 mt-5">Flor de</span>
             <div>
                 <span class="text-4xl font-mono font-black text-white"> {{ sub $.MEnvido 200 }} puntos</span>
             </div>
@@ -41,22 +40,61 @@
         </div>
 
         <div class="space-y-3">
-            <span class="text-slate-400 text-xs font-bold tracking-widest block mb-2">Cómo jugar</span>
+            <div class="flex justify-between items-center mb-2">
+                <div class="flex bg-slate-900/50 p-1 rounded-lg border border-slate-700/50">
+                    <button type="button" onclick="switchView('abs')" id="btn-abs" data-tip="Probabilidad de ganar"
+                        class="tooltip view-btn px-3 py-1 rounded-md text-xs tracking-widest transition-all duration-300 bg-blue-600 text-white shadow-lg">
+                        % Absoluto
+                    </button>
+                    <button type="button" onclick="switchView('rel')" id="btn-rel" data-tip="Probabilidad de jugar"
+                        class="tooltip view-btn px-3 py-1 rounded-md text-xs tracking-widest transition-all duration-300 text-slate-400 hover:text-slate-200">
+                        % Relativo
+                    </button>
+                    <button type="button" onclick="switchView('count')" id="btn-count" data-tip="Cuántas veces ganás"
+                        class="tooltip view-btn px-3 py-1 rounded-md text-xs tracking-widest transition-all duration-300 text-slate-400 hover:text-slate-200">
+                        # Ganás
+                    </button>
+                    <button type="button" onclick="switchView('play')" id="btn-play"
+                        data-tip="Cuántas veces jugás esta mano"
+                        class="tooltip view-btn px-3 py-1 rounded-md text-xs tracking-widest transition-all duration-300 text-slate-400 hover:text-slate-200">
+                        # Jugás
+                    </button>
+                </div>
+            </div>
             {{ range $i, $h := .Perms }}
-            <div class="relative p-3 bg-slate-900/30 rounded-lg border border-slate-700/20 tooltip transition-all hover:bg-slate-900/50 w-full"
-                data-tip="ganás {{( index $.WinsPerm $i )}} de {{ index $.CountPerm $i }} válidos para este orden">
+            <div
+                class="relative p-3 bg-slate-900/30 rounded-lg border border-slate-700/20 tooltip transition-all hover:bg-slate-900/50 w-full">
+
                 <div class="absolute right-0 top-0 h-full bg-blue-400/20 transition-all duration-500"
-                    style='width: {{ printf "%.1f%%" (mul (index $.StrengthPermRel $i) 100.0) }}'></div>
-                <div class="absolute right-0 bottom-0 h-1 bg-green-400/25 transition-all duration-500"
                     style='width: {{ printf "%.1f%%" (mul (index $.StrengthPermAbs $i) 100.0) }}'></div>
+
+                <div class="absolute right-0 bottom-0 w-full h-1 flex flex-row-reverse overflow-hidden">
+                    <div class="h-full bg-green-400/40 transition-all duration-500"
+                        style='width: {{ printf "%.1f%%" (mul (index $.StrengthPermRel $i) 100.0) }}'></div>
+                    <div class="h-full bg-red-400/40 transition-all duration-500"
+                        style='width: {{ printf "%.1f%%" (mul (index $.StrengthPermLoss $i) 100.0) }}'></div>
+                </div>
+
                 <div class="relative flex items-center justify-between">
                     <span class="font-mono text-slate-200 whitespace-nowrap emoji-text">{{ range $h }}{{ mapCardEmoji
                         .ToString }} {{ end }}</span>
-                    <span class="text-green-300/75 font-mono text-xs">
+                    <span class="view-abs text-slate-200 font-mono text-s">
                         {{ printf "%.1f%%" (mul (index $.StrengthPermAbs $i) 100.0) }}
                     </span>
-                    <span class="text-slate-200 font-mono text-s">
-                        {{ printf "%.1f%%" (mul (index $.StrengthPermRel $i) 100.0) }}
+                    <span class="view-rel hidden text-slate-100 font-mono text-s">
+                        <span class="text-red-300/75">
+                            {{ printf "%.1f%%" (mul (index $.StrengthPermLoss $i) 100.0) }}
+                        </span>
+                        <span>vs</span>
+                        <span class="text-green-300/75">
+                            {{ printf "%.1f%%" (mul (index $.StrengthPermRel $i) 100.0) }}
+                        </span>
+                    </span>
+                    <span class="view-count hidden text-slate-400 font-mono text-s tracking-tight">
+                        ganás {{( index $.WinsPerm $i )}} de {{ index $.CountPerm $i }}
+                    </span>
+                    <span class="view-play hidden text-slate-400 font-mono text-s tracking-tight">
+                        jugás {{( index $.CountPerm $i )}} de {{ $.Count }}
                     </span>
                 </div>
             </div>
@@ -94,6 +132,40 @@
     <script>
         if (typeof mapToEmoji === 'function') {
             mapToEmoji();
+        }
+
+        function switchView(view) {
+            const rels = document.querySelectorAll('.view-rel');
+            const abss = document.querySelectorAll('.view-abs');
+            const counts = document.querySelectorAll('.view-count');
+            const btns = document.querySelectorAll('.view-btn');
+
+            // Reset all content
+            rels.forEach(el => el.classList.add('hidden'));
+            abss.forEach(el => el.classList.add('hidden'));
+            counts.forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.view-play').forEach(el => el.classList.add('hidden'));
+
+            // Reset all buttons
+            btns.forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white', 'shadow-lg');
+                btn.classList.add('text-slate-400', 'hover:text-slate-200');
+            });
+
+            // Show selected content and highlight active button
+            const activeBtn = document.getElementById('btn-' + view);
+            activeBtn.classList.remove('text-slate-400', 'hover:text-slate-200');
+            activeBtn.classList.add('bg-blue-600', 'text-white', 'shadow-lg');
+
+            if (view === 'rel') {
+                rels.forEach(el => el.classList.remove('hidden'));
+            } else if (view === 'abs') {
+                abss.forEach(el => el.classList.remove('hidden'));
+            } else if (view === 'count') {
+                counts.forEach(el => el.classList.remove('hidden'));
+            } else if (view === 'play') {
+                document.querySelectorAll('.view-play').forEach(el => el.classList.remove('hidden'));
+            }
         }
     </script>
 </div>

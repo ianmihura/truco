@@ -2,26 +2,10 @@
 <div class="bg-slate-800/50 rounded-2xl border border-slate-700/50 p-6 backdrop-blur-sm shadow-xl space-y-6">
     <div class="space-y-6">
         <div class="space-y-2">
-            <p class="block text-lg font-bold text-slate-200 tracking-widest">Cómo jugar 💡</p>
-            <p class="block text-sm text-slate-400 tracking-widest">
-                Simulá muchos partidos, para ver cómo cambian las probabilidades cuando cambian otros factores:
-            </p>
-            <ul class="ml-4 block text-sm text-slate-400 tracking-widest space-y-1">
-                <li>✓ Envido del otro.</li>
-                <li>✓ Si soy mano.</li>
-                <li>✓ Qué cartas juega el otro.</li>
-                <li>✓ Con o sin "Estrategia" (ver abajo).</li>
-            </ul>
-            <p class="block text-sm text-slate-400 tracking-widest">
-                "Es buena esta mano si el otro me cantó tal envido?", etc
-            </p>
-        </div>
-
-        <div class="space-y-2">
             <p class="block text-lg font-bold text-slate-200 tracking-widest">Cómo calculamos los resultados</p>
             <p class="block text-sm text-slate-400 tracking-widest">
-                Simulamos todos los partidos posibles, y contamos partidos ganados contra perdidos. Es decir, de todas
-                las maneras de jugar las cartas, cuáles son las mejores.
+                Simulamos todos los partidos posibles, y contamos partidos ganados contra perdidos. Buscamos cuál es la
+                mejor manera de jugar las cartas.
             </p>
             <p class="block text-sm text-slate-400 tracking-widest">
                 No modelamos los cantos de truco, el apure (amenazas), la mentira, los paquetes (mazo mal mezclado),
@@ -31,18 +15,33 @@
 
         <div class="space-y-2">
             <p class="block text-lg font-bold text-slate-200 tracking-widest">Cómo leer los resultados</p>
-            <p class="block text-sm text-slate-200 tracking-widest">Fuerza principal absoluta (azul):</p>
-            <ul class="ml-4 block text-sm text-slate-400 tracking-widest space-y-1">
-                <li class="font-mono">manos ganadas / todas las manos jugadas</li>
-                <li>✓ Una buena estrategia puede tener bajo porcentaje por tener pocas chance de ser jugada, y
-                    vice-versa.
-                </li>
-                <li>✓ Más relevante si estás usando "Estrategia" (ver abajo)</li>
+            <p class="block text-sm text-slate-200 tracking-widest">Fuerza absoluta (fondo azul):</p>
+            <ul
+                class="ml-4 list-none [&>li:not(.no-tick)]:before:content-['✓'] [&>li:not(.no-tick)]:before:mr-2 [&>li:not(.no-tick)]:before:text-blue-500/70 text-sm text-slate-400 tracking-widest space-y-1">
+                <li class="no-tick font-mono">manos_ganadas/manos_jugadas (por permutación)</li>
+                <li>Fuerza de esta permutación.</li>
+                <li>Probabilidad de ganar.</li>
+                <li>100% suele indicar una manera perfecta de jugar.</li>
+                <li>Número alto también puede indicar pocas chances de jugar esta mano (jugando razonablemente, ver
+                    Estrategia abajo).</li>
             </ul>
-            <p class="block text-sm text-slate-200 tracking-widest">Fuerza secundaria relativa (verde):</p>
-            <ul class="ml-4 block text-sm text-slate-400 tracking-widest space-y-1">
-                <li class="font-mono">manos ganadas / manos jugadas para esta permutación</li>
-                <li>✓ 100% suele indicar una manera perfecta de jugar.</li>
+            <p class="block text-sm text-slate-200 tracking-widest">Fuerza relativa (linea verde/roja):</p>
+            <ul
+                class="ml-4 list-none [&>li:not(.no-tick)]:before:content-['✓'] [&>li:not(.no-tick)]:before:mr-2 [&>li:not(.no-tick)]:before:text-blue-500/70 text-sm text-slate-400 tracking-widest space-y-1">
+                <li class="no-tick font-mono">manos_ganadas/todas_manos_jugadas vs manos_perdidas/todas_manos_jugadas
+                </li>
+                <li>Probabilidad de jugar esta mano (jugando razonablemente, ver Estrategia abajo).</li>
+                <li>Fuerza relativa a todas las otras permutaciones.</li>
+                <li>Es más relevante si estás usando "Estrategia" (ver abajo).</li>
+            </ul>
+            <p class="block text-sm text-slate-400 tracking-widest">
+                Los resultados pueden ser contra-intuitivos.
+            </p>
+            <p class="block text-sm text-slate-200 tracking-widest">Por carta:</p>
+            <ul
+                class="ml-4 list-none [&>li:not(.no-tick)]:before:content-['✓'] [&>li:not(.no-tick)]:before:mr-2 [&>li:not(.no-tick)]:before:text-blue-500/70 text-sm text-slate-400 tracking-widest space-y-1">
+                <li>La fuerza de jugar cada carta en cada turno.</li>
+                <li>Promedio de fuerza absoluta para el orden de cada carta.</li>
             </ul>
             <p class="block text-sm text-slate-400 tracking-widest">
                 Los resultados pueden ser contra-intuitivos.
@@ -52,18 +51,39 @@
         <div class="space-y-2">
             <p class="block text-lg font-bold text-slate-200 tracking-widest">Botón "Estrategia"</p>
             <p class="block text-sm text-slate-400 tracking-widest">
-                En vez de jugar todas las manos posibles, descartamos las que son ineficientes. Es decir:
+                En vez de jugar todas las manos posibles, descartamos las que son ineficientes (las que no son jugadas
+                razonablemente). Es decir:
             </p>
-            <ul class="ml-4 block text-sm text-slate-400 tracking-widest space-y-1">
-                <li>✓ Se guarda las mejores cartas: si puede usar una carta más baja para conseguir el mismo resultado
+            <ul
+                class="ml-4 list-none [&>li:not(.no-tick)]:before:content-['✓'] [&>li:not(.no-tick)]:before:mr-2 [&>li:not(.no-tick)]:before:text-blue-500/70 text-sm text-slate-400 tracking-widest space-y-1">
+                <li>Se guarda las mejores cartas: si puede usar una carta más baja para conseguir el mismo resultado
                     (sea ganar o perder), usa esa carta.</li>
-                <li>✓ Si está "obligado" a ganar esta mano, intenta ganarla (ej: después de empatar, o después de perder
+                <li>Si está "obligado" a ganar esta mano, intenta ganarla (ej: después de empatar, o después de perder
                     la primera).</li>
-                <li>✓ Busca empatar la segunda o tercera mano sólo si ganó la primera.</li>
+                <li>Busca empatar la segunda o tercera mano sólo si ganó la primera.</li>
             </ul>
             <p class="block text-sm text-slate-400 tracking-widest">
-                Si hay muy pocas manos jugadas en los resultados, probá sin "Estrategia". Para mentir a veces conviene
-                no jugar razonablemente.
+                Por default usamos Estrategia, para jugar razonablemente. Pero para mentir a veces conviene no jugar
+                razonablemente.
+            <p class="block text-sm text-slate-200 tracking-widest">
+                Si hay pocas permutaciones jugadas, quitá la función "Estrategia".
+            </p>
+        </div>
+
+        <div class="space-y-2">
+            <p class="block text-lg font-bold text-slate-200 tracking-widest">Tips 💡</p>
+            <p class="block text-sm text-slate-400 tracking-widest">
+                Simulá muchos partidos, para ver cómo cambian las probabilidades cuando cambian otros factores:
+            </p>
+            <ul
+                class="ml-4 list-none [&>li:not(.no-tick)]:before:content-['✓'] [&>li:not(.no-tick)]:before:mr-2 [&>li:not(.no-tick)]:before:text-blue-500/70 text-sm text-slate-400 tracking-widest space-y-1">
+                <li>Envido del otro.</li>
+                <li>Si soy mano.</li>
+                <li>Qué cartas juega el otro.</li>
+                <li>Con o sin "Estrategia" (ver abajo).</li>
+            </ul>
+            <p class="block text-sm text-slate-400 tracking-widest">
+                "Es buena esta mano si el otro me cantó tal envido?", etc
             </p>
         </div>
 

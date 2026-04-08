@@ -398,20 +398,27 @@ type rawTrucoStats struct {
 // finalTrucoStrengthStats calculates the final Stats from the raw simulation results.
 func finalTrucoStrengthStats(rawStats rawTrucoStats) TrucoStats {
 	var strengthAll float32
-	var strengthsPerm []float32
+	var strengthsPermAbs []float32
 	var strengthsPermRel []float32
+	var strengthsPermLoss []float32
 	var strengthsPosition [][]float32
 
 	if rawStats.TotCount > 0 {
 		strengthAll = float32(rawStats.TotScore) / float32(rawStats.TotCount)
 		for i := range rawStats.WinsPerm {
-			strengthsPerm = append(strengthsPerm, rawStats.WinsPerm[i]/float32(rawStats.TotCount))
-			strengthsPermRel = append(strengthsPermRel, rawStats.WinsPerm[i]/rawStats.Counts[i])
+			if rawStats.Counts[i] == 0 {
+				strengthsPermAbs = append(strengthsPermAbs, 0)
+			} else {
+				strengthsPermAbs = append(strengthsPermAbs, rawStats.WinsPerm[i]/rawStats.Counts[i])
+			}
+			strengthsPermRel = append(strengthsPermRel, rawStats.WinsPerm[i]/float32(rawStats.TotCount))
+			strengthsPermLoss = append(strengthsPermLoss, (rawStats.Counts[i]-rawStats.WinsPerm[i])/float32(rawStats.TotCount))
 		}
 	} else {
 		strengthAll = 0
-		strengthsPerm = []float32{0, 0, 0, 0, 0, 0}
+		strengthsPermAbs = []float32{0, 0, 0, 0, 0, 0}
 		strengthsPermRel = []float32{0, 0, 0, 0, 0, 0}
+		strengthsPermLoss = []float32{0, 0, 0, 0, 0, 0}
 	}
 
 	for pos := range 3 {
@@ -420,10 +427,10 @@ func finalTrucoStrengthStats(rawStats rawTrucoStats) TrucoStats {
 			var pScore float32
 			for iPerm, perm := range rawStats.Perms {
 				if mCard == perm[pos] {
-					pScore += strengthsPerm[iPerm]
+					pScore += strengthsPermAbs[iPerm]
 				}
 			}
-			posScoreArr = append(posScoreArr, pScore)
+			posScoreArr = append(posScoreArr, pScore/2)
 		}
 		strengthsPosition = append(strengthsPosition, posScoreArr)
 	}
@@ -444,10 +451,11 @@ func finalTrucoStrengthStats(rawStats rawTrucoStats) TrucoStats {
 		Count:            rawStats.TotCount,
 		Perms:            rawStats.Perms,
 		WinsPerm:         rawStats.WinsPerm,
-		StrengthPermRel:  strengthsPermRel,
-		StrengthPermAbs:  strengthsPerm,
-		StrengthPosition: strengthsPosition,
 		CountPerm:        rawStats.Counts,
+		StrengthPermRel:  strengthsPermRel,
+		StrengthPermAbs:  strengthsPermAbs,
+		StrengthPermLoss: strengthsPermLoss,
+		StrengthPosition: strengthsPosition,
 		MEnvido:          rawStats.MEnvido,
 		MEnvidoScore:     mEnvidoScore,
 	}
@@ -458,11 +466,12 @@ type TrucoStats struct {
 	StrengthAll      float32     // overall hand strength: % hands you win
 	Count            int         // amount of hands simulated
 	Perms            []Hand      // permutations of mHand
-	WinsPerm         []float32   // hands you win
+	WinsPerm         []float32   // raw wins of each permutation
+	CountPerm        []float32   // amount of hands simulated, by permutations of mHand
 	StrengthPermRel  []float32   // strength: hands you win / hands played with this perm
 	StrengthPermAbs  []float32   // strength: hands you win / hands played in total
-	StrengthPosition [][]float32 //
-	CountPerm        []float32   // amount of hands simulated, by permutations of mHand
+	StrengthPermLoss []float32   //
+	StrengthPosition [][]float32 // strength of each card at each turn
 	MEnvido          uint8       // my envido
 	MEnvidoScore     float32     // my envido strength: hands you win / hands played in total
 }
