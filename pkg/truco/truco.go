@@ -10,13 +10,18 @@ import (
 //
 // returns:
 //   - 1 if mHand beats oHand
-//   - -1 if mHand looses against oHand
-//   - 0 if there's a tie
-func TrucoBeats(mHand, oHand Hand) int {
+//   - 0 if there's a tie or loss
+func TrucoBeats(mHand, oHand Hand, m Card) int {
 	var s0, s1, s2 int
+	var o0, o1, o2, m0, m1, m2 uint8
 
-	o0, o1, o2 := oHand[0].Truco(), oHand[1].Truco(), oHand[2].Truco()
-	m0, m1, m2 := mHand[0].Truco(), mHand[1].Truco(), mHand[2].Truco()
+	if m == NO_CARD {
+		o0, o1, o2 = oHand[0].Truco(), oHand[1].Truco(), oHand[2].Truco()
+		m0, m1, m2 = mHand[0].Truco(), mHand[1].Truco(), mHand[2].Truco()
+	} else {
+		o0, o1, o2 = oHand[0].TrucoUY(m), oHand[1].TrucoUY(m), oHand[2].TrucoUY(m)
+		m0, m1, m2 = mHand[0].TrucoUY(m), mHand[1].TrucoUY(m), mHand[2].TrucoUY(m)
+	}
 
 	if m0 > o0 {
 		s0 = 1
@@ -34,88 +39,38 @@ func TrucoBeats(mHand, oHand Hand) int {
 		s2 = -1
 	}
 
+	var res int
 	if s0 == 0 {
 		// tie in the first round is defined inmediately after
 		if s1 == 0 {
-			return s2
+			res = s2
 		} else {
-			return s1
+			res = s1
 		}
 
 	} else if s1 == 0 {
 		// any other tie is defined by winner of first round
-		return s0
+		res = s0
 
 	} else if s0 == s1 {
 		// a player won first two rounds
-		return s0
+		res = s0
 
 	} else if s2 == 0 {
 		// after we are sure there's no winner of the first two rounds,
 		// (first two round alternate winners)
 		// tie in last round is defined by winner of first round
-		return s0
+		res = s0
 
 	} else {
 		// first two round alternate winners, last round defines
-		return s2
-	}
-}
-
-// Simulates two hands being played in Truco,
-// cards are played in the orther they were given (by index)
-//
-// returns:
-//   - 1 if mHand beats oHand
-//   - -1 if mHand looses against oHand
-//   - 0 if there's a tie
-func TrucoBeatsUY(mHand, oHand Hand, m Card) int {
-	var s0, s1, s2 int
-
-	o0, o1, o2 := oHand[0].TrucoUY(m), oHand[1].TrucoUY(m), oHand[2].TrucoUY(m)
-	m0, m1, m2 := mHand[0].TrucoUY(m), mHand[1].TrucoUY(m), mHand[2].TrucoUY(m)
-
-	if m0 > o0 {
-		s0 = 1
-	} else if m0 < o0 {
-		s0 = -1
-	}
-	if m1 > o1 {
-		s1 = 1
-	} else if m1 < o1 {
-		s1 = -1
-	}
-	if m2 > o2 {
-		s2 = 1
-	} else if m2 < o2 {
-		s2 = -1
+		res = s2
 	}
 
-	if s0 == 0 {
-		// tie in the first round is defined inmediately after
-		if s1 == 0 {
-			return s2
-		} else {
-			return s1
-		}
-
-	} else if s1 == 0 {
-		// any other tie is defined by winner of first round
-		return s0
-
-	} else if s0 == s1 {
-		// a player won first two rounds
-		return s0
-
-	} else if s2 == 0 {
-		// after we are sure there's no winner of the first two rounds,
-		// (first two round alternate winners)
-		// tie in last round is defined by winner of first round
-		return s0
-
+	if res == 1 {
+		return 1
 	} else {
-		// first two round alternate winners, last round defines
-		return s2
+		return 0
 	}
 }
 
@@ -130,7 +85,7 @@ func TrucoBeatsUY(mHand, oHand Hand, m Card) int {
 //
 // Returns false if either player's play violates these strategies (unreasonable/wasteful play).
 func IsReasonablyPlayed(mHand, oHand Hand, m Card) bool {
-	o0, o1, o2, m0, m1, m2 := uint8(0), uint8(0), uint8(0), uint8(0), uint8(0), uint8(0)
+	var o0, o1, o2, m0, m1, m2 uint8
 
 	if m == NO_CARD {
 		o0, o1, o2 = oHand[0].Truco(), oHand[1].Truco(), oHand[2].Truco()
@@ -204,18 +159,6 @@ func IsReasonablyPlayed(mHand, oHand Hand, m Card) bool {
 	return true
 }
 
-// returns count of beats-losses of all permutations of mHand against oHand
-// func (mHand Hand) TrucoBeatsAll(oHand Hand) (score int) {
-// 	mPerms := math.Permutations(mHand, 3)
-// 	oPerms := math.Permutations(oHand, 3)
-// 	for mH := range mPerms {
-// 		for oH := range oPerms {
-// 			score += TrucoBeats(Hand(mH), Hand(oH))
-// 		}
-// 	}
-// 	return score
-// }
-
 // strength of a hand in truco (brute force)
 //
 // plays the hand against all other hands, in all possible permutations.
@@ -228,10 +171,10 @@ func (mHand Hand) TrucoStrength() float32 {
 	var score int
 	for mH := range mPerms {
 		for oH := range oPerms {
-			score += TrucoBeats(Hand(mPerms[mH]), Hand(oPerms[oH]))
+			score += TrucoBeats(Hand(mPerms[mH]), Hand(oPerms[oH]), NO_CARD)
 		}
 	}
-	return (float32(score)/math.PickC(37, 3) + 36.0) / 72
+	return float32(score) / (math.PickC(37, 3) * 36.0)
 }
 
 // strength of a hand in truco uruguay (brute force)
@@ -256,48 +199,13 @@ func (mHand Hand) TrucoStrengthUY() float32 {
 					// muestra may be in oHand
 					continue // muestra should be unique
 				} else {
-					score += TrucoBeatsUY(Hand(mPerms[mH]), Hand(oPerms[oH]), pPerms[m][0])
+					score += TrucoBeats(Hand(mPerms[mH]), Hand(oPerms[oH]), pPerms[m][0])
 					c++
 				}
 			}
 		}
 	}
-	return ((float32(score) / float32(c)) + 1) / 2
-}
-
-type TrucoStats struct {
-	MHand            []string    // my hand: input parameter
-	StrengthAll      float32     // overall hand strength: % hands you win
-	Count            int         // amount of hands simulated
-	Perms            []Hand      // permutations of mHand
-	WinsPerm         []float32   // hands you win
-	StrengthPermRel  []float32   // strength: hands you win / hands played with this perm
-	StrengthPerm     []float32   // strength: hands you win / hands played in total
-	StrengthPosition [][]float32 //
-	CountPerm        []float32   // amount of hands simulated, by permutations of mHand
-	MEnvido          uint8       // my envido
-	MEnvidoScore     float32     // my envido strength: hands you win / hands played in total
-}
-
-func (stats TrucoStats) PPrint() {
-	if stats.Count == 0 {
-		if len(stats.Perms) == 0 {
-			fmt.Println("Empty stats")
-		} else {
-			for _, hand := range stats.Perms {
-				hand.Println()
-			}
-			fmt.Println("0 permutations simulated")
-			fmt.Println("Hand is probably played sub-optimally")
-		}
-	} else {
-		fmt.Println("Overall Strenght=", stats.StrengthAll)
-		for i, hand := range stats.Perms {
-			hand.Print()
-			fmt.Printf(": strength=%.3f, of=%.0f\n", stats.WinsPerm[i], stats.CountPerm[i])
-		}
-		fmt.Println(stats.Count, "permutations simulated")
-	}
+	return float32(score) / float32(c)
 }
 
 // TrucoStrengthStats calculates strength statistics for a mHand by simulating
@@ -327,10 +235,7 @@ func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, envido uint8, isMHan
 	var eScore, eCount, cScore, totScore, cCount, totCount int
 	perms := make([]Hand, 0, 6)
 	winsPerm := make([]float32, 0, 6)
-	strengthsPermRel := make([]float32, 0, 6)
-	strengthsPerm := make([]float32, 0, 6)
 	counts := make([]float32, 0, 6)
-	strengthsPosition := make([][]float32, 0, 3)
 
 	for mH := range mPerms {
 		cScore, cCount = 0, 0
@@ -344,20 +249,17 @@ func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, envido uint8, isMHan
 				}
 			}
 
-			if hasStrategy {
-				if isMHandFirst {
-					isReasonablyPlayed = IsReasonablyPlayed(mH, oH, NO_CARD)
-				} else {
-					isReasonablyPlayed = IsReasonablyPlayed(oH, mH, NO_CARD)
-				}
-			}
-
 			if Hand(oH).HasAllInPlace(kCards) {
-				if isReasonablyPlayed {
-					if TrucoBeats(Hand(mH), Hand(oH)) == 1 {
-						cScore++
+				if hasStrategy {
+					if isMHandFirst {
+						isReasonablyPlayed = IsReasonablyPlayed(mH, oH, NO_CARD)
+					} else {
+						isReasonablyPlayed = IsReasonablyPlayed(oH, mH, NO_CARD)
 					}
-					// cScore += TrucoBeats(Hand(mH), Hand(oH))
+				}
+
+				if isReasonablyPlayed {
+					cScore += TrucoBeats(Hand(mH), Hand(oH), NO_CARD)
 					cCount++
 				}
 				eScore += EnvidoBeats(mEnvido, Hand(oH).Envido(), isMHandFirst)
@@ -371,52 +273,17 @@ func (mHand Hand) TrucoStrengthStats(kCards, oCards []Card, envido uint8, isMHan
 		totCount += cCount
 	}
 
-	var strengthAll float32
-	if totCount > 0 {
-		strengthAll = float32(totScore) / float32(totCount)
-		for i := range winsPerm {
-			strengthsPerm = append(strengthsPerm, winsPerm[i]/float32(totCount))
-			strengthsPermRel = append(strengthsPermRel, winsPerm[i]/float32(counts[i]))
-		}
-	} else {
-		strengthAll = 0
-		strengthsPermRel = []float32{0, 0, 0, 0, 0, 0}
-		strengthsPerm = []float32{0, 0, 0, 0, 0, 0}
-	}
-
-	var pScore float32
-	for pos := range 3 {
-		posScoreArr := make([]float32, 0, 3)
-		for _, mCard := range mHand {
-			pScore = 0
-			for iPerm, perm := range perms {
-				if mCard == perm[pos] {
-					pScore += strengthsPerm[iPerm]
-				}
-			}
-			posScoreArr = append(posScoreArr, pScore)
-		}
-		strengthsPosition = append(strengthsPosition, posScoreArr)
-	}
-
-	sMHand := make([]string, 0, 3)
-	for c := range mHand {
-		sMHand = append(sMHand, mHand[c].ToEmoji())
-	}
-
-	return TrucoStats{
-		MHand:            sMHand,
-		StrengthAll:      strengthAll,
-		Count:            totCount,
-		Perms:            perms,
-		WinsPerm:         winsPerm,
-		StrengthPermRel:  strengthsPermRel,
-		StrengthPerm:     strengthsPerm,
-		StrengthPosition: strengthsPosition,
-		CountPerm:        counts,
-		MEnvido:          mEnvido,
-		MEnvidoScore:     float32(eScore) / float32(eCount),
-	}
+	return finalTrucoStrengthStats(rawTrucoStats{
+		TotCount: totCount,
+		TotScore: totScore,
+		WinsPerm: winsPerm,
+		Counts:   counts,
+		MHand:    mHand,
+		Perms:    perms,
+		MEnvido:  mEnvido,
+		EScore:   eScore,
+		ECount:   eCount,
+	})
 }
 
 // TrucoStrengthStatsUY calculates strength statistics for a mHand by simulating
@@ -447,10 +314,7 @@ func (mHand Hand) TrucoStrengthStatsUY(kCards, oCards []Card, envido uint8, isMH
 	var eScore, eCount, cScore, totScore, cCount, totCount int
 	perms := make([]Hand, 0, 6)
 	winsPerm := make([]float32, 0, 6)
-	strengthsPerm := make([]float32, 0, 6)
-	strengthsPermRel := make([]float32, 0, 6)
 	counts := make([]float32, 0, 6)
-	strengthsPosition := make([][]float32, 0, 3)
 
 	for mH := range mPerms {
 		cScore, cCount = 0, 0
@@ -482,20 +346,17 @@ func (mHand Hand) TrucoStrengthStatsUY(kCards, oCards []Card, envido uint8, isMH
 				}
 			}
 
-			if hasStrategy {
-				if isMHandFirst {
-					isReasonablyPlayed = IsReasonablyPlayed(mPerms[mH], oPerms[oH], muestra)
-				} else {
-					isReasonablyPlayed = IsReasonablyPlayed(oPerms[oH], mPerms[mH], muestra)
-				}
-			}
-
 			if Hand(oPerms[oH]).HasAllInPlace(kCards) {
-				if isReasonablyPlayed {
-					if TrucoBeatsUY(Hand(mPerms[mH]), Hand(oPerms[oH]), muestra) == 1 {
-						cScore++
+				if hasStrategy {
+					if isMHandFirst {
+						isReasonablyPlayed = IsReasonablyPlayed(mPerms[mH], oPerms[oH], muestra)
+					} else {
+						isReasonablyPlayed = IsReasonablyPlayed(oPerms[oH], mPerms[mH], muestra)
 					}
-					// cScore += TrucoBeats(Hand(mH), Hand(oH))
+				}
+
+				if isReasonablyPlayed {
+					cScore += TrucoBeats(Hand(mPerms[mH]), Hand(oPerms[oH]), muestra)
 					cCount++
 				}
 				eScore += EnvidoBeats(mEnvido, oEnvido, isMHandFirst)
@@ -509,12 +370,43 @@ func (mHand Hand) TrucoStrengthStatsUY(kCards, oCards []Card, envido uint8, isMH
 		totCount += cCount
 	}
 
+	return finalTrucoStrengthStats(rawTrucoStats{
+		TotCount: totCount,
+		TotScore: totScore,
+		WinsPerm: winsPerm,
+		Counts:   counts,
+		MHand:    mHand,
+		Perms:    perms,
+		MEnvido:  mEnvido,
+		EScore:   eScore,
+		ECount:   eCount,
+	})
+}
+
+type rawTrucoStats struct {
+	TotCount int
+	TotScore int
+	WinsPerm []float32
+	Counts   []float32
+	MHand    Hand
+	Perms    []Hand
+	MEnvido  uint8
+	EScore   int
+	ECount   int
+}
+
+// finalTrucoStrengthStats calculates the final Stats from the raw simulation results.
+func finalTrucoStrengthStats(rawStats rawTrucoStats) TrucoStats {
 	var strengthAll float32
-	if totCount > 0 {
-		strengthAll = float32(totScore) / float32(totCount)
-		for i := range winsPerm {
-			strengthsPerm = append(strengthsPerm, winsPerm[i]/float32(totCount))
-			strengthsPermRel = append(strengthsPermRel, winsPerm[i]/float32(counts[i]))
+	var strengthsPerm []float32
+	var strengthsPermRel []float32
+	var strengthsPosition [][]float32
+
+	if rawStats.TotCount > 0 {
+		strengthAll = float32(rawStats.TotScore) / float32(rawStats.TotCount)
+		for i := range rawStats.WinsPerm {
+			strengthsPerm = append(strengthsPerm, rawStats.WinsPerm[i]/float32(rawStats.TotCount))
+			strengthsPermRel = append(strengthsPermRel, rawStats.WinsPerm[i]/rawStats.Counts[i])
 		}
 	} else {
 		strengthAll = 0
@@ -522,12 +414,11 @@ func (mHand Hand) TrucoStrengthStatsUY(kCards, oCards []Card, envido uint8, isMH
 		strengthsPermRel = []float32{0, 0, 0, 0, 0, 0}
 	}
 
-	var pScore float32
 	for pos := range 3 {
 		posScoreArr := make([]float32, 0, 3)
-		for _, mCard := range mHand {
-			pScore = 0
-			for iPerm, perm := range perms {
+		for _, mCard := range rawStats.MHand {
+			var pScore float32
+			for iPerm, perm := range rawStats.Perms {
 				if mCard == perm[pos] {
 					pScore += strengthsPerm[iPerm]
 				}
@@ -537,22 +428,62 @@ func (mHand Hand) TrucoStrengthStatsUY(kCards, oCards []Card, envido uint8, isMH
 		strengthsPosition = append(strengthsPosition, posScoreArr)
 	}
 
-	sMHand := make([]string, 0, 3)
-	for c := range mHand {
-		sMHand = append(sMHand, mHand[c].ToEmoji())
+	sMHand := make([]string, 0, len(rawStats.MHand))
+	for c := range rawStats.MHand {
+		sMHand = append(sMHand, rawStats.MHand[c].ToEmoji())
+	}
+
+	var mEnvidoScore float32
+	if rawStats.ECount > 0 {
+		mEnvidoScore = float32(rawStats.EScore) / float32(rawStats.ECount)
 	}
 
 	return TrucoStats{
 		MHand:            sMHand,
 		StrengthAll:      strengthAll,
-		Count:            totCount,
-		Perms:            perms,
-		WinsPerm:         winsPerm,
+		Count:            rawStats.TotCount,
+		Perms:            rawStats.Perms,
+		WinsPerm:         rawStats.WinsPerm,
 		StrengthPermRel:  strengthsPermRel,
-		StrengthPerm:     strengthsPerm,
+		StrengthPermAbs:  strengthsPerm,
 		StrengthPosition: strengthsPosition,
-		CountPerm:        counts,
-		MEnvido:          mEnvido,
-		MEnvidoScore:     float32(eScore) / float32(eCount),
+		CountPerm:        rawStats.Counts,
+		MEnvido:          rawStats.MEnvido,
+		MEnvidoScore:     mEnvidoScore,
+	}
+}
+
+type TrucoStats struct {
+	MHand            []string    // my hand: input parameter
+	StrengthAll      float32     // overall hand strength: % hands you win
+	Count            int         // amount of hands simulated
+	Perms            []Hand      // permutations of mHand
+	WinsPerm         []float32   // hands you win
+	StrengthPermRel  []float32   // strength: hands you win / hands played with this perm
+	StrengthPermAbs  []float32   // strength: hands you win / hands played in total
+	StrengthPosition [][]float32 //
+	CountPerm        []float32   // amount of hands simulated, by permutations of mHand
+	MEnvido          uint8       // my envido
+	MEnvidoScore     float32     // my envido strength: hands you win / hands played in total
+}
+
+func (stats TrucoStats) PPrint() {
+	if stats.Count == 0 {
+		if len(stats.Perms) == 0 {
+			fmt.Println("Empty stats")
+		} else {
+			for _, hand := range stats.Perms {
+				hand.Println()
+			}
+			fmt.Println("0 permutations simulated")
+			fmt.Println("Hand is probably played sub-optimally")
+		}
+	} else {
+		fmt.Println("Overall Strenght=", stats.StrengthAll)
+		for i, hand := range stats.Perms {
+			hand.Print()
+			fmt.Printf(": strength=%.3f, of=%.0f\n", stats.WinsPerm[i], stats.CountPerm[i])
+		}
+		fmt.Println(stats.Count, "permutations simulated")
 	}
 }

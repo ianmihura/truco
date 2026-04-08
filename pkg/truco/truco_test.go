@@ -10,21 +10,21 @@ func TestTrucoBeats(t *testing.T) {
 	checkTrucoBeats(t, 1, 1, 2, 1) // 2 is dummy for x: any other value
 	checkTrucoBeats(t, 1, 0, 2, 1)
 	checkTrucoBeats(t, 1, -1, 1, 1)
-	checkTrucoBeats(t, 1, -1, -1, -1)
+	checkTrucoBeats(t, 1, -1, -1, 0)
 	checkTrucoBeats(t, 1, -1, 0, 1)
 
-	// -1 -1 x => -1
-	checkTrucoBeats(t, -1, -1, 2, -1)
-	checkTrucoBeats(t, -1, 0, 2, -1)
-	checkTrucoBeats(t, -1, 1, -1, -1)
+	// -1 -1 x => 0
+	checkTrucoBeats(t, -1, -1, 2, 0)
+	checkTrucoBeats(t, -1, 0, 2, 0)
+	checkTrucoBeats(t, -1, 1, -1, 0)
 	checkTrucoBeats(t, -1, 1, 1, 1)
-	checkTrucoBeats(t, -1, 1, 0, -1)
+	checkTrucoBeats(t, -1, 1, 0, 0)
 
 	// 0 1 x => 1
 	checkTrucoBeats(t, 0, 1, 2, 1)
-	checkTrucoBeats(t, 0, -1, 2, -1)
+	checkTrucoBeats(t, 0, -1, 2, 0)
 	checkTrucoBeats(t, 0, 0, 1, 1)
-	checkTrucoBeats(t, 0, 0, -1, -1)
+	checkTrucoBeats(t, 0, 0, -1, 0)
 	checkTrucoBeats(t, 0, 0, 0, 0)
 }
 
@@ -42,7 +42,7 @@ func checkTrucoBeats(t *testing.T, s0, s1, s2, expected int) {
 	setupRound(s1, 1, &mHand, &oHand)
 	setupRound(s2, 2, &mHand, &oHand)
 
-	result := TrucoBeats(mHand, oHand)
+	result := TrucoBeats(mHand, oHand, NO_CARD)
 	if result != expected {
 		t.Errorf("For scores [%d, %d, %d], expected %d, got %d", s0, s1, s2, expected, result)
 	}
@@ -77,19 +77,19 @@ func TestTrucoBeatsUY(t *testing.T) {
 	checkTrucoBeatsUY(t, muestra, 1, 1, 2, 1)
 	checkTrucoBeatsUY(t, muestra, 1, 0, 2, 1)
 	checkTrucoBeatsUY(t, muestra, 1, -1, 1, 1)
-	checkTrucoBeatsUY(t, muestra, 1, -1, -1, -1)
+	checkTrucoBeatsUY(t, muestra, 1, -1, -1, 0)
 	checkTrucoBeatsUY(t, muestra, 1, -1, 0, 1)
 
-	checkTrucoBeatsUY(t, muestra, -1, -1, 2, -1)
-	checkTrucoBeatsUY(t, muestra, -1, 0, 2, -1)
-	checkTrucoBeatsUY(t, muestra, -1, 1, -1, -1)
+	checkTrucoBeatsUY(t, muestra, -1, -1, 2, 0)
+	checkTrucoBeatsUY(t, muestra, -1, 0, 2, 0)
+	checkTrucoBeatsUY(t, muestra, -1, 1, -1, 0)
 	checkTrucoBeatsUY(t, muestra, -1, 1, 1, 1)
-	checkTrucoBeatsUY(t, muestra, -1, 1, 0, -1)
+	checkTrucoBeatsUY(t, muestra, -1, 1, 0, 0)
 
 	checkTrucoBeatsUY(t, muestra, 0, 1, 2, 1)
-	checkTrucoBeatsUY(t, muestra, 0, -1, 2, -1)
+	checkTrucoBeatsUY(t, muestra, 0, -1, 2, 0)
 	checkTrucoBeatsUY(t, muestra, 0, 0, 1, 1)
-	checkTrucoBeatsUY(t, muestra, 0, 0, -1, -1)
+	checkTrucoBeatsUY(t, muestra, 0, 0, -1, 0)
 	checkTrucoBeatsUY(t, muestra, 0, 0, 0, 0)
 
 	// Pieza cases
@@ -100,12 +100,12 @@ func TestTrucoBeatsUY(t *testing.T) {
 	c4 := Card{4, 'c'} // 1
 
 	// mHand wins with piece
-	if res := TrucoBeatsUY(Hand{p2, c4, c4}, Hand{c1, c4, c4}, muestraPiece); res != 1 {
+	if res := TrucoBeats(Hand{p2, c4, c4}, Hand{c1, c4, c4}, muestraPiece); res != 1 {
 		t.Errorf("Piece 2e(19) should beat 1e(14), got %d", res)
 	}
 
 	// oHand wins with piece
-	if res := TrucoBeatsUY(Hand{c1, c4, c4}, Hand{p2, c4, c4}, muestraPiece); res != -1 {
+	if res := TrucoBeats(Hand{c1, c4, c4}, Hand{p2, c4, c4}, muestraPiece); res != 0 {
 		t.Errorf("1e(14) should lose to 2e(19), got %d", res)
 	}
 }
@@ -118,7 +118,7 @@ func checkTrucoBeatsUY(t *testing.T, m Card, s0, s1, s2, expected int) {
 	setupRound(s1, 1, &mHand, &oHand)
 	setupRound(s2, 2, &mHand, &oHand)
 
-	result := TrucoBeatsUY(mHand, oHand, m)
+	result := TrucoBeats(mHand, oHand, m)
 	if result != expected {
 		t.Errorf("UY: For scores [%d, %d, %d], expected %d, got %d", s0, s1, s2, expected, result)
 	}

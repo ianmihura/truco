@@ -51,8 +51,8 @@ func main() {
 		// hand.TrucoStrengthUY()
 		// hand.TrucoStrength()
 		// hand.TrucoStrengthStats([]truco.Card{}, []truco.Card{}, 255, false, true).PPrint()
-		hand.TrucoStrengthStatsUY([]truco.Card{}, []truco.Card{{11, 'e'}}, 200, false, true).PPrint()
+		hand.TrucoStrengthStatsUY([]truco.Card{}, []truco.Card{{N: 11, S: 'e'}}, 200, false, true).PPrint()
 		fmt.Println(time.Now().UnixMilli() - start.UnixMilli())
-
+		fmt.Println()
 	}
 }
