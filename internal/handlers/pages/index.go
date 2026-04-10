@@ -1,7 +1,6 @@
 package pages
 
 import (
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -90,8 +89,6 @@ func (h *HomeHandler) handleCalculate(w http.ResponseWriter, r *http.Request) {
 
 	var stats truco.TrucoStats
 	if mode == "UY" {
-		mHand.Println()
-		fmt.Println(kCards, muestra, kEnvido)
 		stats = mHand.TrucoStrengthStatsUY(kCards, []truco.Card{muestra}, uint8(kEnvido), isMHandFirst, hasStrategy)
 	} else {
 		stats = mHand.TrucoStrengthStats(kCards, []truco.Card{}, uint8(kEnvido), isMHandFirst, hasStrategy)

@@ -14,7 +14,7 @@
             <div class="w-full bg-slate-800 h-2 rounded-full mt-2 overflow-hidden">
                 <div class="bg-blue-400/75 h-full" style='width: {{ printf "%.1f%%" (mul .StrengthAll 100.0) }}'></div>
             </div>
-            <span class="text-slate-400 text-xs tracking-widest mb-6"> de {{ .Count }} partidos
+            <span class="text-slate-400 text-xs tracking-widest mb-6"> de {{ thousand_int .Count }} partidos
                 jugados</span>
             {{ if lt $.MEnvido 200 }}
             <span class="text-slate-400 text-s font-bold tracking-widest mb-1 mt-5">Envido</span>
@@ -42,38 +42,39 @@
         <div class="space-y-3">
             <div class="flex justify-between items-center mb-2">
                 <div class="flex bg-slate-900/50 p-1 rounded-lg border border-slate-700/50">
-                    <button type="button" onclick="switchView('abs')" id="btn-abs" data-tip="Probabilidad de ganar"
+                    <button type="button" onclick="switchView('abs')" id="btn-abs" data-tip="Chance de ganar"
                         class="tooltip view-btn px-3 py-1 rounded-md text-xs tracking-widest transition-all duration-300 bg-blue-600 text-white shadow-lg">
-                        % Absoluto
-                    </button>
-                    <button type="button" onclick="switchView('rel')" id="btn-rel" data-tip="Probabilidad de jugar"
-                        class="tooltip view-btn px-3 py-1 rounded-md text-xs tracking-widest transition-all duration-300 text-slate-400 hover:text-slate-200">
-                        % Relativo
-                    </button>
-                    <button type="button" onclick="switchView('count')" id="btn-count" data-tip="Cuántas veces ganás"
-                        class="tooltip view-btn px-3 py-1 rounded-md text-xs tracking-widest transition-all duration-300 text-slate-400 hover:text-slate-200">
-                        # Ganás
+                        Fuerza
                     </button>
                     <button type="button" onclick="switchView('play')" id="btn-play"
-                        data-tip="Cuántas veces jugás esta mano"
+                        data-tip="Chance de jugar esta mano"
                         class="tooltip view-btn px-3 py-1 rounded-md text-xs tracking-widest transition-all duration-300 text-slate-400 hover:text-slate-200">
-                        # Jugás
+                        Jugabilidad
+                    </button>
+                    <button type="button" onclick="switchView('rel')" id="btn-rel" data-tip="Chance de ganar en total"
+                        class="tooltip view-btn px-3 py-1 rounded-md text-xs tracking-widest transition-all duration-300 text-slate-400 hover:text-slate-200">
+                        Total
                     </button>
                 </div>
             </div>
             {{ range $i, $h := .Perms }}
-            <div
-                class="relative p-3 bg-slate-900/30 rounded-lg border border-slate-700/20 tooltip transition-all hover:bg-slate-900/50 w-full">
+            <div data-tip="De {{ thousand_int $.Count }} jugás {{ thousand_int (mul_i (f32 $.Count) (index $.CountPerm $i)) }} manos,
+            de las que ganás {{ thousand_int (mul_i (f32 $.Count) (index $.StrengthPermRel $i)) }} y
+            perdés {{ thousand_int (mul_i (f32 $.Count) (index $.StrengthPermLoss $i)) }}"
+                class="tooltip relative p-3 bg-slate-900/30 rounded-lg border border-slate-700/20 tooltip transition-all hover:bg-slate-900/50 w-full">
 
-                <div class="absolute right-0 top-0 h-full bg-blue-400/20 transition-all duration-500"
+                <div class="progress-bar-abs absolute right-0 bottom-0 h-1 bg-blue-400/20 transition-all duration-500"
                     style='width: {{ printf "%.1f%%" (mul (index $.StrengthPermAbs $i) 100.0) }}'></div>
 
-                <div class="absolute right-0 bottom-0 w-full h-1 flex flex-row-reverse overflow-hidden">
+                <div class="progress-bar-rel absolute right-0 bottom-0 w-full h-1 flex flex-row-reverse overflow-hidden hidden">
                     <div class="h-full bg-green-400/40 transition-all duration-500"
                         style='width: {{ printf "%.1f%%" (mul (index $.StrengthPermRel $i) 100.0) }}'></div>
                     <div class="h-full bg-red-400/40 transition-all duration-500"
                         style='width: {{ printf "%.1f%%" (mul (index $.StrengthPermLoss $i) 100.0) }}'></div>
                 </div>
+
+                <div class="progress-bar-play absolute right-0 bottom-0 h-1 bg-purple-400/30 transition-all duration-500 hidden"
+                    style='width: {{ printf "%.1f%%" (mul (index $.CountPerm $i) 100.0) }}'></div>
 
                 <div class="relative flex items-center justify-between">
                     <span class="font-mono text-slate-200 whitespace-nowrap emoji-text">{{ range $h }}{{ mapCardEmoji
@@ -90,11 +91,8 @@
                             {{ printf "%.1f%%" (mul (index $.StrengthPermRel $i) 100.0) }}
                         </span>
                     </span>
-                    <span class="view-count hidden text-slate-400 font-mono text-s tracking-tight">
-                        ganás {{( index $.WinsPerm $i )}} de {{ index $.CountPerm $i }}
-                    </span>
                     <span class="view-play hidden text-slate-400 font-mono text-s tracking-tight">
-                        jugás {{( index $.CountPerm $i )}} de {{ $.Count }}
+                        {{ printf "%.1f%%" (mul (index $.CountPerm $i) 100.0) }}
                     </span>
                 </div>
             </div>
@@ -102,7 +100,7 @@
         </div>
     </div>
 
-    <h2 class="text-lg font-bold text-white tracking-widest">Por carta</h2>
+    <!-- <h2 class="text-lg font-bold text-white tracking-widest">Por carta</h2> -->
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="hand-result">
         {{ range $pos, $arr := .StrengthPosition }}
@@ -146,6 +144,11 @@
             counts.forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.view-play').forEach(el => el.classList.add('hidden'));
 
+            // Reset all progress bars
+            document.querySelectorAll('.progress-bar-abs').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.progress-bar-rel').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.progress-bar-play').forEach(el => el.classList.add('hidden'));
+
             // Reset all buttons
             btns.forEach(btn => {
                 btn.classList.remove('bg-blue-600', 'text-white', 'shadow-lg');
@@ -159,12 +162,13 @@
 
             if (view === 'rel') {
                 rels.forEach(el => el.classList.remove('hidden'));
+                document.querySelectorAll('.progress-bar-rel').forEach(el => el.classList.remove('hidden'));
             } else if (view === 'abs') {
                 abss.forEach(el => el.classList.remove('hidden'));
-            } else if (view === 'count') {
-                counts.forEach(el => el.classList.remove('hidden'));
+                document.querySelectorAll('.progress-bar-abs').forEach(el => el.classList.remove('hidden'));
             } else if (view === 'play') {
                 document.querySelectorAll('.view-play').forEach(el => el.classList.remove('hidden'));
+                document.querySelectorAll('.progress-bar-play').forEach(el => el.classList.remove('hidden'));
             }
         }
     </script>

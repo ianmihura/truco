@@ -398,6 +398,7 @@ type rawTrucoStats struct {
 // finalTrucoStrengthStats calculates the final Stats from the raw simulation results.
 func finalTrucoStrengthStats(rawStats rawTrucoStats) TrucoStats {
 	var strengthAll float32
+	var countsPerm []float32
 	var strengthsPermAbs []float32
 	var strengthsPermRel []float32
 	var strengthsPermLoss []float32
@@ -413,6 +414,7 @@ func finalTrucoStrengthStats(rawStats rawTrucoStats) TrucoStats {
 			}
 			strengthsPermRel = append(strengthsPermRel, rawStats.WinsPerm[i]/float32(rawStats.TotCount))
 			strengthsPermLoss = append(strengthsPermLoss, (rawStats.Counts[i]-rawStats.WinsPerm[i])/float32(rawStats.TotCount))
+			countsPerm = append(countsPerm, rawStats.Counts[i]/float32(rawStats.TotCount))
 		}
 	} else {
 		strengthAll = 0
@@ -451,7 +453,7 @@ func finalTrucoStrengthStats(rawStats rawTrucoStats) TrucoStats {
 		Count:            rawStats.TotCount,
 		Perms:            rawStats.Perms,
 		WinsPerm:         rawStats.WinsPerm,
-		CountPerm:        rawStats.Counts,
+		CountPerm:        countsPerm,
 		StrengthPermRel:  strengthsPermRel,
 		StrengthPermAbs:  strengthsPermAbs,
 		StrengthPermLoss: strengthsPermLoss,
@@ -467,7 +469,7 @@ type TrucoStats struct {
 	Count            int         // amount of hands simulated
 	Perms            []Hand      // permutations of mHand
 	WinsPerm         []float32   // raw wins of each permutation
-	CountPerm        []float32   // amount of hands simulated, by permutations of mHand
+	CountPerm        []float32   // % hands you play, by permutations of mHand
 	StrengthPermRel  []float32   // strength: hands you win / hands played with this perm
 	StrengthPermAbs  []float32   // strength: hands you win / hands played in total
 	StrengthPermLoss []float32   //

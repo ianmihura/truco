@@ -4,9 +4,7 @@
 3. Show range of other players' card given limited info
     - Individual cards (matrix)
 4. Advances:
-    - UY
     - Num players (4 players, 6 players)
-        - Envido (score or partial score)
     - Given your envido, whats the range of hands you could have
     - what card reveals less, or contradictory, info (eg. 33 envido with 2m + 3, showing any 7 will bluff)
 6. Host:
@@ -14,9 +12,9 @@
     - https://railway.com/pricing
     - https://www.alwaysdata.com/en/offers/
 7. Nice to haves
+    - fuerza de cartas fuera de orden
     - piezas replace emoji
     - click preview will remove it
-    - hold-click text for mobile devices  (muestra)
     - Command palette
     - Hotkeys to choose cards
     - explain
@@ -25,6 +23,9 @@
         - 1e 7c 7b
             kEnvido = 33
             hasStrategy is key to understand the results
+    - is reasonably played
+        confidence score: lie by giving confidence to the other player
+8. landing page?
 
 ### TODO UI:
 - select past turns:
@@ -37,20 +38,14 @@
     on-request past action: recreate the match with the past actions
     frontend: on click any action in a tracker box, delete all next (if any) and concat incoming
     """
-- nicer styles
-- choose mCards and kCards out of a 4x10 matrix
-    then also choose an envido
 - on click
     ### finish identifying your hand:
     - choose the third card
     - choose envido
     ### stats:
     - % chance you can get this hand
-    - strength (truco and envido)
-    - % hands you can win (similar to strength)
 - main matrix: relevant info
     - que cartas puedo tener - my range
-    - que chance hay que mis cartas sean las mejores de la mesa - strength
     - que cartas puede tener el otro
 - translate error messages from fsm
     - toast
@@ -73,9 +68,6 @@
 - Ideal features: How to play: given your hand (and known cards)
     - what's the best card to play
     - what's the chance you win (ask for truco)
-
-### Uruguay
-- Make sure to reuse generic functions
 
 ### Next steps
 - Track progress of a hand
