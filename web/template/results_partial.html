@@ -12,7 +12,7 @@
             <span class="text-slate-400 text-s font-bold tracking-widest mb-1">Truco</span>
             <span class="text-4xl font-mono font-black text-white">{{ printf "%.1f%%" (mul .StrengthAll 100.0) }}</span>
             <div class="w-full bg-slate-800 h-2 rounded-full mt-2 overflow-hidden">
-                <div class="bg-blue-400/50 h-full" style='width: {{ printf "%.1f%%" (mul .StrengthAll 100.0) }}'></div>
+                <div class="bg-blue-400/75 h-full" style='width: {{ printf "%.1f%%" (mul .StrengthAll 100.0) }}'></div>
             </div>
             <span class="text-slate-400 text-xs tracking-widest mb-6"> de {{ thousand_int .Count }} partidos
                 jugados</span>
@@ -24,7 +24,7 @@
                 <span class="text-slate-400 text-xs tracking-widest mb-1 ml-2">con envido de {{ $.MEnvido }}</span>
             </div>
             <div class="w-full bg-slate-800 h-2 rounded-full mt-2 overflow-hidden">
-                <div class="bg-blue-400/50 h-full" style='width: {{ printf "%.1f%%" (mul .MEnvidoScore 100.0) }}'>
+                <div class="bg-blue-400/75 h-full" style='width: {{ printf "%.1f%%" (mul .MEnvidoScore 100.0) }}'>
                 </div>
             </div>
             {{ else }}
@@ -33,7 +33,7 @@
                 <span class="text-4xl font-mono font-black text-white"> {{ sub $.MEnvido 200 }} puntos</span>
             </div>
             <div class="w-full bg-slate-800 h-2 rounded-full mt-2 overflow-hidden">
-                <div class="bg-blue-400/50 h-full" style='width: {{ printf "%.1f%%" (mul .MEnvidoScore 100.0) }}'>
+                <div class="bg-blue-400/75 h-full" style='width: {{ printf "%.1f%%" (mul .MEnvidoScore 100.0) }}'>
                 </div>
             </div>
             {{ end }}
@@ -63,17 +63,17 @@
             perdés {{ thousand_int (mul_i (f32 $.Count) (index $.StrengthPermLoss $i)) }}"
                 class="tooltip relative p-3 bg-slate-900/30 rounded-lg border border-slate-700/20 tooltip transition-all hover:bg-slate-900/50 w-full">
 
-                <div class="progress-bar-abs absolute left-0 bottom-0 h-1 bg-blue-400/50 transition-all duration-500"
+                <div class="progress-bar-abs absolute left-0 bottom-0 h-1 bg-blue-400/75 transition-all duration-500"
                     style='width: {{ printf "%.1f%%" (mul (index $.StrengthPermAbs $i) 100.0) }}'></div>
 
                 <div class="progress-bar-rel absolute left-0 bottom-0 w-full h-1 flex hidden">
-                    <div class="h-full bg-green-400/50 transition-all duration-500"
+                    <div class="h-full bg-green-400/75 transition-all duration-500"
                         style='width: {{ printf "%.1f%%" (mul (index $.StrengthPermRel $i) 100.0) }}'></div>
-                    <div class="h-full bg-red-400/50 transition-all duration-500"
+                    <div class="h-full bg-red-400/75 transition-all duration-500"
                         style='width: {{ printf "%.1f%%" (mul (index $.StrengthPermLoss $i) 100.0) }}'></div>
                 </div>
 
-                <div class="progress-bar-play absolute left-0 bottom-0 h-1 bg-yellow-400/50 transition-all duration-500 hidden"
+                <div class="progress-bar-play absolute left-0 bottom-0 h-1 bg-yellow-400/75 transition-all duration-500 hidden"
                     style='width: {{ printf "%.1f%%" (mul (index $.CountPerm $i) 100.0) }}'></div>
 
                 <div class="relative flex items-center justify-between">
@@ -117,7 +117,7 @@
                         <span class="text-xl font-mono text-white">{{ printf "%.1f%%" (mul $strength 100.0) }}</span>
                     </div>
                     <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
-                        <div class="bg-blue-400/50 h-full transition-all duration-500"
+                        <div class="bg-blue-400/75 h-full transition-all duration-500"
                             style='width: {{ printf "%.1f%%" (mul $strength 100.0) }}'></div>
                     </div>
                 </div>
